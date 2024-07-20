@@ -1,0 +1,152 @@
+{
+  "Namespace": "Tap.Settings.Service",
+  "FrameworkUsings": [ "Tap.Service", "Tap.ServiceModel" ],
+  "Services": [
+    {
+      "Folder": "Db",
+      "Namespace": ".Db",
+      "Usings": [ "Tap.Data", "Tap.Logging", "Tap.Caching", "Tap.Settings" ],
+      "Service": "TapDbSettings",
+      "ParentConstructors": [
+        [ "TapDbSettingsBaseConfig" ],
+        [ "TapDbSettingsBaseConfig", "ILogger" ],
+        [ "TapDbSettingsBaseConfig", "ILogger", "IDb" ],
+        [ "TapDbSettingsBaseConfig", "ILogger", "IDb", "ICacheManager" ],
+        [ "TapDbSettingsBaseConfig", "ILogger", "IDb", "ICacheManager", "ISettingService" ]
+      ],
+      "Constructors": [
+        {
+          "config": ":TapDbSettingsBaseConfig",
+          "logger": "ILogger",
+          "dbContext": "IDb",
+          "cache": "ICacheManager",
+          "settings": "ISettingService"
+        }
+      ],
+      "Concretes": [
+        {
+          "Suffix": "Default",
+          "ActionSuffix": "Default",
+          "Partial": true,
+          "Default": true
+        }
+      ],
+      "ParentService": "TapBaseActionBasedService<TapDbSettingsBaseConfig>",
+      "ParentAction": "TapBaseServiceAction",
+      "ParentConfig": "TapBaseConfig",
+      "PartialRegistration": true,
+      "PartialConfig": true,
+      "PartialServiceBase": true,
+      "PartialInterface": true,
+      "Actions": [
+        {
+          "Name": "Add",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Result": "Tap.Data.CommandParameter",
+            "Message": "Tap.Data.CommandParameter",
+            "AppId": "int",
+            "Key": "string",
+            "Value": "string"
+          },
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "UpdateByPK",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Result": "Tap.Data.CommandParameter",
+            "Message": "Tap.Data.CommandParameter",
+            "Id": "int",
+            "Value": "string"
+          },
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "UpdateByKey",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Result": "Tap.Data.CommandParameter",
+            "Message": "Tap.Data.CommandParameter",
+            "Key": "string",
+            "Value": "string"
+          },
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "DeleteByPK",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Result": "Tap.Data.CommandParameter",
+            "Message": "Tap.Data.CommandParameter",
+            "Id": "int"
+          },
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "ClearAll",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "PartialBase": false,
+          "PartialRequest": false,
+          "PartialResponse": false
+        },
+        {
+          "Name": "DeleteByKey",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Result": "Tap.Data.CommandParameter",
+            "Message": "Tap.Data.CommandParameter",
+            "Key": "string"
+          },
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "GetPage",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestProps": {
+            "Key": "string",
+            "Value": "string",
+            "PageNo": "int",
+            "PageSize": "int",
+            "RecordCount": "Tap.Data.CommandParameter",
+            "PageCount": "Tap.Data.CommandParameter",
+            "OrderBy": "string",
+            "OrderDir": "string"
+          },
+          "ResponseType": "ServicePagingResponse",
+          "ResponseData": "Setting",
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "GetByPK",
+          "Usings": [ "Tap.Settings.Service.Models" ],
+          "Concretes": [ "Default" ],
+          "RequestType": "ServiceRequestByPK<int>",
+          "ResponseData": "Setting",
+          "PartialBase": false,
+          "PartialRequest": false,
+          "PartialResponse": false
+        }
+      ]
+    }
+  ]
+}

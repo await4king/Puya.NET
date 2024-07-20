@@ -1,0 +1,88 @@
+{
+  "Namespace": "Tap.Logging.Services",
+  "Services": [
+    {
+      "Folder": "LogManager",
+      "Namespace": ".LogManager",
+      "Service": "TapLogManager",
+      "Usings": [ "Tap.Data" ],
+      "PartialConfig": true,
+      "PartialServiceBase": false,
+      "ParentConstructors": [
+        [ "TapLogManagerBaseConfig" ]
+      ],
+      "Concretes": [
+        {
+          "Suffix": "Sql",
+          "ActionSuffix": "Sql",
+          "Partial": true,
+          "Default": true,
+          "Constructors": [
+            {
+              "config": "TapLogManagerSqlConfig:TapLogManagerBaseConfig",
+              "db": "IDb"
+            }
+          ]
+        }
+      ],
+      "Actions": [
+        {
+          "Name": "Clear",
+          "Usings": [],
+          "Concretes": [ "Sql" ],
+          "PartialBase": false,
+          "PartialRequest": false,
+          "PartialResponse": false
+        },
+        {
+          "Name": "GetByPK",
+          "Usings": [ "Tap.Logging.Models" ],
+          "Concretes": [ "Sql" ],
+          "RequestType": "ServiceRequestByPK<int>",
+          "ResponseData": "Log",
+          "PartialBase": false,
+          "PartialRequest": false,
+          "PartialResponse": false
+        },
+        {
+          "Name": "GetPage",
+          "Usings": [ "Tap.Logging.Models" ],
+          "Concretes": [ "Sql" ],
+          "RequestProps": {
+            "Page": "int",
+            "PageSize": "int",
+            "RecordCount": "Tap.Data.CommandParameter",
+            "PageCount": "Tap.Data.CommandParameter",
+            "AppId": "int",
+            "LogType": "LogType",
+            "OperationResult": "OperationResult",
+            "Category": "string",
+            "MemberName": "string",
+            "User": "string",
+            "Ip": "string",
+            "Message": "string",
+            "Data": "string",
+            "FromDate": "DateTime?",
+            "ToDate": "DateTime?",
+            "OrderBy": "string",
+            "OrderDir": "string"
+          },
+          "ResponseType": "ServicePagingResponse",
+          "ResponseData": "Log",
+          "PartialBase": false,
+          "PartialRequest": true,
+          "PartialResponse": false
+        },
+        {
+          "Name": "DeleteByPK",
+          "Usings": [],
+          "Concretes": [ "Sql" ],
+          "RequestType": "ServiceRequestByPK<int>",
+          "PartialBase": false,
+          "PartialRequest": false,
+          "PartialResponse": false
+        }
+      ]
+    }
+  ]
+}

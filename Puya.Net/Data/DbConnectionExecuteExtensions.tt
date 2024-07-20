@@ -1,0 +1,150 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+	var execTypes		= new string[] { "", "Async" };
+	var execKinds		= new string[] { "Command", "Sql" };
+	var transformTypes	= new string[] { ", Func<IDataReader, T> fn", "" };
+    var behaviors       = new string[] { ", CommandBehavior behavior", ""};
+#>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Puya.Data
+{
+    public static partial class DbConnectionExtensions
+    {
+<#
+foreach (var execType in execTypes)
+{
+	foreach (var execKind in execKinds)
+	{
+		foreach (var transformType in transformTypes)
+		{
+            var itemType = transformType.StartsWith(", Type") ? "object" : "T";
+            var genericArgType = transformType.StartsWith(", Type") ? "" : "<T>";
+            var textParamName = execKind == "Command" ? "sproc": "query";
+            var cancellationParam = execType == "Async" ? ", CancellationToken cancellation": (transformType.StartsWith(", Type") ? "" : " = null");
+            var readerResultType = execType == "Async" ? $"async Task<IList<{itemType}>>": $"IList<{itemType}>";
+            var readerResultType2 = execType == "Async" ? $"Task<IList<{itemType}>>": $"IList<{itemType}>";
+            var singleResultType = execType == "Async" ? $"async Task<{itemType}>": itemType;
+            var singleResultType2 = execType == "Async" ? $"Task<{itemType}>": itemType;
+            var nonQueryResultType = execType == "Async" ? $"async Task<int>": "int";
+            var commandType = execKind == "Command" ? "CommandType.StoredProcedure": "CommandType.Text";
+            var fnOrtypeArgs = string.IsNullOrEmpty(transformType) ? "": (transformType.StartsWith(", Func") ? ", fn" : ", type");
+            var cancellationArg = execType == "Async" ? ", cancellation": "";
+            var awaitKey = execType == "Async" ? "await ": "";
+
+            foreach (var behavior in behaviors)
+            {
+                var behaviorArg = string.IsNullOrEmpty(behavior) ? "": ", behavior";
+#>
+		public static <#=readerResultType#> ExecuteReader<#=execKind#><#=execType#><#=genericArgType#>(this DbConnection con, string <#=textParamName#><#=behavior#><#=transformType#>, object parameters<#=cancellationParam#>)
+        {
+            if (con == null)
+	        {
+		        throw new ConnectionNullException();
+	        }
+
+            var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters);
+            var result = <#=awaitKey#>DbCommandExtensions.ExecuteReader<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=cancellationArg#>);
+
+            cmd.ApplyOutputs(parameters);
+                
+            return result;
+        }
+        public static <#=singleResultType#> ExecuteSingle<#=execKind#><#=execType#><#=genericArgType#>(this DbConnection con, string <#=textParamName#><#=behavior#><#=transformType#>, object parameters<#=cancellationParam#>)
+        {
+            if (con == null)
+	        {
+		        throw new ConnectionNullException();
+	        }
+
+            var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters);
+            var result = <#=awaitKey#>DbCommandExtensions.ExecuteSingle<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=cancellationArg#>);
+
+            cmd.ApplyOutputs(parameters);
+                
+            return result;
+        }
+<#			    if (execType == "Async")
+			    { #>
+		public static <#=readerResultType2#> ExecuteReader<#=execKind#>Async<#=genericArgType#>(this DbConnection con, string <#=textParamName#><#=behavior#><#=transformType#>, object parameters = null)
+        {
+            return ExecuteReader<#=execKind#>Async<#=genericArgType#>(con, <#=textParamName#><#=behaviorArg#><#=fnOrtypeArgs#>, parameters, CancellationToken.None);
+        }
+        public static <#=singleResultType2#> ExecuteSingle<#=execKind#>Async<#=genericArgType#>(this DbConnection con, string <#=textParamName#><#=behavior#><#=transformType#>, object parameters = null)
+        {
+            return ExecuteSingle<#=execKind#>Async<#=genericArgType#>(con, <#=textParamName#><#=behaviorArg#><#=fnOrtypeArgs#>, parameters, CancellationToken.None);
+        }
+<#			    }
+			}
+		}
+	}
+}
+
+foreach (var execType in execTypes)
+{
+	foreach (var execKind in execKinds)
+	{
+        var textParamName = execKind == "Command" ? "sproc": "query";
+        var cancellationParam = execType == "Async" ? ", CancellationToken cancellation": " = null";
+        var nonQueryResultType = execType == "Async" ? $"async Task<int>": "int";
+        var commandType = execKind == "Command" ? "CommandType.StoredProcedure": "CommandType.Text";
+        var cancellationArg = execType == "Async" ? ", cancellation": "";
+        var awaitKey = execType == "Async" ? "await ": "";
+#>
+        public static <#=nonQueryResultType#> ExecuteNonQuery<#=execKind#><#=execType#>(this DbConnection con, string <#=textParamName#>, object parameters<#=cancellationParam#>)
+        {
+            if (con == null)
+	        {
+		        throw new ConnectionNullException();
+	        }
+
+            var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters);
+            var obj = <#=awaitKey#>DbCommandExtensions.Execute<#=execType#>(cmd, false<#=cancellationArg#>);
+            var result = (int)System.Convert.ChangeType(obj, typeof(System.Int32));
+
+            cmd.ApplyOutputs(parameters);
+                
+			return result;
+        }
+		public static <#=(execType == "Async" ? "async Task<object>": "object")#> ExecuteScaler<#=execKind#><#=execType#>(this DbConnection con, string <#=textParamName#>, object parameters<#=cancellationParam#>)
+        {
+            if (con == null)
+	        {
+		        throw new ConnectionNullException();
+	        }
+
+            var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters);
+            var result = <#=(execType == "Async" ? "await ": "")#>cmd.Execute<#=execType#>(true<#=(execType == "Async" ? ", cancellation": "")#>);
+
+            cmd.ApplyOutputs(parameters);
+
+            return result;
+        }
+<#		if (execType == "Async")
+		{ #>
+		public static Task<int> ExecuteNonQuery<#=execKind#>Async(this DbConnection con, string <#=textParamName#>, object parameters = null)
+        {
+            return ExecuteNonQuery<#=execKind#>Async(con, <#=textParamName#>, parameters, CancellationToken.None);
+        }
+		public static Task<object> ExecuteScaler<#=execKind#>Async(this DbConnection con, string <#=textParamName#>, object parameters = null)
+        {
+            return ExecuteScaler<#=execKind#>Async(con, <#=textParamName#>, parameters, CancellationToken.None);
+        }
+<#      }
+	}
+}
+#>
+	}
+}

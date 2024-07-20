@@ -1,0 +1,136 @@
+﻿using Tap.Service;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+@foreach (var _using in Model.Usings)
+{
+<text>using @(_using);</text>
+}
+
+namespace @Model.Namespace
+{
+	public partial class @(Model.Service + Model.Suffix) : @(Model.Service)Base
+    {
+	public @(Model.Service + Model.Suffix)Config StrongConfig
+        {
+            get { return Config as @(Model.Service + Model.Suffix)Config; }
+        }
+@foreach (var action in Model.Actions)
+{
+	if (!string.IsNullOrEmpty(action.Name))
+	{
+        <text>public override @(Model.Service + action.Name)BaseAction @action.Name { get; protected set; }</text>
+	}
+}
+@if (Model.Constructors == null || Model.Constructors.Count == 0)
+{
+	@GenerateConstructor(Model.ParentConstructors, null);
+}
+else
+{
+	foreach (var dependencies in Model.Constructors)
+	{
+        @GenerateConstructor(Model.ParentConstructors, dependencies);
+	}
+}        
+    }
+}
+
+@helper GenerateConstructor(List<List<string>> parentConstructors, IDictionary<string, string> dependencies)
+{
+	var dependencyList = "";
+	var dependencyArgs = "";
+	var parent = "";
+
+	if (dependencies != null && dependencies.Count > 0)
+	{
+		foreach (var dependency in dependencies)
+		{
+            var colonIndex = dependency.Value.IndexOf(':');
+            var dependencyType = "";
+
+            if (colonIndex == -1)
+            {
+                dependencyType = dependency.Value;
+            }
+            else
+            {
+                dependencyType = dependency.Value.Substring(0, colonIndex);
+            }
+
+			dependencyList += (string.IsNullOrEmpty(dependencyList) ? "" : ", ") + dependencyType + " " + dependency.Key;
+			dependencyArgs += (string.IsNullOrEmpty(dependencyArgs) ? "" : ", ") + dependency.Key;
+		}
+		
+		foreach (var _ctor in parentConstructors.OrderByDescending(ctor => ctor.Count))
+        {
+            var found = true;
+
+            parent = "";
+			
+            foreach (var param in _ctor)
+            {
+                var dependencyFound = false;
+                var dependencyIndex = -1;
+
+                for (var i = 0; i < dependencies.Count; i++)
+                {
+                    var dependencyValue = dependencies.ElementAt(i).Value;
+                    var colonIndex = dependencyValue.IndexOf(':');
+                    var dependencyType = "";
+                    var dependencyParentType = "";
+
+                    if (colonIndex == -1)
+                    {
+                        dependencyType = dependencyValue;
+                    }
+                    else
+                    {
+                        dependencyType = dependencyValue.Substring(0, colonIndex);
+                        dependencyParentType = dependencyValue.Substring(colonIndex + 1);
+                    }
+
+                    if (dependencyType == param || dependencyParentType == param)
+                    {
+                        dependencyFound = true;
+                        dependencyIndex = i;
+                        break;
+                    }
+                }
+
+                if (dependencyFound)
+                {
+                    parent += (string.IsNullOrEmpty(parent) ? "": ",") + " " + dependencies.ElementAt(dependencyIndex).Key;
+                }
+                else
+                {
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found)
+            {
+                parent = ": base(" + parent.Trim() + ")";
+                break;
+            }
+        }
+	}
+	
+		<text>public @(Model.Service + Model.Suffix)(@dependencyList) @parent</text>
+		<text>{</text>
+foreach (var action in Model.Actions)
+{
+	if (!string.IsNullOrEmpty(action.Name))
+	{
+        <text>	@action.Name = new @(Model.Service + Model.ActionSuffix + action.Name)Action(this);</text>
+        <text>	Actions.Add("@action.Name", @action.Name);</text>
+	}
+}
+		<text>	Init(@dependencyArgs);</text>
+        <text>}</text>
+		<text>partial void Init(@dependencyList);</text>
+}
