@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.Net", "Puya.Net\Puya.Net.csproj", "{ECDC1E22-4D1C-4B3A-80BF-08793E77CF48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puya.Net", "Puya.Net\Puya.Net.csproj", "{ECDC1E22-4D1C-4B3A-80BF-08793E77CF48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.Net.Tests", "Puya.Net.Tests\Puya.Net.Tests.csproj", "{B42AC285-F00C-4A26-B01F-DBDD7BC5BDBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puya.Net.Tests", "Puya.Net.Tests\Puya.Net.Tests.csproj", "{B42AC285-F00C-4A26-B01F-DBDD7BC5BDBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.Core", "Puya.Core\Puya.Core.csproj", "{061B5CE9-93B0-4EB8-A8FA-28B0D7D18D52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B42AC285-F00C-4A26-B01F-DBDD7BC5BDBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B42AC285-F00C-4A26-B01F-DBDD7BC5BDBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B42AC285-F00C-4A26-B01F-DBDD7BC5BDBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061B5CE9-93B0-4EB8-A8FA-28B0D7D18D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061B5CE9-93B0-4EB8-A8FA-28B0D7D18D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061B5CE9-93B0-4EB8-A8FA-28B0D7D18D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061B5CE9-93B0-4EB8-A8FA-28B0D7D18D52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

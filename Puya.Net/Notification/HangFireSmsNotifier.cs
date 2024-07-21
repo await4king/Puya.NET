@@ -3,12 +3,12 @@ using System;
 
 namespace Puya.Notification
 {
-    public class DefaultSmsNotifier : ISmsNotifier
+    public class HangFireSmsNotifier : ISmsNotifier
     {
         private readonly SmsSender sms;
         private readonly IBackgroundJobClient backgroundJobClient;
 
-        public DefaultSmsNotifier(SmsSender sms, IBackgroundJobClient backgroundJobClient)
+        public HangFireSmsNotifier(SmsSender sms, IBackgroundJobClient backgroundJobClient)
         {
             this.sms = sms;
             this.backgroundJobClient = backgroundJobClient;

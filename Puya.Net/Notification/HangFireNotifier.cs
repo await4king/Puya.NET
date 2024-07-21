@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Puya.Notification
 {
-    public class DefaultNotifier : INotifier
+    public class HangFireNotifier : INotifier
     {
         private readonly IBackgroundJobClient backgroundJobClient;
-        public DefaultNotifier(IBackgroundJobClient backgroundJobClient)
+        public HangFireNotifier(IBackgroundJobClient backgroundJobClient)
         {
             this.backgroundJobClient = backgroundJobClient;
         }

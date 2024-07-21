@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>Mansoor Omrani</Authors>
+		<Company>PuyaSoft</Company>
+		<Product>Puya.Core</Product>
+		<Version>1.0.0</Version>
+		<WebPage>https://puyasoft.com</WebPage>
+		<PackageProjectUrl>https://github.com/puyacodes/Puya.NET</PackageProjectUrl>
+		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\snk.pfx</AssemblyOriginatorKeyFile>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Nullable>disable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Copyright>2018-2024</Copyright>
+		<RepositoryType>https://github.com/puyacodes/Puya.NET</RepositoryType>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/puyacodes/Puya.NET</RepositoryUrl>
+		<PackageTags>Puyasoft, Tap, "Tarh Andishan Puya", Puya.Core, .Net</PackageTags>
+		<PackageReleaseNotes>This is the first public release of Puya.Core package.</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Update="Conversion\SafeClrTo.cs">
+			<DependentUpon>SafeClrTo.tt</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Data\DbConnectionExecuteExtensions.cs">
+			<DependentUpon>DbConnectionExecuteExtensions.tt</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Data\DbExecuteExtensions.cs">
+			<DependentUpon>DbExecuteExtensions.tt</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Data\FakeDbCommand.cs">
+			<SubType>Component</SubType>
+		</Compile>
+		<Compile Update="Data\FakeDbConnection.cs">
+			<SubType>Component</SubType>
+		</Compile>
+		<Compile Update="Extensions\ToEnum.cs">
+			<DependentUpon>ToEnum.tt</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Conversion\SafeClrTo.tt">
+			<LastGenOutput>SafeClrTo.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Data\DbConnectionExecuteExtensions.tt">
+			<LastGenOutput>DbConnectionExecuteExtensions.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Data\DbExecuteExtensions.tt">
+			<LastGenOutput>DbExecuteExtensions.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Extensions\ToEnum.tt">
+			<LastGenOutput>ToEnum.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Localization\Localization\cdt\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+		<None Include=".\README.md" Pack="true" PackagePath="README.md" />
+	</ItemGroup>
+</Project>
