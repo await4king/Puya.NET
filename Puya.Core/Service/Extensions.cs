@@ -89,6 +89,46 @@ namespace Puya.Service
 
         //    return action.RunAsync(req, cancellation);
         //}
+        public static void Finalize(this ServiceResponse response)
+        {
+            if (response.Message.IsJson())
+            {
+                if (response.Message.IsJsonArray())
+                {
+                    var messages = response.Message.SafeDeserialize<List<ServiceResponse>>();
+
+                    if (messages?.Count > 0)
+                    {
+                        foreach (var msg in messages)
+                        {
+                            response.InnerResponses.Add(msg);
+                        }
+                    }
+                }
+                else if (response.Message.IsJsonObject())
+                {
+                    var message = response.Message.SafeDeserialize<ServiceResponse>();
+
+                    if (message != null)
+                    {
+                        if (!string.IsNullOrEmpty(message.MessageKey))
+                        {
+                            response.MessageKey = message.MessageKey;
+                        }
+                        if (!string.IsNullOrEmpty(message.MessageKeyParam))
+                        {
+                            response.MessageKeyParam = message.MessageKeyParam;
+                        }
+                        if (message.MessageArgs != null)
+                        {
+                            response.MessageArgs = message.MessageArgs;
+                        }
+                    }
+                }
+
+                response.Message = "";
+            }
+        }
         #region Is
         public static bool HasStatus(this ServiceResponse sr, string status)
         {
