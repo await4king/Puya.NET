@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Puya.Collections;
+using Puya.Conversion;
+using Puya.Data;
 using Puya.Reflection;
 
 namespace Puya.Extensions
@@ -98,6 +102,76 @@ namespace Puya.Extensions
                 case 243: result = SqlDbType.Structured; break;        // User-Defined Table Type
 
                 default: throw new ArgumentException("Invalid Sql Server data type");
+            }
+
+            return result;
+        }
+        public static bool GetSprocArgs(this IDb db, string sproc, object @params, DynamicModel customParams, out DynamicModel args)
+        {
+            var result = false;
+            var _args = new DynamicModel();
+            var props = @params?.GetType()
+                                        .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                                        .Where(x => x.CanRead)
+                                        .ToList() ?? new List<PropertyInfo>();
+            var _params = @params as DynamicModel;
+
+            try
+            {
+                db.ExecuteReaderSql(@"
+select
+	name
+from sys.parameters
+where object_id = OBJECT_ID(@sp)
+order by parameter_id", reader =>
+                {
+                    var paramName = SafeClrConvert.ToString(reader[0]);
+
+                    if (customParams.ContainsKey(paramName))
+                    {
+                        _args.Add(paramName, customParams[paramName]);
+                    }
+                    else
+                    if (paramName[0] == '@' && customParams.ContainsKey(paramName.Substring(1)))
+                    {
+                        _args.Add(paramName, customParams[paramName.Substring(1)]);
+                    }
+                    else
+                    if (_params != null && _params.ContainsKey(paramName))
+                    {
+                        _args.Add(paramName, _params[paramName]);
+                    }
+                    else
+                    if (_params != null && paramName[0] == '@' && _params.ContainsKey(paramName.Substring(1)))
+                    {
+                        _args.Add(paramName, _params[paramName.Substring(1)]);
+                    }
+                    else
+                    {
+                        var prop = props.FirstOrDefault(x => string.Equals(paramName, "@" + x.Name, StringComparison.OrdinalIgnoreCase));
+
+                        if (prop != null)
+                        {
+                            _args.Add(paramName, prop.GetValue(@params));
+                        }
+                        else
+                        {
+                            _args.Add(paramName, null);
+                        }
+                    }
+
+                    return (object)null;
+                }, new { sp = sproc });
+
+                args = _args;
+
+                result = true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString("\n"));
+
+                args = null;
             }
 
             return result;
