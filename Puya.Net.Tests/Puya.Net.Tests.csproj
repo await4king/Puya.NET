@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Puya.Net\Puya.Net.csproj" />
+    <ProjectReference Include="..\Puya.Core\Puya.Core.csproj" />
   </ItemGroup>
 
 </Project>
