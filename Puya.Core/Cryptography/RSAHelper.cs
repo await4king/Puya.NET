@@ -7,7 +7,7 @@ namespace Puya.Core.Cryptography
         public RSAParameters? PrivateKey { get; set; }
         public RSAParameters? PublicKey { get; set; }
 
-        public RSAHelper(RSAParameters privateKey, RSAParameters publicKey)
+        public RSAHelper(RSAParameters? privateKey, RSAParameters? publicKey)
         {
             this.PrivateKey = privateKey;
             this.PublicKey = publicKey;
