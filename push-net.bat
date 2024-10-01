@@ -1,1 +1,1 @@
-nuget.exe push nuget/Puya.Net.2.5.0.nupkg -Source http://192.168.10.110:8624/nuget/private-nuget/v3/index.json -SkipDuplicate -ApiKey ac5f8843586d8c24c9d4943930a3da6382e700b0
+nuget.exe push nuget/Puya.Net.2.5.1.nupkg -Source http://192.168.10.110:8624/nuget/private-nuget/v3/index.json -SkipDuplicate -ApiKey ac5f8843586d8c24c9d4943930a3da6382e700b0
