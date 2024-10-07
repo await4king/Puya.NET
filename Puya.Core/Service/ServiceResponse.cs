@@ -81,7 +81,12 @@ namespace Puya.Service
             this.Date = response.Date;
             this.Subject = response.Subject;
             this.Success = response.Success;
-            this.MessageKey = response.MessageKey;
+
+            if (!string.IsNullOrEmpty(response.MessageKey) || string.IsNullOrEmpty(this.MessageKey))
+            {
+                this.MessageKey = response.MessageKey;
+            }
+
             this.MessageKeyParam = response.MessageKeyParam;
             this.Status = response.Status;
             this.Info = response.Info;
