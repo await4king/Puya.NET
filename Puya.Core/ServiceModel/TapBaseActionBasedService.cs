@@ -11,7 +11,7 @@ using Puya.Translation;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseActionBasedService<TConfig> : BaseActionBasedService<TConfig>
+    public abstract class TapBaseActionBasedService<TConfig> : BaseActionBasedService<TConfig>, IBaseService
         where TConfig : TapBaseConfig, new()
     {
         #region Properties
@@ -148,93 +148,6 @@ namespace Puya.ServiceModel
             LogProvider = logProvider;
             Debugger = debugger;
         }
-        #region Logging
-        public void Log(string message,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Info(Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Debug(string message,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Debug(Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Warn(string message,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Warn(Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Message(string message,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Message(Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Trace(string message,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Trace(Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Error(string message,
-                        Exception e,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Error(Name, message, e, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        public void Error(Exception e,
-                        object data = null,
-                        LogSource source = LogSource.App,
-                        [CallerMemberName] string memberName = "",
-                        [CallerFilePath] string sourceFilePath = "",
-                        [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (Debugger.IsDebugging)
-            {
-                LogProvider?.Error(Name, string.Empty, e, data, source, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-        #endregion
         #endregion
     }
     public abstract class TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse> : ServiceAction<TBaseService, TConfig, TRequest, TResponse>

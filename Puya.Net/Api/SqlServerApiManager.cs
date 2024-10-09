@@ -14,12 +14,13 @@ using Puya.Extensions;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Settings;
+using Puya.Debugging;
 
 namespace Puya.Api
 {
     public class SqlServerApiManager : ApiManagerBase
     {
-        public SqlServerApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings) : base(db, logger, cache, settings)
+        public SqlServerApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
         { }
         private string apiTableName;
         public string ApiTableName

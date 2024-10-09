@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Puya.Caching;
 using Puya.Data;
+using Puya.Debugging;
 using Puya.Logging;
 using Puya.Service;
 using Puya.ServiceModel;
@@ -16,7 +17,7 @@ namespace Puya.Api
     public abstract class ApiManagerBase : BaseService, IApiManager
     {
         protected ConcurrentDictionary<string, Type> typeCache;
-        public ApiManagerBase(IDb db, ILogger logger, ICacheManager cache, ISettingService settings) : base(db, logger, cache, settings)
+        public ApiManagerBase(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
         {
             typeCache = new ConcurrentDictionary<string, Type>();
         }
