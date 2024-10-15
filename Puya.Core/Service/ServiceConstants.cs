@@ -12,6 +12,10 @@ namespace Puya.Service
             public static string Failed { get; set; }
             public static string Faulted { get; set; }
             public static string Errored { get; set; }
+            public static string Broke { get; set; }
+            public static string Closed { get; set; }
+            public static string Crashed { get; set; }
+            public static string Aborted { get; set; }
             public static string Flawed { get; set; }
             public static string Halted { get; set; }
             public static string NotFound { get; set; }
@@ -26,7 +30,11 @@ namespace Puya.Service
                 Success = "Success";
                 Failed = "Failed";
                 Faulted = "Faulted";
+                Crashed = "Crashed";
+                Aborted = "Aborted";
                 Errored = "Errored";
+                Closed = "Closed";
+                Broke = "Broke";
                 Flawed = "Flawed";
                 Halted = "Halted";
                 NotFound = "NotFound";
