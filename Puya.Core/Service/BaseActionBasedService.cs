@@ -27,17 +27,17 @@ namespace Puya.Service
             }
             set { _config = value; }
         }
-        public virtual object GetAction(string name)
+        public virtual IServiceAction GetAction(string name)
         {
             return Actions[name];
         }
-        public IDictionary<string, object> Actions { get; private set; }
+        public IDictionary<string, IServiceAction> Actions { get; private set; }
         public BaseActionBasedService(): this(null)
         { }
         public BaseActionBasedService(TConfig config)
         {
             Config = config;
-            Actions = new CaseSensitiveDictionary<object>(true);
+            Actions = new CaseSensitiveDictionary<IServiceAction>();
         }
         public object this[string action]
         {

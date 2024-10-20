@@ -8,7 +8,7 @@ namespace Puya.Service
     public interface IService
     {
         string Name { get; }
-        object GetAction(string name);
+        IServiceAction GetAction(string name);
         object this[string action] { get; }
     }
     public interface IService<TConfig>: IService

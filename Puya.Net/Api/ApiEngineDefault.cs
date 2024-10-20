@@ -17,6 +17,7 @@ using Puya.Conversion;
 using Puya.Extensions;
 using Puya.Logging;
 using Puya.Service;
+using Puya.Net.Api;
 
 namespace Puya.Api
 {
@@ -28,6 +29,7 @@ namespace Puya.Api
         protected readonly ILogger logger;
         protected readonly IApiResponseSerializer serializer;
         protected readonly IMiddlewaresStore middlewaresStore;
+        public ApiEngineOptions Options { get; set; }
         public ApiEngineDefault(IServiceProvider serviceProvider,
                                 IApiManager apis,
                                 IApiCryptor cryptor,
@@ -465,7 +467,7 @@ namespace Puya.Api
 
                 context.Api = far.Data;
 
-                if (context.Api.Apps.IndexOf(context.App.Id) < 0)
+                if (Options?.ForceApiAppAssignment == true && context.Api.Apps.IndexOf(context.App.Id) < 0)
                 {
                     context.Response.SetStatus("ApiAppDenied");
                     break;
