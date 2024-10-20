@@ -9,7 +9,7 @@ namespace Puya.Service
     {
         string Name { get; }
         IServiceAction GetAction(string name);
-        object this[string action] { get; }
+        IServiceAction this[string action] { get; }
     }
     public interface IService<TConfig>: IService
         where TConfig : class, IServiceConfig, new()

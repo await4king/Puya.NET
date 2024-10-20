@@ -39,7 +39,7 @@ namespace Puya.Service
             Config = config;
             Actions = new CaseSensitiveDictionary<IServiceAction>();
         }
-        public object this[string action]
+        public IServiceAction this[string action]
         {
             get
             {
