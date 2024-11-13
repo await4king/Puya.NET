@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using Puya.Extensions;
 using Puya.Reflection;
 using Puya.Collections;
 using Puya.Service;
@@ -56,6 +52,7 @@ namespace Puya.Data
 				contextInfo.SetContextInfo(JsonConvert.SerializeObject(data));
 			}
 		}
+        #region ExecuteReaderDynamic
         public static async Task<IList<DynamicModel>> ExecuteReaderCommandDynamicAsync(this IDb db, string sproc, object args, bool async, CancellationToken cancellation)
         {
             IList<DynamicModel> result;
@@ -126,6 +123,8 @@ namespace Puya.Data
 
             return result;
         }
+        #endregion
+        #region ExecuteReport
         public static async Task<ReportResponse> ExecuteReportCommand(this IDb db, string sproc, object args, bool async, CancellationToken cancellation)
         {
             var count = 0;
@@ -244,7 +243,8 @@ namespace Puya.Data
 
             return response;
         }
-
+        #endregion
+        #region RecordExists
         public static async Task<bool> RecordExistsSql(this IDb db, string query, object args, bool async)
         {
             object id;
@@ -327,5 +327,6 @@ namespace Puya.Data
 
             return result;
         }
+        #endregion
     }
 }
