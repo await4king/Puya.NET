@@ -103,6 +103,8 @@ namespace Puya.ServiceModel
             catch (Exception e)
             {
                 Logger.Danger(e, req);
+                
+                this.Error(e);
 
                 response.Flawed();
             }
@@ -125,6 +127,8 @@ namespace Puya.ServiceModel
             catch (Exception e)
             {
                 await Logger.DangerAsync(e, req);
+                
+                this.Error(e);
 
                 response.Flawed();
             }
