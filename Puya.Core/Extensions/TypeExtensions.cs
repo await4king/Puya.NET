@@ -196,6 +196,29 @@ namespace Puya.Extensions
                 return type.GetInterfaces().Contains(interfaceType);
             }
         }
+        public static bool TryExtractGenericInterfaceArguments(this Type type, Type interfaceType, out Type[] innerType)
+        {
+            innerType = null;
+
+            if (type == null)
+            {
+                return false;
+            }
+
+            var extractGenericTypeArgument = new Func<Type, Type[]>(t => t.IsGenericType && t.GetGenericTypeDefinition() == interfaceType ? t.GetGenericArguments().ToArray() : null);
+
+            foreach (var i in type.GetInterfaces())
+            {
+                innerType = extractGenericTypeArgument(i);
+
+                if (innerType != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         public static bool TryGetItemType(this Type type, out Type innerType)
         {
             //source: https://stackoverflow.com/questions/1043755/c-sharp-generic-list-t-how-to-get-the-type-of-t/13608408#13608408
