@@ -59,5 +59,21 @@
         {
             return FromStatus(ServiceConstants.ServiceResponse.NotAuthorized);
         }
+        public static ServiceResponse Broke()
+        {
+            return FromStatus(ServiceConstants.ServiceResponse.Broke);
+        }
+        public static ServiceResponse Closed()
+        {
+            return FromStatus(ServiceConstants.ServiceResponse.Closed);
+        }
+        public static ServiceResponse Aborted()
+        {
+            return FromStatus(ServiceConstants.ServiceResponse.Aborted);
+        }
+        public static ServiceResponse Crashed()
+        {
+            return FromStatus(ServiceConstants.ServiceResponse.Crashed);
+        }
     }
 }

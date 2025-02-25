@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Puya.Base;
 using Puya.Caching;
 using Puya.Data;
+using Puya.Debugging;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Settings;
@@ -18,10 +17,20 @@ namespace Puya.ServiceModel
         ILogger Logger { get; }
         ICacheManager Cache { get; }
         ISettingService Settings { get; }
+        ILogProvider LogProvider { get; }
+        IDebugger Debugger { get; }
+        string Name { get; }
     }
     public abstract class BaseService: IBaseService
     {
         #region properties
+        public ILogProvider LogProvider { get; set; }
+        IDebugger debugger;
+        public IDebugger Debugger
+        {
+            get { return debugger ?? new NoDebugger(); }
+            set { debugger = value; }
+        }
         private IDb _db;
         public virtual IDb Db
         {
@@ -70,12 +79,14 @@ namespace Puya.ServiceModel
             }
         }
         #endregion 
-        public BaseService(IDb db, ILogger logger, ICacheManager cache, ISettingService settings)
+        public BaseService(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger)
         {
             _db = db;
             _logger = logger;
             _cache = cache;
             _settings = settings;
+            LogProvider = logProvider;
+            Debugger = debugger;
         }
         protected TRes Run<TReq, TRes>(string actionName, Action<TReq, TRes> action, TReq req)
             where TRes : ServiceResponse, new()
@@ -92,6 +103,8 @@ namespace Puya.ServiceModel
             catch (Exception e)
             {
                 Logger.Danger(e, req);
+                
+                this.Error(e);
 
                 response.Flawed();
             }
@@ -114,6 +127,8 @@ namespace Puya.ServiceModel
             catch (Exception e)
             {
                 await Logger.DangerAsync(e, req);
+                
+                this.Error(e);
 
                 response.Flawed();
             }

@@ -12,6 +12,7 @@ using Puya.Extensions;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Settings;
+using Puya.Debugging;
 
 namespace Puya.Api
 {
@@ -21,7 +22,7 @@ namespace Puya.Api
         public string Path { get; set; }
         public string ApiFileName { get; set; }
         public string AppFileName { get; set; }
-        public JsonApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings) : base(db, logger, cache, settings)
+        public JsonApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
         { }
         private string GetPath(string filename = "")
         {

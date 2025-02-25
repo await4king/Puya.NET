@@ -245,6 +245,18 @@ namespace Puya.Service
 
             return response;
         }
+        public static ServiceResponse ChangeStatus(this ServiceResponse response, string status)
+        {
+            response.SetStatus(status);
+
+            return response;
+        }
+        public static ServiceResponse SetException(this ServiceResponse response, Exception e)
+        {
+            response.Exception = e;
+
+            return response;
+        }
         public static ServiceResponse SetBag(this ServiceResponse response, object bag)
         {
             response.Bag = bag;

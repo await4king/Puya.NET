@@ -1088,5 +1088,15 @@ namespace Puya.Extensions
 
             return result;
         }
+
+        public static string ChangeYeKe(this string x)
+        {
+            if (!string.IsNullOrEmpty(x))
+            {
+                x = x.Replace("ك", "ک").Replace("ي", "ی");
+            }
+
+            return x;
+        }
     }
 }

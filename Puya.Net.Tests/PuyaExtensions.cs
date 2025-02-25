@@ -92,5 +92,6 @@ namespace Puya.Net.Tests
 
             Assert.Equal(3, count);
         }
+
     }
 }

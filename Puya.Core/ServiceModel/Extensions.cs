@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Runtime.CompilerServices;
 using Puya.Service;
 using Puya.Translation;
 
@@ -77,5 +76,92 @@ namespace Puya.ServiceModel
                 response.MessageKeyParam = null;
             }
         }
+        #region Logging
+        public static void Log(this IBaseService service, string message,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Info(service.Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Debug(this IBaseService service, string message,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Debug(service.Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Warn(this IBaseService service, string message,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Warn(service.Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Message(this IBaseService service, string message,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Message(service.Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Trace(this IBaseService service, string message,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Trace(service.Name, message, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Error(this IBaseService service, string message,
+                        Exception e,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Error(service.Name, message, e, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        public static void Error(this IBaseService service, Exception e,
+                        object data = null,
+                        LogSource source = LogSource.App,
+                        [CallerMemberName] string memberName = "",
+                        [CallerFilePath] string sourceFilePath = "",
+                        [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (service.Debugger.IsDebugging)
+            {
+                service.LogProvider?.Error(service.Name, string.Empty, e, data, source, memberName, sourceFilePath, sourceLineNumber);
+            }
+        }
+        #endregion
     }
 }
