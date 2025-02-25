@@ -11,7 +11,7 @@
 		<PackageProjectUrl>https://github.com/puyacodes/Puya.NET</PackageProjectUrl>
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\snk.pfx</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>snk.pfx</AssemblyOriginatorKeyFile>
 		<AssemblyVersion>2.1.1.0</AssemblyVersion>
 		<Nullable>disable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
