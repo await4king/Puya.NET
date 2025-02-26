@@ -21,10 +21,7 @@ public class ApiEngineWorkerServiceMiddleware
         {
             var cancellationToken = context.RequestAborted;
 
-            //var connectionString = context.Request.Headers["x-constr"].ToString();
-            //context.Items["ConnectionString"] = connectionString;
-
-            var apiEngine = scope.ServiceProvider.GetRequiredService<IApiEngine>();
+           var apiEngine = scope.ServiceProvider.GetRequiredService<IApiEngine>();
 
             if (apiEngine == null)
             {
@@ -37,6 +34,6 @@ public class ApiEngineWorkerServiceMiddleware
 
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(response);
-        }
+       }
     }
 }
