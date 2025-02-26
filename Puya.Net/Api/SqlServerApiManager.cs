@@ -20,7 +20,7 @@ namespace Puya.Api
 {
     public class SqlServerApiManager : ApiManagerBase
     {
-        public SqlServerApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
+        public SqlServerApiManager(IDb db, ILogger logger, ICache cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
         { }
         private string apiTableName;
         public string ApiTableName

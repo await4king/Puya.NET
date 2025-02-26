@@ -22,7 +22,7 @@ namespace Puya.Api
         public string Path { get; set; }
         public string ApiFileName { get; set; }
         public string AppFileName { get; set; }
-        public JsonApiManager(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
+        public JsonApiManager(IDb db, ILogger logger, ICache cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
         { }
         private string GetPath(string filename = "")
         {

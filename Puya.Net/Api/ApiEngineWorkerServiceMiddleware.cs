@@ -1,39 +1,42 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using System.Threading;
-using Puya.Api;
 using Microsoft.Extensions.DependencyInjection;
+using Puya.Api;
+using Puya.Data;
+using System.Threading.Tasks;
 
-namespace Puya.Net.Api
+public class ApiEngineWorkerServiceMiddleware
 {
-    public class ApiEngineWorkerServiceMiddleware
+    private readonly RequestDelegate _next;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+
+    public ApiEngineWorkerServiceMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
     {
-        private readonly RequestDelegate _next;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        _next = next;
+        _serviceScopeFactory = serviceScopeFactory;
+    }
 
-        public ApiEngineWorkerServiceMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        using (var scope = _serviceScopeFactory.CreateScope())
         {
-            _next = next;
-            _serviceScopeFactory = serviceScopeFactory;
-        }
+            var cancellationToken = context.RequestAborted;
 
-        public async Task InvokeAsync(HttpContext context, CancellationToken cancellationToken)
-        {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            //var connectionString = context.Request.Headers["x-constr"].ToString();
+            //context.Items["ConnectionString"] = connectionString;
+
+            var apiEngine = scope.ServiceProvider.GetRequiredService<IApiEngine>();
+
+            if (apiEngine == null)
             {
-                var apiEngine = scope.ServiceProvider.GetRequiredService<IApiEngine>();
-
-                if (apiEngine == null)
-                {
-                    context.Response.StatusCode = 500;
-                    await context.Response.WriteAsync("Internal Server Error: IApiEngine is missing.");
-                    return;
-                }
-                var response = await apiEngine.Serve(context, cancellationToken);
-
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(response);
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsync("Internal Server Error: IApiEngine is missing.");
+                return;
             }
+
+            var response = await apiEngine.Serve(context, cancellationToken);
+
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(response);
         }
     }
 }
