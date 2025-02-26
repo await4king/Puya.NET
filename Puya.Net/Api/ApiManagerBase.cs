@@ -17,9 +17,11 @@ namespace Puya.Api
     public abstract class ApiManagerBase : BaseService, IApiManager
     {
         protected ConcurrentDictionary<string, Type> typeCache;
-        public ApiManagerBase(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, cache, settings, logProvider, debugger)
+        ICache _cache;
+        public ApiManagerBase(IDb db, ILogger logger, ICache cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger) : base(db, logger, null, settings, logProvider, debugger)
         {
             typeCache = new ConcurrentDictionary<string, Type>();
+            _cache = cache;
         }
         private string cacheName;
         public virtual string CacheName
@@ -43,9 +45,9 @@ namespace Puya.Api
             var result = null as List<Api>;
             var load = true;
 
-            if (Cache.IsSet(CacheNameApi))
+            if (_cache.Exists(CacheNameApi))
             {
-                result = Cache.Get<List<Api>>(CacheNameApi);
+                result = _cache.Get<List<Api>>(CacheNameApi);
                 load = result == null || result.Count == 0;
             }
             
@@ -53,7 +55,7 @@ namespace Puya.Api
             {
                 result = GetApisInternal() ?? new List<Api>();
 
-                Cache.Set(CacheNameApi, result, CacheDuration);
+                _cache.Set(CacheNameApi, result, CacheDuration);
             }
 
             return result;
@@ -64,9 +66,9 @@ namespace Puya.Api
             var result = null as List<Application>;
             var load = true;
 
-            if (Cache.IsSet(CacheNameApp))
+            if (_cache.Exists(CacheNameApp))
             {
-                result = Cache.Get<List<Application>>(CacheNameApp);
+                result = _cache.Get<List<Application>>(CacheNameApp);
                 load = result == null || result.Count == 0;
             }
 
@@ -74,7 +76,7 @@ namespace Puya.Api
             {
                 result = GetAppsInternal() ?? new List<Application>();
 
-                Cache.Set(CacheNameApp, result, CacheDuration);
+                _cache.Set(CacheNameApp, result, CacheDuration);
             }
 
             return result;
