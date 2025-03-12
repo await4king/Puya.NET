@@ -54,7 +54,7 @@ namespace Puya.Sms
 
             return result;
         }
-        protected override SendResponse SendInternal(string mobile, string message)
+        protected override SendResponse SendInternal(string mobile, string message, string category)
         {
             var path = GetPath();
 
@@ -63,7 +63,7 @@ namespace Puya.Sms
             return null;
         }
 
-        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, CancellationToken cancellation)
+        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, string category, CancellationToken cancellation)
         {
             var path = GetPath();
 

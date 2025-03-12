@@ -17,7 +17,7 @@ namespace Puya.Sms
         { }
         public MemorySmsService()
         { }
-        protected override SendResponse SendInternal(string mobile, string message)
+        protected override SendResponse SendInternal(string mobile, string message, string category)
         {
             var result = new SendResponse();
             
@@ -28,9 +28,9 @@ namespace Puya.Sms
             return result;
         }
 
-        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, CancellationToken cancellation)
+        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, string category, CancellationToken cancellation)
         {
-            var result = SendInternal(mobile, message);
+            var result = SendInternal(mobile, message, category);
 
             return Task.FromResult(result);
         }

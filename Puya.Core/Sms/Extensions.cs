@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Puya.Sms
 {
@@ -73,6 +75,10 @@ namespace Puya.Sms
             }
 
             return result;
+        }
+        public static Task<SendResponse> SendAsync(this ISmsService service, string mobile, string message, CancellationToken cancellation)
+        {
+            return service.SendAsync(mobile, message, null, cancellation);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Puya.Sms
 {
     public class NullSmsService : ISmsService
     {
-        public SendResponse Send(string mobile, string message)
+        public SendResponse Send(string mobile, string message, string category = null)
         {
             var result = new SendResponse();
 
@@ -17,7 +17,7 @@ namespace Puya.Sms
             return result;
         }
 
-        public Task<SendResponse> SendAsync(string mobile, string message, CancellationToken cancellation)
+        public Task<SendResponse> SendAsync(string mobile, string message, string category, CancellationToken cancellation)
         {
             var result = new SendResponse();
 
