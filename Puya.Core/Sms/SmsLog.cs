@@ -13,6 +13,7 @@ namespace Puya.Sms
         public Exception Error { get; set; }
         public bool? Success { get; set; }
         public DateTime LogDate { get; set; }
+        public string Category { get; set; }
         public SmsLog()
         {
             LogDate = DateTime.Now;

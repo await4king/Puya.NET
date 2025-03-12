@@ -178,7 +178,7 @@ namespace Puya.Sms
 
             return _service;
         }
-        protected override SendResponse SendInternal(string mobile, string message)
+        protected override SendResponse SendInternal(string mobile, string message, string category)
         {
             var result = null as SendResponse;
             var service = GetService();
@@ -196,7 +196,7 @@ namespace Puya.Sms
 
             return result;
         }
-        protected override async Task<SendResponse> SendAsyncInternal(string mobile, string message, CancellationToken cancellation)
+        protected override async Task<SendResponse> SendAsyncInternal(string mobile, string message, string category, CancellationToken cancellation)
         {
             var result = null as SendResponse;
             var service = GetService();

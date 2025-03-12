@@ -24,7 +24,8 @@ insert into SmsLog
     Success,
     Response,
     Data,
-    Error
+    Error,
+    Category
 )
 values
 (
@@ -34,7 +35,8 @@ values
     @Success,
     @Response,
     @Data,
-    @Error
+    @Error,
+    @Category
 )";
             cmd.CommandType = System.Data.CommandType.Text;
 
@@ -45,6 +47,7 @@ values
             cmd.Parameters.AddWithValue("@Response", log.Response == null ? DBNull.Value : (object)JsonConvert.SerializeObject(log.Response));
             cmd.Parameters.AddWithValue("@Data", log.Data == null ? DBNull.Value : (object)JsonConvert.SerializeObject(log.Data));
             cmd.Parameters.AddWithValue("@Error", log.Error == null ? DBNull.Value : (object)JsonConvert.SerializeObject(new { Message = log.Error.ToString("\n"), StackTrace = log.Error.StackTrace }));
+            cmd.Parameters.AddWithValue("@Category", log.Category == null ? DBNull.Value : (object)log.Category);
 
             return cmd;
         }

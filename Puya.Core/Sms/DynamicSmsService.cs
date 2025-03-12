@@ -170,13 +170,13 @@ namespace Puya.Sms
 
             return result;
         }
-        public Task<SendResponse> SendAsync(string mobile, string message, CancellationToken cancellation)
+        public Task<SendResponse> SendAsync(string mobile, string message, string category, CancellationToken cancellation)
         {
-            return Instance?.SendAsync(mobile, message, cancellation);
+            return Instance?.SendAsync(mobile, message, category, cancellation);
         }
-        public SendResponse Send(string mobile, string message)
+        public SendResponse Send(string mobile, string message, string category = null)
         {
-            return Instance?.Send(mobile, message);
+            return Instance?.Send(mobile, message, category);
         }
     }
 }

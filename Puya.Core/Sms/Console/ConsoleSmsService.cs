@@ -17,14 +17,14 @@ namespace Puya.Sms
         public ConsoleSmsService()
         { }
 
-        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, CancellationToken cancellation)
+        protected override Task<SendResponse> SendAsyncInternal(string mobile, string message, string category, CancellationToken cancellation)
         {
             Console.WriteLine($"mobile: {mobile}, message: {message}");
 
             return Task.FromResult(null as SendResponse);
         }
 
-        protected override SendResponse SendInternal(string mobile, string message)
+        protected override SendResponse SendInternal(string mobile, string message, string category)
         {
             Console.WriteLine($"mobile: {mobile}, message: {message}");
 

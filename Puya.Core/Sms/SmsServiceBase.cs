@@ -42,15 +42,15 @@ namespace Puya.Sms
             get { return _logger; }
             set { _logger = value; }
         }
-        protected abstract SendResponse SendInternal(string mobile, string message);
-        protected abstract Task<SendResponse> SendAsyncInternal(string mobile, string message, CancellationToken cancellation);
-        public SendResponse Send(string mobile, string message)
+        protected abstract SendResponse SendInternal(string mobile, string message, string category);
+        protected abstract Task<SendResponse> SendAsyncInternal(string mobile, string message, string category, CancellationToken cancellation);
+        public SendResponse Send(string mobile, string message, string category = null)
         {
             var result = new SendResponse();
 
             try
             {
-                var sr = SendInternal(mobile, message);
+                var sr = SendInternal(mobile, message, category);
 
                 if (sr != null)
                 {
@@ -72,14 +72,13 @@ namespace Puya.Sms
 
             return result;
         }
-
-        public async Task<SendResponse> SendAsync(string mobile, string message, CancellationToken cancellation)
+        public async Task<SendResponse> SendAsync(string mobile, string message, string category, CancellationToken cancellation)
         {
             var result = new SendResponse();
 
             try
             {
-                var sr = await SendAsyncInternal(mobile, message, cancellation);
+                var sr = await SendAsyncInternal(mobile, message, category, cancellation);
 
                 if (sr != null)
                 {
@@ -90,11 +89,11 @@ namespace Puya.Sms
                     result.Succeeded();
                 }
 
-                await Logger?.LogAsync(new SmsLog { MobileNo = mobile, Message = message, Success = result.Success, Response = sr?.Data?.Response, Data = sr?.Data?.Data }, cancellation);
+                await Logger?.LogAsync(new SmsLog { Category = category, MobileNo = mobile, Message = message, Success = result.Success, Response = sr?.Data?.Response, Data = sr?.Data?.Data }, cancellation);
             }
             catch (Exception e)
             {
-                await Logger?.LogAsync(new SmsLog { MobileNo = mobile, Message = message, Success = false, Error = e }, cancellation);
+                await Logger?.LogAsync(new SmsLog { Category = category, MobileNo = mobile, Message = message, Success = false, Error = e }, cancellation);
 
                 result.Failed(e);
             }

@@ -6,16 +6,16 @@
 		<Authors>Mansoor Omrani</Authors>
 		<Company>PuyaSoft</Company>
 		<Product>Puya.NET</Product>
-		<Version>3.0.6</Version>
+		<Version>3.1.2</Version>
 		<WebPage>https://puyasoft.com</WebPage>
 		<PackageProjectUrl>https://github.com/puyacodes/Puya.NET</PackageProjectUrl>
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>../snk.pfx</AssemblyOriginatorKeyFile>
-		<AssemblyVersion>3.0.6.0</AssemblyVersion>
+		<AssemblyVersion>3.1.2.0</AssemblyVersion>
 		<Nullable>disable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<Copyright>2018-2024</Copyright>
+		<Copyright>2018-2025</Copyright>
 		<RepositoryType>https://github.com/puyacodes/Puya.NET</RepositoryType>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -45,7 +45,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.0" />
-		<PackageReference Include="Puya.Core" Version="2.0.3" />
+		<PackageReference Include="Puya.Core" Version="2.1.2" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
 		<PackageReference Include="UAParser" Version="3.1.47" />
 	</ItemGroup>
