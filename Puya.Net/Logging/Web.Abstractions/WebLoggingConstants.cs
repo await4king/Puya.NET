@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Puya.Logging.Web.Abstractions
+﻿namespace Puya.Logging.Web.Abstractions
 {
     public static class WebLoggingConstants
     {
-        public static string LogLevelHeaderName => "x-log-level";
+        public static string LogLevelHeaderName { get; set; }
+        static WebLoggingConstants()
+        {
+            LogLevelHeaderName = "x-loglevel";
+        }
     }
 }
