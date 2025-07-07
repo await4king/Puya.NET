@@ -2,6 +2,6 @@
 {
     public interface IDebugger
     {
-        bool IsDebugging { get; }
+        bool IsDebugging { get; set; }
     }
 }

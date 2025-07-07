@@ -1,63 +1,37 @@
-﻿using System;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Puya.Core.Debugging;
 
 namespace Puya.Debugging.AspNetCore
 {
-    public class HttpDebuggerOptions
+    public class HttpDebugger : BaseDebugger
     {
-        public bool DebuggingEnabled { get; set; }
-        public bool IsGlobalDebugging { get; set; }
-        public string DebuggerUsers { get; set; }
-        public string DebuggerRoleName { get; set; }
-        public HttpDebuggerOptions()
-        {
-            DebuggingEnabled = true;
-            IsGlobalDebugging = false;
-            DebuggerRoleName = "Debugger";
-        }
-    }
-    public class HttpDebugger : IDebugger
-    {
+        public static string IsDebuggingHeaderName { get; set; }
         public IHttpContextAccessor HttpContextAccessor { get; }
-        public HttpDebuggerOptions Options { get; set; }
-
-        public HttpDebugger(IHttpContextAccessor httpContextAccessor, HttpDebuggerOptions options)
+        public HttpDebugger(IHttpContextAccessor httpContextAccessor) : base(new DebuggerOptions())
         {
             HttpContextAccessor = httpContextAccessor;
-            Options = options;
         }
-        bool? isDebugger;
-        public bool IsDebugging
+        public HttpDebugger(IHttpContextAccessor httpContextAccessor, DebuggerOptions options) : base(options)
         {
-            get
-            {
-                if (isDebugger == null)
-                {
-                    var httpContext = HttpContextAccessor.HttpContext;
-
-                    if (httpContext != null)
-                    {
-                        var isDebugging = HttpContextAccessor.HttpContext.Request.Headers["x-debug"].ToString();
-                        var debuggers = Options.DebuggerUsers?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries) ?? new string[] { };
-
-                        isDebugger = (isDebugging == "1" || isDebugging == "true")
-                                        &&
-                                        Options.DebuggingEnabled
-                                        &&
-                                        (
-                                            Options.IsGlobalDebugging
-                                                ||
-                                            HttpContextAccessor.HttpContext.User.IsInRole(Options.DebuggerRoleName)
-                                                ||
-                                            debuggers.Contains(HttpContextAccessor.HttpContext.User.Identity.Name, StringComparer.OrdinalIgnoreCase)
-                                        );
-                    }
-                }
-
-                return isDebugger.Value;
-            }
+            HttpContextAccessor = httpContextAccessor;
         }
+        static HttpDebugger()
+        {
+            IsDebuggingHeaderName = "x-debug";
+        }
+        protected override bool? GetIsDebugging()
+        {
+            var isDebugging = string.IsNullOrEmpty(IsDebuggingHeaderName) ? string.Empty : HttpContextAccessor?.HttpContext?.Request?.Headers[IsDebuggingHeaderName].ToString();
 
+            return isDebugging == "1" || isDebugging == "true";
+        }
+        protected override string GetUserName()
+        {
+            return HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
+        }
+        protected override bool IsInRole(string roleName)
+        {
+            return HttpContextAccessor?.HttpContext?.User?.IsInRole(Options.DebuggerRoleName) ?? false;
+        }
     }
 }

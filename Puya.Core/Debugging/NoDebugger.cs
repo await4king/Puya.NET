@@ -2,6 +2,10 @@
 {
     public class NoDebugger : IDebugger
     {
-        public bool IsDebugging => false;
+        public bool IsDebugging
+        {
+            get { return false; }
+            set { }
+        }
     }
 }
