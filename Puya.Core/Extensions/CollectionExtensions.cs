@@ -1,16 +1,23 @@
-﻿using System;
+﻿using Puya.Base;
+using Puya.Conversion;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Puya.Base;
 
 namespace Puya.Extensions
 {
+    public enum SetDictionaryItemMode
+    {
+        AddIfNotExists,
+        UpdateIfExists,
+        AddOrUpdate
+    }
     internal class IdentityFunction<TElement>
     {
         internal static Func<TElement, TElement> Instance
@@ -24,6 +31,7 @@ namespace Puya.Extensions
     public static class CollectionExtensions
     {
         static ConcurrentDictionary<Type, Func<object, KeyValuePair<object, object>>> fnGetKeyValuePairs = new ConcurrentDictionary<Type, Func<object, KeyValuePair<object, object>>>();
+        static ConcurrentDictionary<Type, PropertyInfo[]> dictionaryIndexers = new ConcurrentDictionary<Type, PropertyInfo[]>();
         static KeyValuePair<object, object> GetKeyValue(Type kt, Type vt, object dictionaryItem)
         {
             if (dictionaryItem == null)
@@ -697,6 +705,76 @@ namespace Puya.Extensions
             }
 
             return found ? result : -1;
+        }
+        public static bool TrySetDictionaryItem(this object dictionary, object key, object value, SetDictionaryItemMode mode = SetDictionaryItemMode.AddOrUpdate)
+        {
+            var result = false;
+            var type = dictionary?.GetType();
+
+            if (type.IsDictionary() && key != null)
+            {
+                if (type.TryGetDictionaryItemType(out Type keyType, out Type valueType))
+                {
+                    if (key.GetType() == keyType && ((value != null && (value.GetType() == valueType || value.GetType().DescendsFrom(valueType))) || (value == null && valueType.IsNullable())))
+                    {
+                        var containsKeyMethod = type.GetMethod("ContainsKey");
+                        var keyExists = false;
+
+                        if (containsKeyMethod != null)
+                        {
+                            keyExists = SafeClrConvert.ToBoolean(containsKeyMethod.Invoke(dictionary, new object[] { key }));
+                        }
+
+                        var setItem = false;
+
+                        switch (mode)
+                        {
+                            case SetDictionaryItemMode.AddIfNotExists:
+                                if (!keyExists)
+                                {
+                                    var addMethod = type.GetMethod("Add");
+
+                                    addMethod.Invoke(dictionary, new object[] { key, value });
+                                }
+
+                                break;
+                            case SetDictionaryItemMode.UpdateIfExists:
+                                if (keyExists)
+                                {
+                                    setItem = true;
+                                }
+
+                                break;
+                            case SetDictionaryItemMode.AddOrUpdate:
+                                if (!keyExists)
+                                {
+                                    var addMethod = type.GetMethod("Add");
+
+                                    addMethod.Invoke(dictionary, new object[] { key, value });
+
+                                }
+                                else
+                                {
+                                    setItem = true;
+                                }
+
+                                break;
+                        }
+
+                        if (setItem)
+                        {
+                            var indexers = dictionaryIndexers.GetOrAdd(type, type.GetProperties().Where(p => p.GetIndexParameters().Length == 1).ToArray());
+
+                            if (indexers.Length > 0)
+                            {
+                                indexers[0].SetValue(dictionary, value, new object[] { key });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

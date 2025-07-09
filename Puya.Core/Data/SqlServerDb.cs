@@ -2,6 +2,7 @@
 using System.Data.Common;
 using System.Data;
 using System;
+using Puya.Mapping;
 
 namespace Puya.Data
 {
@@ -13,11 +14,13 @@ namespace Puya.Data
         }
         public SqlServerDb(IConnectionStringProvider constrProvider): this(constrProvider, null)
         { }
-        public SqlServerDb(IConnectionStringProvider constrProvider, IDbContextInfoProvider dbContextInfoProvider)
+        public SqlServerDb(IConnectionStringProvider constrProvider, IDbContextInfoProvider dbContextInfoProvider) : this(constrProvider, dbContextInfoProvider, null)
+        { }
+        public SqlServerDb(IConnectionStringProvider constrProvider, IDbContextInfoProvider dbContextInfoProvider, IMapper mapper)
         {
             ConnectionStringProvider = constrProvider;
             DbContextInfoProvider = dbContextInfoProvider;
-
+            Mapper = mapper;
             MaxContextInfoSize = 128;
         }
         protected override void SetContextInfo(DbConnection con)

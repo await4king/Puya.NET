@@ -41,6 +41,7 @@ foreach (var execType in execTypes)
             var nonQueryResultType = execType == "Async" ? $"async Task<int>": "int";
             var commandType = execKind == "Command" ? "CommandType.StoredProcedure": "CommandType.Text";
             var fnOrtypeArgs = string.IsNullOrEmpty(transformType) ? "": (transformType.StartsWith(", Func") ? ", fn" : ", type");
+            var mapperArg = string.IsNullOrEmpty(transformType) ? ", db.Mapper": (transformType.StartsWith(", Func") ? "" : ", type, db.Mapper");
             var cancellationArg = execType == "Async" ? ", cancellation": "";
             var awaitKey = execType == "Async" ? "await ": "";
 
@@ -62,7 +63,7 @@ foreach (var execType in execTypes)
             {
                 var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters, db.AutoNullEmptyStrings);
                 
-                result = <#=awaitKey#>DbCommandExtensions.ExecuteReader<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=cancellationArg#>);
+                result = <#=awaitKey#>DbCommandExtensions.ExecuteReader<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=mapperArg#><#=cancellationArg#>);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -89,7 +90,7 @@ foreach (var execType in execTypes)
             {
                 var cmd = con.CreateCommand(<#=textParamName#>, <#=commandType#>, parameters, db.AutoNullEmptyStrings);
                 
-                result = <#=awaitKey#>DbCommandExtensions.ExecuteSingle<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=cancellationArg#>);
+                result = <#=awaitKey#>DbCommandExtensions.ExecuteSingle<#=execType#><#=genericArgType#>(cmd<#=behaviorArg#><#=fnOrtypeArgs#><#=mapperArg#><#=cancellationArg#>);
 
                 cmd.ApplyOutputs(parameters);
             

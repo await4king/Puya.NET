@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Puya.Data;
 using System.Data;
-using System.Text;
 
 namespace Puya.Mapping
 {
@@ -9,6 +7,11 @@ namespace Puya.Mapping
     {
         public static T Map<T>(this IMapper mapper, IDataReader reader)
         {
+            if (mapper == null)
+            {
+                return reader.ConvertTo<T>();
+            }
+
             return (T)mapper.Map(reader, typeof(T));
         }
         public static T Map<T>(this IMapper mapper, object source)

@@ -184,8 +184,15 @@ namespace Puya.Extensions
         }
         public static bool Implements(this Type type, Type interfaceType)
         {
-            if (!interfaceType.IsInterface)
+            if (type == null)
+            {
                 return false;
+            }
+
+            if (!interfaceType.IsInterface)
+            {
+                return false;
+            }
 
             if (interfaceType.IsGenericType)
             {

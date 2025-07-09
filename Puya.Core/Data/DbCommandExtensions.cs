@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Puya.Reflection;
+using Puya.Mapping;
 
 namespace Puya.Data
 {
@@ -173,6 +174,17 @@ namespace Puya.Data
             if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.State == ConnectionState.Broken)
                 cmd.Connection.Open();
         }
+        internal static async Task InitCommandAsync(DbCommand cmd, CancellationToken cancellation)
+        {
+            if (cmd == null)
+                throw new CommandNullException();
+
+            if (cmd.Connection == null)
+                new CommandConnectionNullException();
+
+            if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.State == ConnectionState.Broken)
+                await cmd.Connection.OpenAsync(cancellation);
+        }
         internal static void InitCommand<T>(DbCommand cmd, IList<T> list)
         {
             if (cmd == null)
@@ -187,14 +199,28 @@ namespace Puya.Data
             if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.State == ConnectionState.Broken)
                 cmd.Connection.Open();
         }
+        internal static async Task InitCommandAsync<T>(DbCommand cmd, IList<T> list, CancellationToken cancellation)
+        {
+            if (cmd == null)
+                throw new CommandNullException();
+
+            if (cmd.Connection == null)
+                new CommandConnectionNullException();
+
+            if (list == null)
+                new ListNullException();
+
+            if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.State == ConnectionState.Broken)
+                await cmd.Connection.OpenAsync(cancellation);
+        }
         // ------------------ ExecuteReader() ------------------
         public static void ExecuteReader<T>(this DbCommand cmd, IList<T> result, Func<IDataReader, T> fn)
         {
             ExecuteReader<T>(cmd, CommandBehavior.Default, result, fn);
         }
-        public static void ExecuteReader<T>(this DbCommand cmd, IList<T> result)
+        public static void ExecuteReader<T>(this DbCommand cmd, IList<T> result, IMapper mapper = null)
         {
-            ExecuteReader(cmd, result, reader => reader.ConvertTo<T>());
+            ExecuteReader(cmd, result, reader => mapper.Map<T>(reader));
         }
         public static IList<T> ExecuteReader<T>(this DbCommand cmd, Func<IDataReader, T> fn)
         {
@@ -204,11 +230,12 @@ namespace Puya.Data
 
             return result;
         }
-        public static IList<T> ExecuteReader<T>(this DbCommand cmd)
+        // *
+        public static IList<T> ExecuteReader<T>(this DbCommand cmd, IMapper mapper = null)
         {
             var result = new List<T>();
 
-            ExecuteReader(cmd, result);
+            ExecuteReader(cmd, result, mapper);
 
             return result;
         }
@@ -239,10 +266,11 @@ namespace Puya.Data
                 }
             }
         }
-        public static void ExecuteReader<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result)
+        public static void ExecuteReader<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result, IMapper mapper = null)
         {
-            ExecuteReader(cmd, behavior, result, reader => reader.ConvertTo<T>());
+            ExecuteReader(cmd, behavior, result, reader => mapper.Map<T>(reader));
         }
+        // *
         public static IList<T> ExecuteReader<T>(this DbCommand cmd, CommandBehavior behavior, Func<IDataReader, T> fn)
         {
             var result = new List<T>();
@@ -251,11 +279,12 @@ namespace Puya.Data
 
             return result;
         }
-        public static IList<T> ExecuteReader<T>(this DbCommand cmd, CommandBehavior behavior)
+        // *
+        public static IList<T> ExecuteReader<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
         {
             var result = new List<T>();
 
-            ExecuteReader(cmd, behavior, result);
+            ExecuteReader(cmd, behavior, result, mapper);
 
             return result;
         }
@@ -276,9 +305,9 @@ namespace Puya.Data
         {
             return ExecuteSingle<T>(cmd, CommandBehavior.Default, fn);
         }
-        public static T ExecuteSingle<T>(this DbCommand cmd)
+        public static T ExecuteSingle<T>(this DbCommand cmd, IMapper mapper = null)
         {
-            var result = ExecuteSingle(cmd, reader => reader.ConvertTo<T>());
+            var result = ExecuteSingle(cmd, reader => mapper.Map<T>(reader));
 
             return result;
         }
@@ -307,9 +336,9 @@ namespace Puya.Data
 
             return result;
         }
-        public static T ExecuteSingle<T>(this DbCommand cmd, CommandBehavior behavior)
+        public static T ExecuteSingle<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
         {
-            var result = ExecuteSingle(cmd, behavior, reader => reader.ConvertTo<T>());
+            var result = ExecuteSingle(cmd, behavior, reader => mapper.Map<T>(mapper));
 
             return result;
         }
@@ -332,9 +361,13 @@ namespace Puya.Data
         {
             return ExecuteSingleAsync(cmd, reader => reader.ConvertTo<T>(), cancellation);
         }
-        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd)
+        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteSingleAsync<T>(cmd, CancellationToken.None);
+            return ExecuteSingleAsync(cmd, reader => mapper.Map<T>(mapper), cancellation);
+        }
+        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, IMapper mapper = null)
+        {
+            return ExecuteSingleAsync<T>(cmd, mapper, CancellationToken.None);
         }
         public static Task<object> ExecuteSingleAsync(this DbCommand cmd, Type type, CancellationToken cancellation)
         {
@@ -349,7 +382,7 @@ namespace Puya.Data
         {
             var result = default(T);
 
-            InitCommand(cmd);
+            await InitCommandAsync(cmd, cancellation);
 
             using (var reader = await cmd.ExecuteReaderAsync(behavior))
             {
@@ -371,9 +404,13 @@ namespace Puya.Data
         {
             return ExecuteSingleAsync(cmd, behavior, reader => reader.ConvertTo<T>());
         }
-        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, CommandBehavior behavior)
+        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteSingleAsync<T>(cmd, behavior, CancellationToken.None);
+            return ExecuteSingleAsync(cmd, behavior, reader => mapper.Map<T>(mapper));
+        }
+        public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
+        {
+            return ExecuteSingleAsync<T>(cmd, behavior, mapper, CancellationToken.None);
         }
         public static Task<object> ExecuteSingleAsync(this DbCommand cmd, CommandBehavior behavior, Type type, CancellationToken cancellation)
         {
@@ -396,9 +433,13 @@ namespace Puya.Data
         {
             return ExecuteReaderAsync(cmd, result, reader => reader.ConvertTo<T>(), cancellation);
         }
-        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, IList<T> result)
+        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, IList<T> result, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteReaderAsync(cmd, result, CancellationToken.None);
+            return ExecuteReaderAsync(cmd, result, reader => mapper.Map<T>(reader), cancellation);
+        }
+        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, IList<T> result, IMapper mapper = null)
+        {
+            return ExecuteReaderAsync(cmd, result, mapper, CancellationToken.None);
         }
         public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, Func<IDataReader, T> fn, CancellationToken cancellation)
         {
@@ -413,6 +454,7 @@ namespace Puya.Data
             return ExecuteReaderAsync<T>(cmd, fn, CancellationToken.None);
 
         }
+        // *
         public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CancellationToken cancellation)
         {
             var result = new List<T>();
@@ -421,9 +463,17 @@ namespace Puya.Data
 
             return result;
         }
-        public static Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd)
+        public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteReaderAsync<T>(cmd, CancellationToken.None);
+            var result = new List<T>();
+
+            await ExecuteReaderAsync(cmd, result, mapper, cancellation);
+
+            return result;
+        }
+        public static Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, IMapper mapper = null)
+        {
+            return ExecuteReaderAsync<T>(cmd, mapper, CancellationToken.None);
         }
         public static Task ExecuteReaderAsync(this DbCommand cmd, IList<object> result, Type type, CancellationToken cancellation)
         {
@@ -448,7 +498,7 @@ namespace Puya.Data
         // ------------------ ExecuteReaderAsync (CoomandBehavior) ------------------
         public static async Task ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result, Func<IDataReader, T> fn, CancellationToken cancellation)
         {
-            InitCommand(cmd, result);
+            await InitCommandAsync(cmd, result, cancellation);
 
             using (var reader = await cmd.ExecuteReaderAsync(behavior, cancellation))
             {
@@ -468,9 +518,13 @@ namespace Puya.Data
         {
             return ExecuteReaderAsync(cmd, behavior, result, reader => reader.ConvertTo<T>(), cancellation);
         }
-        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result)
+        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteReaderAsync(cmd, behavior, result, CancellationToken.None);
+            return ExecuteReaderAsync(cmd, behavior, result, reader => mapper.Map<T>(reader), cancellation);
+        }
+        public static Task ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IList<T> result, IMapper mapper = null)
+        {
+            return ExecuteReaderAsync(cmd, behavior, result, mapper, CancellationToken.None);
         }
         public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, Func<IDataReader, T> fn, CancellationToken cancellation)
         {
@@ -485,6 +539,7 @@ namespace Puya.Data
             return ExecuteReaderAsync<T>(cmd, behavior, fn, CancellationToken.None);
 
         }
+        // *
         public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, CancellationToken cancellation)
         {
             var result = new List<T>();
@@ -493,9 +548,17 @@ namespace Puya.Data
 
             return result;
         }
-        public static Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior)
+        public static async Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteReaderAsync<T>(cmd, behavior, CancellationToken.None);
+            var result = new List<T>();
+
+            await ExecuteReaderAsync(cmd, behavior, result, mapper, cancellation);
+
+            return result;
+        }
+        public static Task<IList<T>> ExecuteReaderAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
+        {
+            return ExecuteReaderAsync<T>(cmd, behavior, mapper, CancellationToken.None);
         }
         public static Task ExecuteReaderAsync(this DbCommand cmd, CommandBehavior behavior, IList<object> result, Type type, CancellationToken cancellation)
         {
@@ -537,7 +600,7 @@ namespace Puya.Data
         }
         public static async Task<object> ExecuteAsync(this DbCommand cmd, bool scaler, CancellationToken cancellation)
         {
-            InitCommand(cmd);
+            await InitCommandAsync(cmd, cancellation);
 
             if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.State == ConnectionState.Broken)
                 cmd.Connection.Open();

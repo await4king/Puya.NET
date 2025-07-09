@@ -133,7 +133,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior);
+                result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -160,7 +160,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteSingle<T>(cmd, behavior);
+                result = DbCommandExtensions.ExecuteSingle<T>(cmd, behavior, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -187,7 +187,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteReader<T>(cmd);
+                result = DbCommandExtensions.ExecuteReader<T>(cmd, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -214,7 +214,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteSingle<T>(cmd);
+                result = DbCommandExtensions.ExecuteSingle<T>(cmd, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -349,7 +349,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior);
+                result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -376,7 +376,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteSingle<T>(cmd, behavior);
+                result = DbCommandExtensions.ExecuteSingle<T>(cmd, behavior, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -403,7 +403,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteReader<T>(cmd);
+                result = DbCommandExtensions.ExecuteReader<T>(cmd, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -430,7 +430,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = DbCommandExtensions.ExecuteSingle<T>(cmd);
+                result = DbCommandExtensions.ExecuteSingle<T>(cmd, db.Mapper);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -581,7 +581,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, behavior, cancellation);
+                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, behavior, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -608,7 +608,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, behavior, cancellation);
+                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, behavior, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -643,7 +643,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, cancellation);
+                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -670,7 +670,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, cancellation);
+                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -829,7 +829,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, behavior, cancellation);
+                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, behavior, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -856,7 +856,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, behavior, cancellation);
+                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, behavior, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -891,7 +891,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, cancellation);
+                result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             
@@ -918,7 +918,7 @@ namespace Puya.Data
             {
                 var cmd = con.CreateCommand(query, CommandType.Text, parameters, db.AutoNullEmptyStrings);
                 
-                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, cancellation);
+                result = await DbCommandExtensions.ExecuteSingleAsync<T>(cmd, db.Mapper, cancellation);
 
                 cmd.ApplyOutputs(parameters);
             

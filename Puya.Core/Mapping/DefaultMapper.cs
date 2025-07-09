@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Puya.Base;
+using Puya.Collections;
 using Puya.Conversion;
 using Puya.Extensions;
 using Puya.Reflection;
@@ -92,7 +93,30 @@ namespace Puya.Mapping
 
             if (target == null)
             {
-                target = reader[0];
+                var _target = new DynamicModel();
+                
+                target = _target;
+
+                for (var index = 0; index < reader.FieldCount; index++)
+                {
+                    var name = reader.GetName(index);
+                    var value = reader.GetValue(index);
+
+                    _target[name] = value;
+                }
+
+                return;
+            }
+
+            if (target.GetType().IsDictionary())
+            {
+                for (var index = 0; index < reader.FieldCount; index++)
+                {
+                    var name = reader.GetName(index);
+                    var value = reader.GetValue(index);
+
+                    target.TrySetDictionaryItem(name, value);
+                }
 
                 return;
             }
@@ -111,10 +135,48 @@ namespace Puya.Mapping
                     }
                     else
                     {
-                        target = SafeClrConvert.ChangeType(value, type);
+                        var _value = value.ConvertTo(type);
+
+                        if (_value != null)
+                        {
+                            if (_value.GetType().IsBasicType())
+                            {
+                                target = _value;
+                            }
+                        }
+                        else
+                        {
+                            // last chance.
+                            // this is rare to occur though, since Object.ConvertTo() extension method
+                            // is smart and able to successfully convert DataReader's current column value
+
+                            target = SafeClrConvert.ChangeType(value, type);
+                        }
                     }
                 }
 
+                return;
+            }
+
+            if (target == null)
+            {
+                if (type.IsConstructable())
+                {
+                    try
+                    {
+                        target = ObjectActivator.Instance.Activate(type);
+                    }
+                    catch
+                    { }
+                }
+                else
+                {
+                    target = new DynamicModel();
+                }
+            }
+
+            if (target == null)
+            {
                 return;
             }
 

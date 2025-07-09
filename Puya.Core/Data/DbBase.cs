@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using Puya.Mapping;
+using System.Data.Common;
 
 namespace Puya.Data
 {
@@ -6,6 +7,7 @@ namespace Puya.Data
     {
         public virtual bool PersistConnection { get; set; }
         public virtual bool AutoNullEmptyStrings { get; set; }
+        public IMapper Mapper { get; set; }
         private IConnectionStringProvider _constrProvider;
         public IConnectionStringProvider ConnectionStringProvider
         {
@@ -18,7 +20,18 @@ namespace Puya.Data
             }
             set { _constrProvider = value; }
         }
-        public IDbContextInfoProvider DbContextInfoProvider { get; set; }
+        IDbContextInfoProvider _dbContextInfoProvider;
+        public IDbContextInfoProvider DbContextInfoProvider
+        {
+            get
+            {
+                if (_dbContextInfoProvider == null)
+                    _dbContextInfoProvider = new NullDbContextInfoProvider();
+
+                return _dbContextInfoProvider;
+            }
+            set { _dbContextInfoProvider = value; }
+        }
         protected abstract DbConnection GetConnectionInternal(string connectionString);
         protected abstract void SetContextInfo(DbConnection con);
         protected virtual void OnBeforeConnection(DbConnection con) { }

@@ -6,13 +6,13 @@
 		<Authors>Mansoor Omrani</Authors>
 		<Company>PuyaSoft</Company>
 		<Product>Puya.Core</Product>
-		<Version>2.1.8</Version>
+		<Version>3.0.0</Version>
 		<WebPage>https://puyasoft.com</WebPage>
 		<PackageProjectUrl>https://github.com/puyacodes/Puya.NET</PackageProjectUrl>
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\snk.pfx</AssemblyOriginatorKeyFile>
-		<AssemblyVersion>2.1.8.0</AssemblyVersion>
+		<AssemblyVersion>3.0.0.0</AssemblyVersion>
 		<Nullable>disable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Copyright>2018-2025</Copyright>
@@ -21,7 +21,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/puyacodes/Puya.NET</RepositoryUrl>
 		<PackageTags>Puyasoft, Tap, "Tarh Andishan Puya", Puya.Core, .Net</PackageTags>
-		<PackageReleaseNotes>This is the first public release of Puya.Core package.</PackageReleaseNotes>
+		<PackageReleaseNotes></PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

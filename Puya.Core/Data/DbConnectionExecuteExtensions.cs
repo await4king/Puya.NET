@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Puya.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -67,7 +68,7 @@ namespace Puya.Data
                 
             return result;
         }
-		public static IList<T> ExecuteReaderCommand<T>(this DbConnection con, string sproc, CommandBehavior behavior, object parameters = null)
+		public static IList<T> ExecuteReaderCommand<T>(this DbConnection con, string sproc, CommandBehavior behavior, object parameters = null, IMapper mapper = null)
         {
             if (con == null)
 	        {
@@ -75,7 +76,7 @@ namespace Puya.Data
 	        }
 
             var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters);
-            var result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior);
+            var result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior, mapper);
 
             cmd.ApplyOutputs(parameters);
                 
@@ -95,7 +96,7 @@ namespace Puya.Data
                 
             return result;
         }
-		public static IList<T> ExecuteReaderCommand<T>(this DbConnection con, string sproc, object parameters = null)
+		public static IList<T> ExecuteReaderCommand<T>(this DbConnection con, string sproc, object parameters = null, IMapper mapper = null)
         {
             if (con == null)
 	        {
@@ -103,7 +104,7 @@ namespace Puya.Data
 	        }
 
             var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters);
-            var result = DbCommandExtensions.ExecuteReader<T>(cmd);
+            var result = DbCommandExtensions.ExecuteReader<T>(cmd, mapper);
 
             cmd.ApplyOutputs(parameters);
                 
@@ -179,7 +180,7 @@ namespace Puya.Data
                 
             return result;
         }
-		public static IList<T> ExecuteReaderSql<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters = null)
+		public static IList<T> ExecuteReaderSql<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters = null, IMapper mapper = null)
         {
             if (con == null)
 	        {
@@ -187,7 +188,7 @@ namespace Puya.Data
 	        }
 
             var cmd = con.CreateCommand(query, CommandType.Text, parameters);
-            var result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior);
+            var result = DbCommandExtensions.ExecuteReader<T>(cmd, behavior, mapper);
 
             cmd.ApplyOutputs(parameters);
                 
@@ -207,7 +208,7 @@ namespace Puya.Data
                 
             return result;
         }
-		public static IList<T> ExecuteReaderSql<T>(this DbConnection con, string query, object parameters = null)
+		public static IList<T> ExecuteReaderSql<T>(this DbConnection con, string query, object parameters = null, IMapper mapper = null)
         {
             if (con == null)
 	        {
@@ -215,7 +216,7 @@ namespace Puya.Data
 	        }
 
             var cmd = con.CreateCommand(query, CommandType.Text, parameters);
-            var result = DbCommandExtensions.ExecuteReader<T>(cmd);
+            var result = DbCommandExtensions.ExecuteReader<T>(cmd, mapper);
 
             cmd.ApplyOutputs(parameters);
                 
@@ -357,6 +358,20 @@ namespace Puya.Data
                 
             return result;
         }
+        public static async Task<IList<T>> ExecuteReaderCommandAsync<T>(this DbConnection con, string sproc, object parameters, IMapper mapper, CancellationToken cancellation)
+        {
+            if (con == null)
+            {
+                throw new ConnectionNullException();
+            }
+
+            var cmd = con.CreateCommand(sproc, CommandType.StoredProcedure, parameters);
+            var result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, mapper, cancellation);
+
+            cmd.ApplyOutputs(parameters);
+
+            return result;
+        }
         public static async Task<T> ExecuteSingleCommandAsync<T>(this DbConnection con, string sproc, object parameters, CancellationToken cancellation)
         {
             if (con == null)
@@ -371,9 +386,9 @@ namespace Puya.Data
                 
             return result;
         }
-		public static Task<IList<T>> ExecuteReaderCommandAsync<T>(this DbConnection con, string sproc, object parameters = null)
+		public static Task<IList<T>> ExecuteReaderCommandAsync<T>(this DbConnection con, string sproc, object parameters = null, IMapper mapper = null)
         {
-            return ExecuteReaderCommandAsync<T>(con, sproc, parameters, CancellationToken.None);
+            return ExecuteReaderCommandAsync<T>(con, sproc, parameters, mapper, CancellationToken.None);
         }
         public static Task<T> ExecuteSingleCommandAsync<T>(this DbConnection con, string sproc, object parameters = null)
         {
@@ -465,6 +480,20 @@ namespace Puya.Data
                 
             return result;
         }
+        public static async Task<IList<T>> ExecuteReaderSqlAsync<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters, IMapper mapper, CancellationToken cancellation)
+        {
+            if (con == null)
+            {
+                throw new ConnectionNullException();
+            }
+
+            var cmd = con.CreateCommand(query, CommandType.Text, parameters);
+            var result = await DbCommandExtensions.ExecuteReaderAsync<T>(cmd, behavior, mapper, cancellation);
+
+            cmd.ApplyOutputs(parameters);
+
+            return result;
+        }
         public static async Task<T> ExecuteSingleSqlAsync<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters, CancellationToken cancellation)
         {
             if (con == null)
@@ -479,9 +508,9 @@ namespace Puya.Data
                 
             return result;
         }
-		public static Task<IList<T>> ExecuteReaderSqlAsync<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters = null)
+		public static Task<IList<T>> ExecuteReaderSqlAsync<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters = null, IMapper mapper = null)
         {
-            return ExecuteReaderSqlAsync<T>(con, query, behavior, parameters, CancellationToken.None);
+            return ExecuteReaderSqlAsync<T>(con, query, behavior, parameters, mapper, CancellationToken.None);
         }
         public static Task<T> ExecuteSingleSqlAsync<T>(this DbConnection con, string query, CommandBehavior behavior, object parameters = null)
         {

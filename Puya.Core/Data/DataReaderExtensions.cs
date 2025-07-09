@@ -131,7 +131,7 @@ namespace Puya.Data
 
             if (instance == null)
             {
-                if (!(_type.IsInterface || _type.IsAbstract))
+                if (_type.IsConstructable())
                 {
                     try
                     {

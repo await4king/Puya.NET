@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.Common;
 
 namespace Puya.Data
 {
-    public class NullDb : IDb
+    public class NullDb : DbBase
     {
-        public IConnectionStringProvider ConnectionStringProvider
+        protected override DbConnection GetConnectionInternal(string connectionString)
         {
-            get;set;
-        }
-        public bool PersistConnection { get; set; }
-        public bool AutoNullEmptyStrings { get; set; }
+            var result = new FakeDbConnection();
 
-        public DbConnection GetConnection()
+            result.ConnectionString = connectionString;
+
+            return result;
+        }
+        protected override void SetContextInfo(DbConnection con)
         {
-            return new FakeDbConnection();
         }
     }
 }
