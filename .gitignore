@@ -23,6 +23,7 @@ bld/
 [Oo]bj/
 
 !Puya.Core/Sms/Debug
+!Puya.Core/Logging/Debug
 
 # Visual Studio 2015 cache/options directory
 .vs/
