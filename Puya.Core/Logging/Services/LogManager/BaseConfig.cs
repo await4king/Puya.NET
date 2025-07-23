@@ -5,7 +5,7 @@ using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerBaseConfig: ServiceConfig
+	public partial class PuyaLogManagerBaseConfig: ServiceConfig
     {
     }
 }

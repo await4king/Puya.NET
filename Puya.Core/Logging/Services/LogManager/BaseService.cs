@@ -9,17 +9,17 @@ using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public abstract partial class TapLogManagerBase : BaseActionBasedService<TapLogManagerBaseConfig>, ITapLogManager
+	public abstract partial class PuyaLogManagerBase : BaseActionBasedService<PuyaLogManagerBaseConfig>, IPuyaLogManager
     {
-        public abstract TapLogManagerClearBaseAction Clear { get; protected set; }
-        public abstract TapLogManagerGetByPKBaseAction GetByPK { get; protected set; }
-        public abstract TapLogManagerGetPageBaseAction GetPage { get; protected set; }
-        public abstract TapLogManagerDeleteByPKBaseAction DeleteByPK { get; protected set; }
-		public TapLogManagerBase(TapLogManagerBaseConfig config) : base(config)
+        public abstract PuyaLogManagerClearBaseAction Clear { get; protected set; }
+        public abstract PuyaLogManagerGetByPKBaseAction GetByPK { get; protected set; }
+        public abstract PuyaLogManagerGetPageBaseAction GetPage { get; protected set; }
+        public abstract PuyaLogManagerDeleteByPKBaseAction DeleteByPK { get; protected set; }
+		public PuyaLogManagerBase(PuyaLogManagerBaseConfig config) : base(config)
 		{
 			Init(config);
         }
-		partial void Init(TapLogManagerBaseConfig config);
+		partial void Init(PuyaLogManagerBaseConfig config);
     }
 }
 

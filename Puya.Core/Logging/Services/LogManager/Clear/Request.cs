@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerClearRequest : ServiceRequest
+	public partial class PuyaLogManagerClearRequest : ServiceRequest
     {
 	}
 }

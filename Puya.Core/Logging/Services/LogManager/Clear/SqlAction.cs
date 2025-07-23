@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerSqlClearAction : TapLogManagerClearBaseAction
+	public partial class PuyaLogManagerSqlClearAction : PuyaLogManagerClearBaseAction
     {
-        public TapLogManagerSqlClearAction(TapLogManagerSql owner) : base(owner)
+        public PuyaLogManagerSqlClearAction(PuyaLogManagerSql owner) : base(owner)
         {
         }
 	}

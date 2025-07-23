@@ -129,7 +129,7 @@ namespace Puya.Translation
             var assemblies = new List<Assembly>();
 
             Logger.Info($"{this.GetType().Name}.LoadInternal");
-            Logger.Debug("Current resource assemblies : ", logger => Assemblies.Join(", "));
+            Logger.Debug("Current resource assemblies : ", () => Assemblies.Join(", "));
 
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 

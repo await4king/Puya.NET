@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Puya.Logging.Models;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public abstract partial class TapLogManagerGetByPKBaseAction:
-        ServiceAction<TapLogManagerBase, TapLogManagerBaseConfig, TapLogManagerGetByPKRequest, TapLogManagerGetByPKResponse>
+	public abstract partial class PuyaLogManagerGetByPKBaseAction:
+        ServiceAction<PuyaLogManagerBase, PuyaLogManagerBaseConfig, PuyaLogManagerGetByPKRequest, PuyaLogManagerGetByPKResponse>
     {
-        public TapLogManagerGetByPKBaseAction(TapLogManagerBase owner) : base(owner)
+        public PuyaLogManagerGetByPKBaseAction(PuyaLogManagerBase owner) : base(owner)
         {
         }
     }

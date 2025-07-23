@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial interface ITapLogManager :IService<TapLogManagerBaseConfig>
+	public partial interface IPuyaLogManager :IService<PuyaLogManagerBaseConfig>
     {
-        TapLogManagerClearBaseAction Clear { get; }
-        TapLogManagerGetByPKBaseAction GetByPK { get; }
-        TapLogManagerGetPageBaseAction GetPage { get; }
-        TapLogManagerDeleteByPKBaseAction DeleteByPK { get; }
+        PuyaLogManagerClearBaseAction Clear { get; }
+        PuyaLogManagerGetByPKBaseAction GetByPK { get; }
+        PuyaLogManagerGetPageBaseAction GetPage { get; }
+        PuyaLogManagerDeleteByPKBaseAction DeleteByPK { get; }
     }
 }

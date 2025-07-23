@@ -5,25 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Puya.Logging.Models;
 using Puya.Data;
 using Puya.Conversion;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerSqlGetPageAction : TapLogManagerGetPageBaseAction
+	public partial class PuyaLogManagerSqlGetPageAction : PuyaLogManagerGetPageBaseAction
     {
-		private async Task DoRun(TapLogManagerGetPageRequest request, TapLogManagerGetPageResponse response, bool async, CancellationToken cancellation)
+		private async Task DoRun(PuyaLogManagerGetPageRequest request, PuyaLogManagerGetPageResponse response, bool async, CancellationToken cancellation)
 		{
-			var owner = Owner as TapLogManagerSql;
+			var owner = Owner as PuyaLogManagerSql;
 
 			if (async)
 			{
-				response.Data.Items = await owner.Db.ExecuteReaderCommandAsync<Models.Log>("usp1_Logs_get_page", request, cancellation);
+				response.Data.Items = await owner.Db.ExecuteReaderCommandAsync<Log>("usp1_Logs_get_page", request, cancellation);
 			}
 			else
 			{
-				response.Data.Items = owner.Db.ExecuteReaderCommand<Models.Log>("usp1_Logs_get_page");
+				response.Data.Items = owner.Db.ExecuteReaderCommand<Log>("usp1_Logs_get_page");
 			}
 
 			response.Data.RecordCount = SafeClrConvert.ToInt(request.RecordCount.Value);
@@ -31,11 +30,11 @@ namespace Puya.Logging.Services.LogManager
 
 			response.Succeeded();
 		}
-		protected override void RunInternal(TapLogManagerGetPageRequest request, TapLogManagerGetPageResponse response)
+		protected override void RunInternal(PuyaLogManagerGetPageRequest request, PuyaLogManagerGetPageResponse response)
 		{
 			DoRun(request, response, false, CancellationToken.None).Wait();
 		}
-        protected override async Task RunInternalAsync(TapLogManagerGetPageRequest request, TapLogManagerGetPageResponse response, CancellationToken cancellation)
+        protected override async Task RunInternalAsync(PuyaLogManagerGetPageRequest request, PuyaLogManagerGetPageResponse response, CancellationToken cancellation)
         {
 			await DoRun(request, response, true, cancellation);
 		}

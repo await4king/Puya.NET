@@ -1,12 +1,8 @@
 ﻿using Puya.Extensions;
-using Puya.Logging.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puya.Logging
 {
@@ -31,7 +27,7 @@ namespace Puya.Logging
                 Category = category,
                 Message = e.ToString("\n"),
                 StackTrace = e.StackTrace,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -67,7 +63,7 @@ namespace Puya.Logging
                 Category = category,
                 Message = e.ToString("\n"),
                 StackTrace = e.StackTrace,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -114,7 +110,7 @@ namespace Puya.Logging
                 Category = category,
                 Message = e.ToString("\n"),
                 StackTrace = e.StackTrace,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -150,7 +146,7 @@ namespace Puya.Logging
                 Category = category,
                 Message = e.ToString("\n"),
                 StackTrace = e.StackTrace,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -194,7 +190,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Trace,
                 OperationResult = OperationResult.Normal,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -204,7 +200,7 @@ namespace Puya.Logging
         }
         public static void Trace(this ILogger logger,
                                 string category = "",
-                                Func<ILogger, object> fnGetData = null,
+                                Func<object> fnGetData = null,
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
@@ -241,7 +237,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Trace,
                 OperationResult = OperationResult.Normal,
-                DataObject = data,
+                Data = data,
                 Message = message,
                 MemberName = memberName,
                 Line = sourceLineNumber,
@@ -253,7 +249,7 @@ namespace Puya.Logging
         public static void Trace(this ILogger logger,
                                 string category,
                                 string message = "",
-                                Func<ILogger, object> fnGetData = null,
+                                Func<object> fnGetData = null,
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
@@ -277,7 +273,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Trace,
                 OperationResult = OperationResult.Normal,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath,
@@ -289,7 +285,7 @@ namespace Puya.Logging
         public static Task TraceAsync(this ILogger logger,
                                 string category,
                                 string message,
-                                Func<ILogger, object> fnGetData,
+                                Func<object> fnGetData,
                                 CancellationToken cancellation,
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
@@ -323,7 +319,7 @@ namespace Puya.Logging
         }
         public static Task TraceAsync(this ILogger logger,
                                 string category,
-                                Func<ILogger, object> fnGetData,
+                                Func<object> fnGetData,
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
@@ -343,7 +339,7 @@ namespace Puya.Logging
         public static Task TraceAsync(this ILogger logger,
                                 string category,
                                 string message,
-                                Func<ILogger, object> fnGetData,
+                                Func<object> fnGetData,
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
@@ -366,7 +362,7 @@ namespace Puya.Logging
             {
                 OperationResult = OperationResult.Cancel,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -390,7 +386,7 @@ namespace Puya.Logging
                 Category = category,
                 OperationResult = OperationResult.Cancel,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -415,7 +411,7 @@ namespace Puya.Logging
                 OperationResult = OperationResult.Cancel,
                 Category = category,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -459,7 +455,7 @@ namespace Puya.Logging
             {
                 OperationResult = OperationResult.Success,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -483,7 +479,7 @@ namespace Puya.Logging
                 Category = category,
                 OperationResult = OperationResult.Success,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -508,7 +504,7 @@ namespace Puya.Logging
                 Category = category,
                 OperationResult = OperationResult.Success,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -555,7 +551,7 @@ namespace Puya.Logging
                 OperationResult = OperationResult.Fault,
                 Category = category,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -578,7 +574,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Fault,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -604,7 +600,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Fault,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -650,7 +646,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Failure,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -673,7 +669,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Failure,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -698,7 +694,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Failure,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -744,7 +740,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Error,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -767,7 +763,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Error,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -793,7 +789,7 @@ namespace Puya.Logging
                 LogType = LogType.Error,
                 OperationResult = OperationResult.Error,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -838,7 +834,7 @@ namespace Puya.Logging
                 Category = category,
                 OperationResult = OperationResult.Abort,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -860,7 +856,7 @@ namespace Puya.Logging
             {
                 OperationResult = OperationResult.Abort,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -885,7 +881,7 @@ namespace Puya.Logging
                 Category = category,
                 OperationResult = OperationResult.Abort,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -931,7 +927,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Alert,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -954,7 +950,7 @@ namespace Puya.Logging
             {
                 LogType = LogType.Alert,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -980,7 +976,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Alert,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1025,7 +1021,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Debug,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1036,7 +1032,7 @@ namespace Puya.Logging
         public static void Debug(this ILogger logger,
                                     string category,
                                     string message,
-                                    Func<ILogger, object> fnGetData,
+                                    Func<object> fnGetData,
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
@@ -1071,7 +1067,7 @@ namespace Puya.Logging
             {
                 LogType = LogType.Debug,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1081,7 +1077,7 @@ namespace Puya.Logging
         }
         public static void Debug(this ILogger logger,
                                     string message,
-                                    Func<ILogger, object> fnGetData,
+                                    Func<object> fnGetData,
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
@@ -1118,7 +1114,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Debug,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1129,7 +1125,7 @@ namespace Puya.Logging
         public static Task DebugAsync(this ILogger logger,
                                         string category,
                                         string message,
-                                        Func<ILogger, object> fnGetData,
+                                        Func<object> fnGetData,
                                         CancellationToken cancellation,
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
@@ -1164,7 +1160,7 @@ namespace Puya.Logging
         public static Task DebugAsync(this ILogger logger,
                                         string category,
                                         string message,
-                                        Func<ILogger, object> fnGetData,
+                                        Func<object> fnGetData,
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
@@ -1182,7 +1178,7 @@ namespace Puya.Logging
         }
         public static Task DebugAsync(this ILogger logger,
                                         string message,
-                                        Func<ILogger, object> fnGetData,
+                                        Func<object> fnGetData,
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
@@ -1206,7 +1202,7 @@ namespace Puya.Logging
             {
                 Category = category,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1227,7 +1223,7 @@ namespace Puya.Logging
             var log = new Log
             {
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1251,7 +1247,7 @@ namespace Puya.Logging
             {
                 Category = category,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1296,7 +1292,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Warning,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1318,7 +1314,7 @@ namespace Puya.Logging
             {
                 LogType = LogType.Warning,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1343,7 +1339,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Warning,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1388,7 +1384,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Suggestion,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1410,7 +1406,7 @@ namespace Puya.Logging
             {
                 LogType = LogType.Suggestion,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1435,7 +1431,7 @@ namespace Puya.Logging
                 Category = category,
                 LogType = LogType.Suggestion,
                 Message = message,
-                DataObject = data,
+                Data = data,
                 MemberName = memberName,
                 Line = sourceLineNumber,
                 File = sourceFilePath
@@ -1463,5 +1459,21 @@ namespace Puya.Logging
             return SuggestAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
         #endregion
+        public static string SerializeData(this ILogFormatter formatter, Log log)
+        {
+            var data = string.Empty;
+
+            if (formatter != null && log != null && formatter.DataConverter != null)
+            {
+                var obj = log.GetData == null ? log.Data : log.GetData();
+
+                if (obj != null)
+                {
+                    data = formatter.DataConverter.Serialize(obj);
+                }
+            }
+
+            return data;
+        }
     }
 }

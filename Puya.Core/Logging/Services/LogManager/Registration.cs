@@ -3,20 +3,20 @@ using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerRegistration : ServiceRegistery
+	public partial class PuyaLogManagerRegistration : ServiceRegistery
     {
-        public TapLogManagerRegistration()
+        public PuyaLogManagerRegistration()
         {
-			Add(typeof(TapLogManagerSqlConfig), typeof(TapLogManagerSqlConfig));
-			Add(typeof(TapLogManagerBaseConfig), typeof(TapLogManagerBaseConfig));
-			Add(typeof(TapLogManagerBase), typeof(TapLogManagerSql));
-			Add(typeof(ITapLogManager), typeof(TapLogManagerSql));
-			Add(typeof(TapLogManagerSql), typeof(TapLogManagerSql));
+			Add(typeof(PuyaLogManagerSqlConfig), typeof(PuyaLogManagerSqlConfig));
+			Add(typeof(PuyaLogManagerBaseConfig), typeof(PuyaLogManagerBaseConfig));
+			Add(typeof(PuyaLogManagerBase), typeof(PuyaLogManagerSql));
+			Add(typeof(IPuyaLogManager), typeof(PuyaLogManagerSql));
+			Add(typeof(PuyaLogManagerSql), typeof(PuyaLogManagerSql));
 
-            Add(typeof(TapLogManagerClearBaseAction), typeof(TapLogManagerSqlClearAction));
-            Add(typeof(TapLogManagerGetByPKBaseAction), typeof(TapLogManagerSqlGetByPKAction));
-            Add(typeof(TapLogManagerGetPageBaseAction), typeof(TapLogManagerSqlGetPageAction));
-            Add(typeof(TapLogManagerDeleteByPKBaseAction), typeof(TapLogManagerSqlDeleteByPKAction));
+            Add(typeof(PuyaLogManagerClearBaseAction), typeof(PuyaLogManagerSqlClearAction));
+            Add(typeof(PuyaLogManagerGetByPKBaseAction), typeof(PuyaLogManagerSqlGetByPKAction));
+            Add(typeof(PuyaLogManagerGetPageBaseAction), typeof(PuyaLogManagerSqlGetPageAction));
+            Add(typeof(PuyaLogManagerDeleteByPKBaseAction), typeof(PuyaLogManagerSqlDeleteByPKAction));
 		}
 	}
 }

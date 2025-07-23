@@ -9,11 +9,11 @@ using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerSqlDeleteByPKAction : TapLogManagerDeleteByPKBaseAction
+	public partial class PuyaLogManagerSqlDeleteByPKAction : PuyaLogManagerDeleteByPKBaseAction
     {
-		private async Task DoRun(TapLogManagerDeleteByPKRequest request, TapLogManagerDeleteByPKResponse response, bool async, CancellationToken cancellation)
+		private async Task DoRun(PuyaLogManagerDeleteByPKRequest request, PuyaLogManagerDeleteByPKResponse response, bool async, CancellationToken cancellation)
 		{
-			var owner = Owner as TapLogManagerSql;
+			var owner = Owner as PuyaLogManagerSql;
 			var query = $"delete from dbo.Logs where Id={request.Key}";
 
 			if (async)
@@ -27,11 +27,11 @@ namespace Puya.Logging.Services.LogManager
 
 			response.Succeeded();
 		}
-		protected override void RunInternal(TapLogManagerDeleteByPKRequest request, TapLogManagerDeleteByPKResponse response)
+		protected override void RunInternal(PuyaLogManagerDeleteByPKRequest request, PuyaLogManagerDeleteByPKResponse response)
 		{
 			DoRun(request, response, false, CancellationToken.None).Wait();
 		}
-        protected override async Task RunInternalAsync(TapLogManagerDeleteByPKRequest request, TapLogManagerDeleteByPKResponse response, CancellationToken cancellation)
+        protected override async Task RunInternalAsync(PuyaLogManagerDeleteByPKRequest request, PuyaLogManagerDeleteByPKResponse response, CancellationToken cancellation)
         {
 			await DoRun(request, response, true, cancellation);
 		}

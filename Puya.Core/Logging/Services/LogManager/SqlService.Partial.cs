@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerSql : TapLogManagerBase
+	public partial class PuyaLogManagerSql : PuyaLogManagerBase
     {
         public IDb Db { get; set; }
-        partial void Init(TapLogManagerSqlConfig config, IDb db)
+        partial void Init(PuyaLogManagerSqlConfig config, IDb db)
         {
             Db = db;
         }

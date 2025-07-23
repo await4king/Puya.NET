@@ -1,11 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace Puya.Logging.Models
+namespace Puya.Logging
 {
     public enum LogType : byte
     {
@@ -32,12 +27,12 @@ namespace Puya.Logging.Models
     public enum LogLevel : byte
     {
         None = 0,
-        Info = 71,  // LogTypes: 1: Info, 2: Warning, 4: Alert, 64: Suggestion
-        Debug = 40, // LogType: 8: Debug, 32: Trace
-        Error = 16, // LogType: 32: Error
-        InfoError = 87, // Info (71) + Error (16)
-        InfoDebug = 111,    // Info (71) + Debug (40)
-        DebugError = 56,    // Debug (16) + Error (16)
+        Info = 71,          // Info (1) + Warning (2) + Alert (4) + Suggestion (64)
+        Debug = 40,         // Debug (8) + Trace (32)
+        Error = 16,         // Error (16)
+        InfoError = 87,     // InfoLevel (71) + ErrorLevel (16)
+        InfoDebug = 111,    // InfoLevel (71) + DebugLevel (40)
+        DebugError = 56,    // DebugLevel (40) + ErrorLevel (16)
         All = 127
     }
     public class Log
@@ -61,10 +56,8 @@ namespace Puya.Logging.Models
         public string Ip { get; set; }
         public string User { get; set; }
         public DateTime LogDate { get; set; }
-        public string Data { get; set; }
-        public Func<ILogger, object> GetData { get; set; }
-        public object DataObject { get; set; }
-        public dynamic StrongDataObject { get; set; }
+        public Func<object> GetData { get; set; }
+        public object Data { get; set; }
         public OperationResult OperationResult
         {
             get
@@ -92,6 +85,27 @@ namespace Puya.Logging.Models
             LogDate = DateTime.Now;
             OperationResult = OperationResult.Normal;
             LogType = LogType.Info;
+        }
+        public virtual Log Clone()
+        {
+            return new Log
+            {
+                AppId = AppId,
+                LogDate = LogDate,
+                Category = Category,
+                Data = Data,
+                File = File,
+                GetData = GetData,
+                Id = Id,
+                Ip = Ip,
+                Line = Line,
+                MemberName = MemberName,
+                Message = Message,
+                Result = Result,
+                StackTrace = StackTrace,
+                Type = Type,
+                User = User
+            };
         }
     }
 }

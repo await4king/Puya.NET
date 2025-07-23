@@ -9,29 +9,29 @@ using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public partial class TapLogManagerSql : TapLogManagerBase
+	public partial class PuyaLogManagerSql : PuyaLogManagerBase
     {
-	public TapLogManagerSqlConfig StrongConfig
+	public PuyaLogManagerSqlConfig StrongConfig
         {
-            get { return Config as TapLogManagerSqlConfig; }
+            get { return Config as PuyaLogManagerSqlConfig; }
         }
-        public override TapLogManagerClearBaseAction Clear { get; protected set; }
-        public override TapLogManagerGetByPKBaseAction GetByPK { get; protected set; }
-        public override TapLogManagerGetPageBaseAction GetPage { get; protected set; }
-        public override TapLogManagerDeleteByPKBaseAction DeleteByPK { get; protected set; }
-		public TapLogManagerSql(TapLogManagerSqlConfig config, IDb db) : base(config)
+        public override PuyaLogManagerClearBaseAction Clear { get; protected set; }
+        public override PuyaLogManagerGetByPKBaseAction GetByPK { get; protected set; }
+        public override PuyaLogManagerGetPageBaseAction GetPage { get; protected set; }
+        public override PuyaLogManagerDeleteByPKBaseAction DeleteByPK { get; protected set; }
+		public PuyaLogManagerSql(PuyaLogManagerSqlConfig config, IDb db) : base(config)
 		{
-        	Clear = new TapLogManagerSqlClearAction(this);
+        	Clear = new PuyaLogManagerSqlClearAction(this);
         	Actions.Add("Clear", Clear);
-        	GetByPK = new TapLogManagerSqlGetByPKAction(this);
+        	GetByPK = new PuyaLogManagerSqlGetByPKAction(this);
         	Actions.Add("GetByPK", GetByPK);
-        	GetPage = new TapLogManagerSqlGetPageAction(this);
+        	GetPage = new PuyaLogManagerSqlGetPageAction(this);
         	Actions.Add("GetPage", GetPage);
-        	DeleteByPK = new TapLogManagerSqlDeleteByPKAction(this);
+        	DeleteByPK = new PuyaLogManagerSqlDeleteByPKAction(this);
         	Actions.Add("DeleteByPK", DeleteByPK);
 			Init(config, db);
         }
-		partial void Init(TapLogManagerSqlConfig config, IDb db);
+		partial void Init(PuyaLogManagerSqlConfig config, IDb db);
     }
 }
 

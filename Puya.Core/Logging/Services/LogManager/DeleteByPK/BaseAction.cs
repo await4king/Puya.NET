@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.LogManager
 {
-	public abstract partial class TapLogManagerDeleteByPKBaseAction:
-        ServiceAction<TapLogManagerBase, TapLogManagerBaseConfig, TapLogManagerDeleteByPKRequest, TapLogManagerDeleteByPKResponse>
+	public abstract partial class PuyaLogManagerDeleteByPKBaseAction:
+        ServiceAction<PuyaLogManagerBase, PuyaLogManagerBaseConfig, PuyaLogManagerDeleteByPKRequest, PuyaLogManagerDeleteByPKResponse>
     {
-        public TapLogManagerDeleteByPKBaseAction(TapLogManagerBase owner) : base(owner)
+        public PuyaLogManagerDeleteByPKBaseAction(PuyaLogManagerBase owner) : base(owner)
         {
         }
     }

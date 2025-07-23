@@ -1,7 +1,6 @@
 ﻿using System.Data.SqlClient;
 using System.Data.Common;
 using System.Data;
-using System;
 using Puya.Mapping;
 
 namespace Puya.Data
@@ -27,24 +26,28 @@ namespace Puya.Data
         {
             if (MaxContextInfoSize > 0)
             {
-                var contextInfo = DbContextInfoProvider.GetContextInfo();
-                var CONTEXT_SQL = $@"
-                              declare @ctx varbinary({MaxContextInfoSize})
-                              set @ctx = cast(@contextinfo as varbinary({MaxContextInfoSize}))
-                              set context_info @ctx";
+                var contextInfo = DbContextInfoProvider?.GetContextInfo();
 
-                var cmd = con.CreateCommand();
+                if (!string.IsNullOrEmpty(contextInfo))
+                {
+                    var CONTEXT_SQL = $@"
+                                  declare @ctx varbinary({MaxContextInfoSize})
+                                  set @ctx = cast(@contextinfo as varbinary({MaxContextInfoSize}))
+                                  set context_info @ctx";
 
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = CONTEXT_SQL;
+                    var cmd = con.CreateCommand();
 
-                var p = new SqlParameter("@contextinfo", SqlDbType.NVarChar, MaxContextInfoSize);
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = CONTEXT_SQL;
 
-                p.Value = string.IsNullOrEmpty(contextInfo) ? DBNull.Value : (object)contextInfo;
+                    var p = new SqlParameter("@contextinfo", SqlDbType.NVarChar, MaxContextInfoSize);
 
-                cmd.Parameters.Add(p);
+                    p.Value = contextInfo;
 
-                cmd.ExecuteNonQuery();
+                    cmd.Parameters.Add(p);
+
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
         protected override DbConnection GetConnectionInternal(string conenctionString)

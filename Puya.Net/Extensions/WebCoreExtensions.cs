@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Puya.Extensions.WebCore
+namespace Puya.Extensions
 {
     public static class WbCoreExtensions
     {

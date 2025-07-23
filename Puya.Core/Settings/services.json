@@ -5,7 +5,7 @@
     {
       "Folder": "Db",
       "Namespace": ".Db",
-      "Usings": [ "Tap.Data", "Tap.Logging", "Tap.Caching", "Tap.Settings" ],
+      "Usings": [ "Puya.Data", "Puya.Logging", "Tap.Caching", "Tap.Settings" ],
       "Service": "TapDbSettings",
       "ParentConstructors": [
         [ "TapDbSettingsBaseConfig" ],
@@ -44,8 +44,8 @@
           "Usings": [ "Tap.Settings.Service.Models" ],
           "Concretes": [ "Default" ],
           "RequestProps": {
-            "Result": "Tap.Data.CommandParameter",
-            "Message": "Tap.Data.CommandParameter",
+            "Result": "Puya.Data.CommandParameter",
+            "Message": "Puya.Data.CommandParameter",
             "AppId": "int",
             "Key": "string",
             "Value": "string"
@@ -59,8 +59,8 @@
           "Usings": [ "Tap.Settings.Service.Models" ],
           "Concretes": [ "Default" ],
           "RequestProps": {
-            "Result": "Tap.Data.CommandParameter",
-            "Message": "Tap.Data.CommandParameter",
+            "Result": "Puya.Data.CommandParameter",
+            "Message": "Puya.Data.CommandParameter",
             "Id": "int",
             "Value": "string"
           },
@@ -73,8 +73,8 @@
           "Usings": [ "Tap.Settings.Service.Models" ],
           "Concretes": [ "Default" ],
           "RequestProps": {
-            "Result": "Tap.Data.CommandParameter",
-            "Message": "Tap.Data.CommandParameter",
+            "Result": "Puya.Data.CommandParameter",
+            "Message": "Puya.Data.CommandParameter",
             "Key": "string",
             "Value": "string"
           },
@@ -87,8 +87,8 @@
           "Usings": [ "Tap.Settings.Service.Models" ],
           "Concretes": [ "Default" ],
           "RequestProps": {
-            "Result": "Tap.Data.CommandParameter",
-            "Message": "Tap.Data.CommandParameter",
+            "Result": "Puya.Data.CommandParameter",
+            "Message": "Puya.Data.CommandParameter",
             "Id": "int"
           },
           "PartialBase": false,
@@ -108,8 +108,8 @@
           "Usings": [ "Tap.Settings.Service.Models" ],
           "Concretes": [ "Default" ],
           "RequestProps": {
-            "Result": "Tap.Data.CommandParameter",
-            "Message": "Tap.Data.CommandParameter",
+            "Result": "Puya.Data.CommandParameter",
+            "Message": "Puya.Data.CommandParameter",
             "Key": "string"
           },
           "PartialBase": false,
@@ -125,8 +125,8 @@
             "Value": "string",
             "PageNo": "int",
             "PageSize": "int",
-            "RecordCount": "Tap.Data.CommandParameter",
-            "PageCount": "Tap.Data.CommandParameter",
+            "RecordCount": "Puya.Data.CommandParameter",
+            "PageCount": "Puya.Data.CommandParameter",
             "OrderBy": "string",
             "OrderDir": "string"
           },

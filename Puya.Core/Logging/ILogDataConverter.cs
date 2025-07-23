@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Puya.Logging
+﻿namespace Puya.Logging
 {
     public interface ILogDataConverter
     {
