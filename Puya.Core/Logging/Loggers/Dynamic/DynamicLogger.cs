@@ -34,6 +34,49 @@ namespace Puya.Logging
             return Instance.LogAsync(log, cancellation);
         }
         #region GetLoggers
+        protected virtual ILogger GetLogger(string type)
+        {
+            var result = null as ILogger;
+
+            switch (type.ToLower())
+            {
+                case "console":
+                    result = GetConsoleLogger();
+                    break;
+                case "debug":
+                    result = GetDebugLogger();
+                    break;
+                case "memory":
+                    result = GetMemoryLogger();
+                    break;
+                case "file":
+                    result = GetFileLogger();
+                    break;
+                case "sqlserver":
+                    result = GetSqlServerLogger();
+                    break;
+                case "xml":
+                    result = GetXmlLogger();
+                    break;
+                case "json":
+                    result = GetJsonLogger();
+                    break;
+                case "csv":
+                    result = GetCsvLogger();
+                    break;
+                case "null":
+                    result = new NullLogger();
+                    break;
+                default:
+                    if (Config.ThrowOnInvalidLoggers)
+                    {
+                        throw new Exception($"Logger '{type}' not supported");
+                    }
+                    break;
+            }
+
+            return result;
+        }
         protected virtual ILogger GetConsoleLogger()
         {
             return new ConsoleLogger(new ConsoleLoggerConfig(Config?.Formatter), Next);
@@ -52,7 +95,7 @@ namespace Puya.Logging
         }
         protected virtual ILogger GetSqlServerLogger()
         {
-            return new SqlServerLogger(new SqlServerLoggerConfig(Config?.Formatter), Db, Next);
+            return new SqlServerLogger(new SqlServerLoggerConfig(), Db, Next);
         }
         protected virtual ILogger GetXmlLogger()
         {
@@ -64,7 +107,7 @@ namespace Puya.Logging
         }
         protected virtual ILogger GetCsvLogger()
         {
-            return new CsvFileLogger(new CsvFileLoggerConfig(Config?.Formatter), Next);
+            return new FormattedFileLogger(new FormattedFileLoggerConfig(Config?.Formatter), Next);
         }
         #endregion
         private string type;
@@ -81,50 +124,9 @@ namespace Puya.Logging
             }
             set
             {
-                value = value?.ToLower();
                 var oldLogger = logger;
 
-                logger = null;
-
-                switch (value)
-                {
-                    case "console":
-                        logger = GetConsoleLogger();
-                        break;
-                    case "debug":
-                        logger = GetDebugLogger();
-                        break;
-                    case "memory":
-                        logger = GetMemoryLogger();
-                        break;
-                    case "file":
-                        logger = GetFileLogger();
-                        break;
-                    case "sqlserver":
-                        logger = GetSqlServerLogger();
-                        break;
-                    case "sql":
-                        logger = GetSqlServerLogger();
-                        break;
-                    case "xml":
-                        logger = GetXmlLogger();
-                        break;
-                    case "json":
-                        logger = GetJsonLogger();
-                        break;
-                    case "csv":
-                        logger = GetCsvLogger();
-                        break;
-                    case "null":
-                        logger = new NullLogger();
-                        break;
-                    default:
-                        if (Config.ThrowOnInvalidLoggers)
-                        {
-                            throw new Exception($"Logger '{type}' not supported");
-                        }
-                        break;
-                }
+                logger = GetLogger(value);
 
                 if (logger != null)
                 {

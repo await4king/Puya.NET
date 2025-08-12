@@ -4,7 +4,7 @@ using Puya.Logging;
 
 namespace Puya.Core.Tests
 {
-    public class PuyaLogging
+    public class PuyaLoggingSqlServer
     {
         IDb GetDb()
         {
@@ -18,7 +18,7 @@ namespace Puya.Core.Tests
         }
         SqlServerLoggerConfig GetDbLoggerConfig()
         {
-            return new SqlServerLoggerConfig();
+            return new SqlServerLoggerConfig { LogTable = "dbo.Logs" };
         }
         [Fact]
         public void Test_DbLogger_LogsTable_Exists()
@@ -46,6 +46,10 @@ select case when exists
 
             Assert.True(SafeClrConvert.ToBoolean(exists));
         }
+        IList<Log> GetLogs(SqlServerLogger logger)
+        {
+            return logger.Db.ExecuteReaderSql<Log>("select * from " + logger.Config.LogTable);
+        }
         [Fact]
         public void Test_DbLogger_Clear()
         {
@@ -55,9 +59,9 @@ select case when exists
 
             logger.Clear();
 
-            var count = db.ExecuteScalerSql("select count(*) from " + config.LogTable);
+            var logs = GetLogs(logger);
 
-            Assert.True(SafeClrConvert.ToInt(count)  == 0);
+            Assert.True(SafeClrConvert.ToInt(logs.Count)  == 0);
         }
         [Fact]
         public void Test_DbLogger_Insert()
@@ -74,7 +78,7 @@ select case when exists
 
             logger.Info(category, message, data);
 
-            var logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            var logs = GetLogs(logger);
 
             Assert.True(logs.Count == 1);
             Assert.Equal(category, logs[0].Category);
@@ -95,7 +99,7 @@ select case when exists
 
             logger.Info("test");
             
-            var logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            var logs = GetLogs(logger);
 
             Assert.True(logs.Count == 0);
 
@@ -156,7 +160,7 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            var logs = GetLogs(logger);
 
             Assert.True(logs.Count == 1);
         }
@@ -177,7 +181,7 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            var logs = GetLogs(logger);
 
             Assert.True(logs.Count == 1);
         }

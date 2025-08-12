@@ -35,8 +35,10 @@ namespace Puya.Logging
         {
             var args = new DynamicModel
             {
+                ["LogTable"] = Config.LogTable,
                 ["MaxLog"] = Config.MaxLog,
                 ["MaxDailyLog"] = Config.MaxDailyLog,
+                ["ThreadId"] = log.ThreadId,
                 ["AppId"] = log.AppId,
                 ["LogDate"] = log.LogDate,
                 ["LogType"] = log.LogType,

@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puya.Logging
 {
-    public abstract class BaseLogger<TConfig>: ILogger where TConfig: BaseLoggerConfig, new()
+    public abstract class BaseLogger<TConfig>: ILogger, IBaseLogger
+        where TConfig: BaseLoggerConfig, new()
     {
         public ILogger Next { get; set; }
         public BaseLogger(): this(null, null)
@@ -31,6 +32,19 @@ namespace Puya.Logging
                 _config = value;
             }
         }
+
+        IBaseLoggerConfig IBaseLogger.Config
+        {
+            get => Config;
+            set
+            {
+                if (value is TConfig)
+                {
+                    Config = (TConfig)value;
+                }
+            }
+        }
+
         protected abstract void LogInternal(Log log);
         protected virtual Task LogInternalAsync(Log log, CancellationToken cancellation)
         {
@@ -45,6 +59,27 @@ namespace Puya.Logging
             return result;
         }
         protected virtual Log Init(Log log)
+        {
+            if (log == null)
+            {
+                return default(Log);
+            }
+
+            var _log = log.Clone();
+
+            if (_log.AppId == null)
+            {
+                _log.AppId = Config.AppId;
+            }
+
+            if (string.IsNullOrEmpty(log.User))
+            {
+                _log.User = Config.User;
+            }
+
+            return (Log)_log;
+        }
+        protected virtual Task<Log> InitAsync(Log log)
         {
             if (log == null)
             {
@@ -63,7 +98,7 @@ namespace Puya.Logging
                 _log.User = Config.User;
             }
 
-            return _log;
+            return Task.FromResult((Log)_log);
         }
         public virtual void Log(Log log)
         {
@@ -90,7 +125,7 @@ namespace Puya.Logging
             {
                 if (CanLog(log))
                 {
-                    var _log = Init(log);
+                    var _log = await InitAsync(log);
 
                     await LogInternalAsync(_log, cancellation);
                 }

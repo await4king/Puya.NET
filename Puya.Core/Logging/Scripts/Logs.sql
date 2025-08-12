@@ -10,6 +10,7 @@ begin
 
 	CREATE TABLE [dbo].[Logs](
 		[Id]				[int] IDENTITY(1,1) NOT NULL,
+		[ThreadId]			[int]				NULL,
 		[AppId]				[int]				NULL,
 		[LogDate]			[datetime]			NOT NULL,
 		[LogType]			[tinyint]			NULL,

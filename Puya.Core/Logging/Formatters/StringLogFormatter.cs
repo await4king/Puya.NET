@@ -12,22 +12,37 @@ namespace Puya.Logging
         { }
         public StringLogFormatter(ILogDataConverter converter, string logItems): base(converter, logItems)
         {
+            LogItems = "*";
             LogParts = new Dictionary<string, string>
             {
-                ["logdate"] = "{logdate}\n",
-                ["id"] = "{id}.\n",
-                ["appid"] = "App: {appid}\n",
-                ["user"] = "User: {user}\n",
-                ["ip"] = "Ip: {ip}\n",
-                ["category"] = "Category: {category}\n",
-                ["operationresult"] = "Result: {operationresult}\n",
-                ["membername"] = "MemberName: {membername}\n",
-                ["file"] = "File: {file}\n",
-                ["line"] = "Line: {line}\n",
-                ["message"] = "\n{message}\n",
-                ["data"] = "\nData:\n{data}\n",
-                ["stacktrace"] = "\n{stacktrace}\n"
+                ["logtype"] = "{logtype}",
+                ["logdate"] = "{logdate}",
+                ["id"] = "{id}.",
+                ["appid"] = "App: {appid}",
+                ["threadid"] = "ThreadId: {threadid}",
+                ["user"] = "User: {user}",
+                ["ip"] = "Ip: {ip}",
+                ["category"] = "Category: {category}",
+                ["operationresult"] = "Result: {operationresult}",
+                ["membername"] = "MemberName: {membername}",
+                ["mixed0"] = "File: {file}, line: {line}",
+                ["message"] = "{message}",
+                ["data"] = "Data:\n{data}",
+                ["stacktrace"] = "StackTrace: {stacktrace}",
+                ["method"] = "Http Method: {method}",
+                ["url"] = "Url: {url}",
+                ["mixed1"] = "Browser: {browsername} {browserversion}",
+                ["referrer"] = "Referer: {referrer}",
+                ["headers"] = "Request Headers: {headers}",
+                ["form"] = "Request Form: {form}",
+                ["cookies"] = "Request Cookies: {cookies}",
+                ["body"] = "Request Body: {body}",
+                ["contenttype"] = "Content-Type: {contenttype}",
             };
+        }
+        protected override string GetPartSeparator()
+        {
+            return "\n";
         }
         protected override string GetLogSeparator()
         {

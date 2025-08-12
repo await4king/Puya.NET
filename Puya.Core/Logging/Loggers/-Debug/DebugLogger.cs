@@ -16,5 +16,9 @@ namespace Puya.Logging
 
             Debug.WriteLine(data);
         }
+        public override void Clear()
+        {
+            Debug.Flush();
+        }
     }
 }

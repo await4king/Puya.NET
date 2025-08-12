@@ -1,16 +1,18 @@
-﻿namespace Puya.Logging
+﻿using System;
+
+namespace Puya.Logging
 {
-    public class CsvFileLoggerConfig : FileLoggerConfig
+    public class FormattedFileLoggerConfig : FileLoggerConfig
     {
-        private char rowSeparator;
-        public char RowSeparator
+        private string rowSeparator;
+        public string RowSeparator
         {
             get { return rowSeparator; }
             set
             {
                 rowSeparator = value;
 
-                var f = Formatter as CsvStringLogFormatter;
+                var f = Formatter as FormattedFileStringLogFormatter;
 
                 if (f != null)
                 {
@@ -26,7 +28,7 @@
             {
                 colSeparator = value;
 
-                var f = Formatter as CsvStringLogFormatter;
+                var f = Formatter as FormattedFileStringLogFormatter;
 
                 if (f != null)
                 {
@@ -34,20 +36,19 @@
                 }
             }
         }
-        public bool FirstRowIsHeading { get; set; }
         public override string FileExtension { get; set; }
         #region ctor
-        public CsvFileLoggerConfig() : this(null)
+        public FormattedFileLoggerConfig() : this(null)
         { }
-        public CsvFileLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public FormattedFileLoggerConfig(ILogFormatter formatter) : base(formatter)
         {
             FileExtension = ".csv";
-            RowSeparator = '\n';
-            ColSeparator = ';';
+            RowSeparator = Environment.NewLine;
+            ColSeparator = ',';
         }
         protected override ILogFormatter GetDefaultFormatter()
         {
-            var result = new CsvStringLogFormatter();
+            var result = new FormattedFileStringLogFormatter();
 
             result.RowSeparator = RowSeparator;
             result.ColSeparator = ColSeparator;

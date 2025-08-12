@@ -19,11 +19,11 @@ namespace Puya.Logging
         }
         protected virtual string GetDate()
         {
-            return DateTime.Now.ToString("yyyyyMMdd");
+            return DateTime.Now.ToString("yyyyMMdd");
         }
         protected virtual string FormatLogFileName(string date, string chunk)
         {
-            return Config.FileName + (string.IsNullOrEmpty(chunk) ? "" : "-" + date + "-" + chunk) + Config.FileExtension;
+            return Config.FileName + (string.IsNullOrEmpty(chunk) ? "" : "-" + date + "-" + chunk.ToString().PadLeft(Config.MaxChunk.ToString().Length, '0')) + Config.FileExtension;
         }
         protected virtual string GetChunkNo(string filename, string defaultChunk = "")
         {
@@ -38,18 +38,20 @@ namespace Puya.Logging
             var path = "";
             var chunk = "";
             var date = "";
+
             reset = false;
 
             if (Config.MaxSize > 0)
             {
                 date = GetDate();
+
                 var existingLogFiles = Directory.GetFiles(basePath, FormatLogFileName(date, "*"));
                 var firstMax = existingLogFiles
                     .Where(f =>
                     {
                         var fi = new FileInfo(f);
 
-                        return fi.Length < Config.MaxSize;
+                        return fi.Length + data?.Length < Config.MaxSize;
                     }).Max(f => GetChunkNo(f));
 
                 if (!string.IsNullOrEmpty(firstMax))
@@ -118,6 +120,11 @@ namespace Puya.Logging
             }
 
             path = basePath + "\\" + FormatLogFileName(date, chunk);
+
+            if (!reset && (!File.Exists(path) || new FileInfo(path).Length == 0))
+            {
+                reset = true;
+            }
 
             return path;
         }

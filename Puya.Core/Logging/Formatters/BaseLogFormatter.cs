@@ -1,14 +1,47 @@
-﻿using System;
+﻿using Puya.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Puya.Base;
 
 namespace Puya.Logging
 {
-    public abstract class BaseLogFormatter: ILogFormatter
+    public abstract class BaseLogFormatter : ILogFormatter
     {
-        public bool IncludeNullValues { get; set; }
-        public BaseLogFormatter(string logItems): this(null, logItems)
+        public virtual bool IncludeNullValues { get; set; }
+        public virtual bool EncodeData { get; set; }
+        public static readonly string[] DefaultLogItems;
+        static BaseLogFormatter()
+        {
+            DefaultLogItems = new string[]
+            {
+                "id",
+                "appid",
+                "threadid",
+                "operationresult",
+                "category",
+                "file",
+                "line",
+                "membername",
+                "message",
+                "stacktrace",
+                "ip",
+                "user",
+                "logdate",
+                "logtype",
+                "data",
+                "method",
+                "url",
+                "browsername",
+                "browserversion",
+                "referrer",
+                "headers",
+                "form",
+                "cookies",
+                "body",
+                "contentType"
+            };
+        }
+        public BaseLogFormatter(string logItems) : this(null, logItems)
         { }
         public BaseLogFormatter(ILogDataConverter converter, string logItems)
         {
@@ -16,12 +49,7 @@ namespace Puya.Logging
 
             if (string.IsNullOrEmpty(logItems) || logItems == "*")
             {
-                LogItems = "id,appid,operationresult,category,file,line,membername,message,stacktrace,ip,user,logdate,data";
-            }
-
-            if (converter == null)
-            {
-                DataConverter = GetDefaultDataConverter();
+                LogItems = GetDefaultLogItems();
             }
         }
         protected virtual ILogDataConverter GetDefaultDataConverter()
@@ -33,27 +61,66 @@ namespace Puya.Logging
         {
             get
             {
-                return TypeHelper.EnsureInitialized<ILogDataConverter, JsonLogDataConverter>(ref _dataConverter);
+                if (_dataConverter == null)
+                {
+                    _dataConverter = GetDefaultDataConverter();
+                }
+                if (_dataConverter == null)
+                {
+                    _dataConverter = new JsonLogDataConverter();
+                }
+
+                return _dataConverter;
             }
             set { _dataConverter = value; }
         }
-        public Dictionary<string, string> LogParts { get; set; }
-        public string LogItems { get; set; }
+        Dictionary<string, string> logParts;
+        public Dictionary<string, string> LogParts
+        {
+            get { return logParts; }
+            set
+            {
+                logParts = value;
+                LogItems = logParts.Where(x => IsValidLogItem(x.Key)).Select(x => x.Key).Join(",");
+            }
+        }
+        string logItems;
+        public string LogItems
+        {
+            get { return logItems; }
+            set
+            {
+                logItems = ValidateLogItems(value);
+            }
+        }
+        public static bool IsValidLogItem(string logItem)
+        {
+            return DefaultLogItems.Contains(logItem);
+        }
+        protected static string ValidateLogItems(string items)
+        {
+            var result = new List<string>();
+
+            if (!string.IsNullOrEmpty(items))
+            {
+                foreach (var item in items.Split(',', MyStringSplitOptions.TrimToLowerAndRemoveEmptyEntries))
+                {
+                    if (IsValidLogItem(item))
+                    {
+                        result.Add(item);
+                    }
+                }
+            }
+
+            return result.Join(",");
+        }
         protected virtual string FormatDate(DateTime date)
         {
             return date.ToString("yyyy/MM/dd HH:mm:ss.fffffff");
         }
-        protected virtual string SerializeData(object obj, string data)
+        protected virtual string GetDefaultLogItems()
         {
-            var result = string.Empty;
-
-            if (DataConverter != null && obj != null)
-                result = DataConverter.Serialize(obj);
-
-            if (string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(data))
-                result = Encode(data);
-
-            return result;
+            return DefaultLogItems.Join(",");
         }
         public virtual string Encode(string x)
         {
@@ -71,123 +138,138 @@ namespace Puya.Logging
         {
             return "";
         }
+        protected virtual string GetPropValue(Log log, string propName)
+        {
+            var result = string.Empty;
+
+            switch (propName?.ToLower())
+            {
+                case "id": result = log.Id > 0 ? log.Id.ToString() : ""; break;
+                case "appid": result = log.AppId.HasValue && log.AppId.Value > 0 ? log.AppId.Value.ToString() : ""; break;
+                case "threadid": result = log.ThreadId.HasValue && log.ThreadId.Value > 0 ? log.ThreadId.Value.ToString() : ""; break;
+                case "type": result = log.Type.ToString(); break;
+                case "logtype": result = log.LogType.ToString(); break;
+                case "result": result = log.Result.ToString(); break;
+                case "operationresult": result = log.OperationResult.ToString(); break;
+                case "category": result = log.Category; break;
+                case "file": result = log.File; break;
+                case "line": result = log.Line.ToString(); break;
+                case "membername": result = log.MemberName; break;
+                case "message": result = log.Message; break;
+                case "stacktrace": result = log.StackTrace; break;
+                case "ip": result = log.Ip; break;
+                case "user": result = log.User; break;
+                case "logdate": result = FormatDate(log.LogDate); break;
+                case "data": result = this.SerializeData(log); break;
+                case "method": result = log.Method; break;
+                case "url": result = log.Url; break;
+                case "browsername": result = log.BrowserName; break;
+                case "browserversion": result = log.BrowserVersion; break;
+                case "referrer": result = log.Referrer; break;
+                case "headers": result = log.Headers; break;
+                case "form": result = log.Form; break;
+                case "cookies": result = log.Cookies; break;
+                case "body": result = log.Body; break;
+                case "contenttype": result = log.ContentType; break;
+            }
+
+            return result;
+        }
+        protected virtual void OnFormatPart(Log log, string part, string value, string format, string formattedValue)
+        { }
+        protected virtual void OnBeginFormat(Log log)
+        { }
+        protected virtual void OnEndFormat(Log log)
+        { }
+        protected bool Equals(string a, string b)
+        {
+            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+        }
+        public string Format(string template, string name, string value)
+        {
+            return template.Replace("{" + name.ToLower() + "}", value);
+        }
         protected virtual string FormatInternal(Log log)
         {
             var result = "";
 
-            if (LogParts != null && LogParts.Count > 0)
+            var _logItems = string.IsNullOrEmpty(LogItems) || LogItems == "*" ? GetDefaultLogItems() : LogItems;
+
+            if (LogParts != null && LogParts.Count > 0 && !string.IsNullOrEmpty(_logItems))
             {
-                var data = this.SerializeData(log);
-                var logItems = LogItems.Split(new char[] { ',' });
+                var logItems = _logItems.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 var partSeparator = GetPartSeparator();
                 var logSeparator = GetLogSeparator();
+                var parts = LogParts.Where(x => !string.IsNullOrEmpty(x.Key) && !string.IsNullOrEmpty(x.Value)).ToList();
 
-                foreach (var item in logItems)
+                OnBeginFormat(log);
+
+                for (var i = 0; i < parts.Count; i++)
                 {
-                    var part = LogParts.FirstOrDefault(x => string.Compare(x.Key, item, true) == 0);
+                    var part = parts[i];
 
-                    if (!string.IsNullOrEmpty(part.Key))
+                    if (part.Key.StartsWith("raw", StringComparison.OrdinalIgnoreCase))
                     {
-                        switch (part.Key)
+                        OnFormatPart(log, null, null, part.Value, part.Value);
+
+                        result += part.Value + (i < parts.Count - 1 ? partSeparator: "");
+                        continue;
+                    }
+
+                    if (part.Key.StartsWith("mixed", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var formattedValue = part.Value;
+                        var oldFormattedValue = formattedValue;
+
+                        foreach (var item in logItems)
                         {
-                            case "appid":
-                                if ((log.AppId != null && log.AppId > 0) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{appid}", log.AppId.ToString()) + partSeparator;
-                                }
-                                break;
-                            case "id":
-                                if (log.Id > 0 || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{id}", log.Id.ToString()) + partSeparator;
-                                }
-                                break;
-                            case "result":
-                                if (log.Result > 0 || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{result}", log.Result.ToString()) + partSeparator;
-                                }
-                                break;
-                            case "operationresult":
-                                if (log.OperationResult != OperationResult.Normal || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{operationresult}", log.OperationResult.ToString()) + partSeparator;
-                                }
+                            if (string.IsNullOrEmpty(item) || formattedValue.IndexOf("{" + item.ToLower() + "}") < 0)
+                            {
+                                continue;
+                            }
 
-                                break;
-                            case "type":
-                                result += part.Value.Replace("{type}", log.Type.ToString()) + partSeparator;
+                            var propValue = GetPropValue(log, item);
 
-                                break;
-                            case "logtype":
-                                result += part.Value.Replace("{logtype}", log.LogType.ToString()) + partSeparator;
+                            if (!string.IsNullOrEmpty(propValue) || IncludeNullValues)
+                            {
+                                formattedValue = Format(formattedValue, item, propValue);
+                            }
+                        }
 
-                                break;
-                            case "category":
-                                if (!string.IsNullOrEmpty(log.Category) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{category}", Encode(log.Category)) + partSeparator;
-                                }
-                                break;
-                            case "file":
-                                if (!string.IsNullOrEmpty(log.File) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{file}", Encode(log.File)) + partSeparator;
-                                }
-                                break;
-                            case "line":
-                                if ((log.Line != null && log.Line > 0) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{line}", log.Line.ToString()) + partSeparator;
-                                }
-                                break;
-                            case "membername":
-                                if (!string.IsNullOrEmpty(log.MemberName) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{membername}", Encode(log.MemberName)) + partSeparator;
-                                }
-                                break;
-                            case "message":
-                                if (!string.IsNullOrEmpty(log.Message) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{message}", Encode(log.Message)) + partSeparator;
-                                }
-                                break;
-                            case "stacktrace":
-                                if (!string.IsNullOrEmpty(log.StackTrace) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{stacktrace}", Encode(log.StackTrace)) + partSeparator;
-                                }
-                                break;
-                            case "user":
-                                if (!string.IsNullOrEmpty(log.User) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{user}", Encode(log.User)) + partSeparator;
-                                }
-                                break;
-                            case "ip":
-                                if (!string.IsNullOrEmpty(log.Ip) || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{ip}", log.Ip) + partSeparator;
-                                }
-                                break;
-                            case "logdate":
-                                result += part.Value.Replace("{logdate}", FormatDate(log.LogDate)) + partSeparator;
+                        if (!Equals(oldFormattedValue, formattedValue))
+                        {
+                            formattedValue += partSeparator;
 
-                                break;
-                            case "data":
-                                if ((!string.IsNullOrEmpty(data) && data != "null") || IncludeNullValues)
-                                {
-                                    result += part.Value.Replace("{data}", data) + partSeparator;
-                                }
-                                break;
-                            default:
-                                result += part.Value + partSeparator;
+                            OnFormatPart(log, part.Key, part.Value, "", formattedValue);
 
-                                break;
+                            result += formattedValue;
+                        }
+
+                        continue;
+                    }
+                    else
+                    {
+                        var item = logItems.FirstOrDefault(x => Equals(x, part.Key));
+
+                        if (string.IsNullOrEmpty(item))
+                        {
+                            continue;
+                        }
+
+                        var propValue = GetPropValue(log, item);
+
+                        if (!string.IsNullOrEmpty(propValue) || IncludeNullValues)
+                        {
+                            var formattedValue = Format(part.Value, item, propValue) + (i < parts.Count - 1 ? partSeparator : "");
+
+                            OnFormatPart(log, item.ToLower(), propValue, part.Value, formattedValue);
+
+                            result += formattedValue;
                         }
                     }
                 }
+
+                OnEndFormat(log);
 
                 result += logSeparator;
             }

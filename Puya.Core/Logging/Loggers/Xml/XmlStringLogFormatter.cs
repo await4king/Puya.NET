@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Puya.Extensions;
 
@@ -34,37 +35,20 @@ namespace Puya.Logging
                 ["stacktrace"] = "\t<StackTrace>{stacktrace}</StackTrace>\n",
             };
         }
+        public override bool EncodeData
+        {
+            get
+            {
+                return DataConverter != null &&!DataConverter.GetType().DescendsFrom<XmlDataConverter>();
+            }
+            set
+            {
+                throw new Exception("not supprted");
+            }
+        }
         protected override ILogDataConverter GetDefaultDataConverter()
         {
             return new XmlDataConverter();
-        }
-        protected override string SerializeData(object obj, string data)
-        {
-            var result = string.Empty;
-
-            if (DataConverter != null && obj != null)
-            {
-                try
-                {
-                    result = DataConverter.Serialize(obj);
-
-                    if (!DataConverter.GetType().DescendsFrom<XmlDataConverter>())
-                    {
-                        result = Encode(result);
-                    }
-                }
-                catch
-                {
-                    result = new JsonLogDataConverter().Serialize(obj);
-
-                    result = Encode(result);
-                }
-            }
-
-            if (string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(data))
-                result = Encode(data);
-
-            return result;
         }
         public override string Encode(string x)
         {

@@ -9,7 +9,6 @@
         { }
         public DbLoggerConfig(ILogFormatter formatter) : base(formatter)
         {
-            LogTable = "dbo.Logs";
             MaxDailyLog = -1;
             MaxLog = -1;
         }

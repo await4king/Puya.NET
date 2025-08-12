@@ -2,9 +2,7 @@
 {
     public class SqlServerLoggerConfig: DbLoggerConfig
     {
-        public SqlServerLoggerConfig() : this(null)
-        { }
-        public SqlServerLoggerConfig(ILogFormatter formatter): base(formatter)
+        public SqlServerLoggerConfig()
         {
             LogTable = "dbo.Logs";
         }

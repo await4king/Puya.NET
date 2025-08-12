@@ -5,11 +5,10 @@
         public ConsoleLoggerConfig() : this(null)
         { }
         public ConsoleLoggerConfig(ILogFormatter formatter): base(formatter)
+        { }
+        protected override ILogFormatter GetDefaultFormatter()
         {
-            if (formatter == null)
-            {
-                Formatter = new StringLogFormatter();
-            }
+            return new ConsoleLogFormatter();
         }
     }
 }

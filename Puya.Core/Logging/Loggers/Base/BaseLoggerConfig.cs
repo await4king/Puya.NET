@@ -1,8 +1,6 @@
-﻿using Puya.Base;
-
-namespace Puya.Logging
+﻿namespace Puya.Logging
 {
-    public class BaseLoggerConfig
+    public class BaseLoggerConfig: IBaseLoggerConfig
     {
         public int? AppId { get; set; }
         public string User { get; set; }
@@ -12,7 +10,17 @@ namespace Puya.Logging
         {
             get
             {
-                return TypeHelper.EnsureInitialized<ILogFormatter, JsonLogFormatter>(ref _formatter);
+                if (_formatter == null)
+                {
+                    _formatter = GetDefaultFormatter();
+                }
+
+                if (_formatter == null)
+                {
+                    _formatter = new StringLogFormatter();
+                }
+
+                return _formatter;
             }
             set { _formatter = value; }
         }
@@ -22,11 +30,6 @@ namespace Puya.Logging
         {
             Level = LogLevel.All;
             _formatter = formatter;
-
-            if (_formatter == null)
-            {
-                _formatter = GetDefaultFormatter();
-            }
         }
         protected virtual ILogFormatter GetDefaultFormatter()
         {

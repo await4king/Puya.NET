@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Puya.Logging
 {
@@ -12,7 +13,7 @@ namespace Puya.Logging
         Trace = 32,
         Suggestion = 64
     }
-    public enum OperationResult: byte
+    public enum OperationResult : byte
     {
         Normal = 0,
         Success = 1,
@@ -45,6 +46,7 @@ namespace Puya.Logging
         /// specific application.
         /// </summary>
         public int? AppId { get; set; }
+        public int? ThreadId { get; set; }
         public byte Type { get; set; }
         public byte Result { get; set; }
         public string Category { get; set; }
@@ -58,6 +60,17 @@ namespace Puya.Logging
         public DateTime LogDate { get; set; }
         public Func<object> GetData { get; set; }
         public object Data { get; set; }
+        public string Method { get; set; }
+        public string Url { get; set; }
+        public string BrowserName { get; set; }
+        public string BrowserVersion { get; set; }
+        public string Referrer { get; set; }
+        public string Headers { get; set; }
+        public string Form { get; set; }
+        public string Cookies { get; set; }
+        public string Body { get; set; }
+        public string ContentType { get; set; }
+        public Browser Browser { get; set; }
         public OperationResult OperationResult
         {
             get
@@ -85,12 +98,14 @@ namespace Puya.Logging
             LogDate = DateTime.Now;
             OperationResult = OperationResult.Normal;
             LogType = LogType.Info;
+            ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
         public virtual Log Clone()
         {
             return new Log
             {
                 AppId = AppId,
+                ThreadId = ThreadId,
                 LogDate = LogDate,
                 Category = Category,
                 Data = Data,
@@ -104,8 +119,51 @@ namespace Puya.Logging
                 Result = Result,
                 StackTrace = StackTrace,
                 Type = Type,
-                User = User
+                User = User,
+                Method = Method,
+                Url = Url,
+                BrowserName = BrowserName,
+                BrowserVersion = BrowserVersion,
+                Referrer = Referrer,
+                Headers = Headers,
+                Form = Form,
+                Body = Body,
+                ContentType = ContentType,
+                Cookies = Cookies,
+                Browser = Browser,
             };
+        }
+        public Log(Log log)
+        {
+            if (log != null)
+            {
+                Id = log.Id;
+                AppId = log.AppId;
+                ThreadId = log.ThreadId;
+                Type = log.Type;
+                Result = log.Result;
+                Category = log.Category;
+                File = log.File;
+                Line = log.Line;
+                MemberName = log.MemberName;
+                Message = log.Message;
+                StackTrace = log.StackTrace;
+                Ip = log.Ip;
+                User = log.User;
+                LogDate = log.LogDate;
+                Data = log.Data;
+                Method = log.Method;
+                Url = log.Url;
+                BrowserName = log.BrowserName;
+                BrowserVersion = log.BrowserVersion;
+                Referrer = log.Referrer;
+                Headers = log.Headers;
+                Form = log.Form;
+                Cookies = log.Cookies;
+                Browser = log.Browser;
+                Body = log.Body;
+                ContentType = log.ContentType;
+            }
         }
     }
 }
