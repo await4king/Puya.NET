@@ -1578,6 +1578,21 @@ namespace Puya.Logging
 
             return data;
         }
+        public static object DeserializeData(this ILogFormatter formatter, string data)
+        {
+            var result = null as object;
+            var _formatter = formatter as IDetailedLogFormatter;
+            var dataConverter = _formatter?.DataConverter ?? new JsonLogDataConverter();
+
+            try
+            {
+                result = dataConverter.Deserialize(data);
+            }
+            catch (Exception)
+            { }
+
+            return result;
+        }
         public static ILogger UseForm(this ILogger logger, string include = "*", string exclude = "")
         {
             var _logger = logger as IBaseLogger;

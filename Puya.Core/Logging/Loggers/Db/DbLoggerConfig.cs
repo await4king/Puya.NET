@@ -16,7 +16,7 @@
         }
         protected override ILogFormatter GetDefaultFormatter()
         {
-            return new StringLogFormatter();
+            return new JsonLogFormatter();
         }
     }
 }

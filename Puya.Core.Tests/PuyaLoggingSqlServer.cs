@@ -46,10 +46,6 @@ select case when exists
 
             Assert.True(SafeClrConvert.ToBoolean(exists));
         }
-        IList<Log> GetLogs(SqlServerLogger logger)
-        {
-            return logger.Db.ExecuteReaderSql<Log>("select * from " + logger.Config.LogTable);
-        }
         [Fact]
         public void Test_DbLogger_Clear()
         {
@@ -59,7 +55,7 @@ select case when exists
 
             logger.Clear();
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(SafeClrConvert.ToInt(logs.Count)  == 0);
         }
@@ -78,12 +74,13 @@ select case when exists
 
             logger.Info(category, message, data);
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
             Assert.Equal(category, logs[0].Category);
             Assert.Equal(message, logs[0].Message);
             Assert.Equal(LogType.Info, logs[0].LogType);
+            Assert.NotNull(logs[0].Data);
         }
         [Fact]
         public void Test_DbLogger_LogLevel()
@@ -99,7 +96,7 @@ select case when exists
 
             logger.Info("test");
             
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 0);
 
@@ -109,7 +106,7 @@ select case when exists
 
             logger.Info("test");
 
-            logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
 
@@ -119,7 +116,7 @@ select case when exists
 
             logger.Info("test");
 
-            logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
 
@@ -129,7 +126,7 @@ select case when exists
 
             logger.Debug("test");
 
-            logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
 
@@ -139,7 +136,7 @@ select case when exists
 
             logger.Warn("warning");
 
-            logs = db.ExecuteReaderSql<Log>("select * from " + config.LogTable);
+            logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 0);
         }
@@ -160,7 +157,7 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -181,7 +178,7 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }

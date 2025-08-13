@@ -1,5 +1,6 @@
 ﻿using Puya.Collections;
 using Puya.Data;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace Puya.Logging
             Db = db;
         }
         #endregion
+        protected abstract string GetFetchLogsQuery(out CommandType commandType);
         protected abstract string GetInsertLogQuery(out CommandType commandType);
         protected abstract DynamicModel GetInsertLogArgs(Log log);
         protected abstract DynamicModel GetClearLogArgs();
@@ -115,6 +117,41 @@ namespace Puya.Logging
                     await Db.ExecuteNonQueryCommandAsync(query, args, cancellation);
                 }
             }
+        }
+        public IList<Log> FetchLogs(object args = null)
+        {
+            IList<Log> result = new List<Log>();
+
+            if (Db != null)
+            {
+                var query = GetFetchLogsQuery(out CommandType commandType);
+
+                if (string.IsNullOrEmpty(query))
+                {
+                    throw new System.Exception("fetch logs query not specified");
+                }
+
+                if (commandType == CommandType.Text)
+                {
+                    result = Db.ExecuteReaderSql<Log>(query, args);
+                }
+                else if (commandType == CommandType.StoredProcedure)
+                {
+                    result = Db.ExecuteReaderCommand<Log>(query, args);
+                }
+
+                if (result?.Count > 0)
+                {
+                    foreach (var log in result)
+                    {
+                        var data = log.Data?.ToString();
+
+                        log.Data = Config.Formatter.DeserializeData(data);
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

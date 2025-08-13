@@ -1,4 +1,5 @@
 ﻿using Puya.Collections;
+using Puya.Conversion;
 using Puya.Data;
 using System.Data;
 
@@ -77,6 +78,25 @@ if object_id(@tbl) is not null
             };
 
             return args;
+        }
+
+        protected override string GetFetchLogsQuery(out CommandType commandType)
+        {
+            commandType = CommandType.Text;
+
+            if (Db != null)
+            {
+                var exists = Db.ExecuteScalerSql("select case when object_id(@tbl) is null then 0 else 1 end", new { tbl = Config.LogTable });
+
+                if (!SafeClrConvert.ToBoolean(exists))
+                {
+                    return null;
+                }
+            }
+
+            var query = $"select * from {Config.LogTable}";
+
+            return query;
         }
     }
 }
