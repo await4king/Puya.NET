@@ -5,6 +5,8 @@ namespace Puya.Logging
 {
     public class NoLoggingPolicy : ILoggingPolicy
     {
+        public LoggingPolicyOptions Options { get; set; }
+
         public bool CanLog(ILogger logger, Log log)
         {
             return true;

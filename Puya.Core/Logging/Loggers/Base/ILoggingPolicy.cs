@@ -7,5 +7,6 @@ namespace Puya.Logging
     {
         bool CanLog(ILogger logger, Log log);
         Task InitAsync(ILogger logger, Log log, CancellationToken cancellation);
+        LoggingPolicyOptions Options { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Puya.Extensions;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Puya.Extensions;
 
 namespace Puya.Logging
 {
@@ -1577,6 +1577,216 @@ namespace Puya.Logging
             }
 
             return data;
+        }
+        public static ILogger UseForm(this ILogger logger, string include = "*", string exclude = "")
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                if (!string.IsNullOrEmpty(include))
+                {
+                    if (include == "*")
+                    {
+                        _logger.Config.Policy.Options.FormIncludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in include.Split(','))
+                        {
+                            _logger.Config.Policy.Options.FormIncludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.FormIncludeKeys.Count > 0 && !string.IsNullOrEmpty(exclude))
+                {
+                    if (exclude == "*")
+                    {
+                        _logger.Config.Policy.Options.FormExcludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in exclude.Split(','))
+                        {
+                            _logger.Config.Policy.Options.FormExcludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.FormIncludeKeys.Count > 0)
+                {
+                    _logger.Config.Policy.Options.Form = true;
+                }
+            }
+
+            return logger;
+        }
+        public static ILogger UseHeaders(this ILogger logger, string include = "*", string exclude = "")
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                if (!string.IsNullOrEmpty(include))
+                {
+                    if (include == "*")
+                    {
+                        _logger.Config.Policy.Options.HeadersIncludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in include.Split(','))
+                        {
+                            _logger.Config.Policy.Options.HeadersIncludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.HeadersIncludeKeys.Count > 0 && !string.IsNullOrEmpty(exclude))
+                {
+                    if (exclude == "*")
+                    {
+                        _logger.Config.Policy.Options.HeadersExcludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in exclude.Split(','))
+                        {
+                            _logger.Config.Policy.Options.HeadersExcludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.HeadersIncludeKeys.Count > 0)
+                {
+                    _logger.Config.Policy.Options.Headers = true;
+                }
+            }
+
+            return logger;
+        }
+        public static ILogger UseCookies(this ILogger logger, string include = "*", string exclude = "")
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                if (!string.IsNullOrEmpty(include))
+                {
+                    if (include == "*")
+                    {
+                        _logger.Config.Policy.Options.CookiesIncludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in include.Split(','))
+                        {
+                            _logger.Config.Policy.Options.CookiesIncludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.CookiesIncludeKeys.Count > 0 && !string.IsNullOrEmpty(exclude))
+                {
+                    if (exclude == "*")
+                    {
+                        _logger.Config.Policy.Options.CookiesExcludeKeys.Add("*");
+                    }
+                    else
+                    {
+                        foreach (var key in exclude.Split(','))
+                        {
+                            _logger.Config.Policy.Options.CookiesExcludeKeys.Add(key);
+                        }
+                    }
+                }
+
+                if (_logger.Config.Policy.Options.CookiesIncludeKeys.Count > 0)
+                {
+                    _logger.Config.Policy.Options.Cookies = true;
+                }
+            }
+
+            return logger;
+        }
+        public static ILogger UseBody(this ILogger logger)
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                _logger.Config.Policy.Options.Body = true;
+            }
+
+            return logger;
+        }
+        public static ILogger ConfigureOptions(this ILogger logger, string items)
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                foreach (var item in items.Split(new char[] { ',' }))
+                {
+                    if (item == "*")
+                    {
+                        _logger.Config.Policy.Options.Form = true;
+                        _logger.Config.Policy.Options.FormIncludeKeys.Add("*");
+                        _logger.Config.Policy.Options.Headers = true;
+                        _logger.Config.Policy.Options.HeadersIncludeKeys.Add("*");
+                        _logger.Config.Policy.Options.Cookies = true;
+                        _logger.Config.Policy.Options.CookiesIncludeKeys.Add("*");
+                        _logger.Config.Policy.Options.Body = true;
+
+                        break;
+                    }
+
+                    if (string.Equals(item, "f", StringComparison.OrdinalIgnoreCase) || string.Equals(item, "form", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.Config.Policy.Options.Form = true;
+                        _logger.Config.Policy.Options.FormIncludeKeys.Add("*");
+
+                        continue;
+                    }
+
+                    if (string.Equals(item, "h", StringComparison.OrdinalIgnoreCase) || string.Equals(item, "headers", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.Config.Policy.Options.Headers = true;
+                        _logger.Config.Policy.Options.HeadersIncludeKeys.Add("*");
+
+                        continue;
+                    }
+
+                    if (string.Equals(item, "c", StringComparison.OrdinalIgnoreCase) || string.Equals(item, "cookies", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.Config.Policy.Options.Cookies = true;
+                        _logger.Config.Policy.Options.CookiesIncludeKeys.Add("*");
+
+                        continue;
+                    }
+
+                    if (string.Equals(item, "b", StringComparison.OrdinalIgnoreCase) || string.Equals(item, "body", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.Config.Policy.Options.Body = true;
+
+                        continue;
+                    }
+                }
+            }
+
+            return logger;
+        }
+        public static ILogger Persist(this ILogger logger)
+        {
+            var _logger = logger as IBaseLogger;
+
+            if (_logger != null && _logger.Config != null)
+            {
+                _logger.Config.Policy.Options.Persist = true;
+            }
+
+            return logger;
         }
     }
 }
