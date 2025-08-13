@@ -16,7 +16,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -42,7 +42,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             logger.Danger(e, "", data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -54,7 +54,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -81,7 +81,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.DangerAsync(e, category, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -91,7 +91,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.DangerAsync(e, "", data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -104,7 +104,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -130,7 +130,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             logger.Fatal(e, "", data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -142,7 +142,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -169,7 +169,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.FatalAsync(e, category, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -179,7 +179,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.FatalAsync(e, "", data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -191,7 +191,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -215,7 +215,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -240,7 +240,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -266,7 +266,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             logger.Trace(category, message, fnGetData, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -278,7 +278,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -305,7 +305,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -330,7 +330,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.TraceAsync(category, "", data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -340,7 +340,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.TraceAsync(category, "", fnGetData, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -351,7 +351,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.TraceAsync(category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -362,7 +362,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return logger.TraceAsync(category, message, fnGetData, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -374,7 +374,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -398,7 +398,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -424,7 +424,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -442,7 +442,7 @@ namespace Puya.Logging
 
             return logger.LogAsync(log, cancellation);
         }
-        
+
         public static Task CancelAsync(this ILogger logger,
                                         string category,
                                         string message,
@@ -450,7 +450,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return CancelAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -460,7 +460,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return CancelAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -472,7 +472,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -496,7 +496,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -522,7 +522,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -546,11 +546,11 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return SuccessAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
-        
+
         public static Task SuccessAsync(this ILogger logger,
                                         string category,
                                         string message,
@@ -558,7 +558,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return SuccessAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -571,7 +571,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -596,7 +596,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -622,7 +622,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -647,7 +647,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return FaultAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -658,7 +658,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return FaultAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -671,7 +671,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -696,7 +696,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -721,7 +721,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -746,7 +746,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return FailAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -757,7 +757,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return FailAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -770,7 +770,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -795,7 +795,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -821,7 +821,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -847,7 +847,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return ErrorAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -857,7 +857,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return ErrorAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -870,7 +870,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -894,7 +894,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -919,7 +919,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -937,7 +937,7 @@ namespace Puya.Logging
 
             return logger.LogAsync(log, cancellation);
         }
-        
+
         public static Task AbortAsync(this ILogger logger,
                                         string category,
                                         string message,
@@ -945,7 +945,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return AbortAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -955,7 +955,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return AbortAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -968,7 +968,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -993,7 +993,7 @@ namespace Puya.Logging
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0
                                 )
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1019,7 +1019,7 @@ namespace Puya.Logging
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0
                                         )
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1035,7 +1035,7 @@ namespace Puya.Logging
                 File = sourceFilePath
             };
 
-            return logger.LogAsync(log,cancellation);
+            return logger.LogAsync(log, cancellation);
         }
         public static Task AlertAsync(this ILogger logger,
                                         string category,
@@ -1044,7 +1044,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return AlertAsync(logger, category, message, data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1054,7 +1054,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return AlertAsync(logger, "", message, data, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1067,7 +1067,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1092,7 +1092,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1116,7 +1116,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1139,7 +1139,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1164,7 +1164,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1190,7 +1190,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1215,7 +1215,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return DebugAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1226,7 +1226,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return DebugAsync(logger, category, message, fnGetData, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1236,7 +1236,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return DebugAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1246,7 +1246,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return DebugAsync(logger, "", message, fnGetData, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1259,7 +1259,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1282,7 +1282,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1306,7 +1306,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1330,7 +1330,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return InfoAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1340,7 +1340,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return InfoAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1353,7 +1353,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1377,7 +1377,7 @@ namespace Puya.Logging
                                 [CallerMemberName] string memberName = "",
                                 [CallerFilePath] string sourceFilePath = "",
                                 [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1402,7 +1402,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1427,7 +1427,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return WarnAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1437,7 +1437,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return WarnAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1450,7 +1450,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1474,7 +1474,7 @@ namespace Puya.Logging
                                     [CallerMemberName] string memberName = "",
                                     [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return;
@@ -1499,7 +1499,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             if (logger == null || logger is NullLogger)
                 return Task.CompletedTask;
@@ -1524,7 +1524,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return SuggestAsync(logger, category, message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1534,7 +1534,7 @@ namespace Puya.Logging
                                         [CallerMemberName] string memberName = "",
                                         [CallerFilePath] string sourceFilePath = "",
                                         [CallerLineNumber] int sourceLineNumber = 0)
-            
+
         {
             return SuggestAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
@@ -1543,47 +1543,37 @@ namespace Puya.Logging
         {
             var data = string.Empty;
 
-            if (formatter != null && log != null && formatter.DataConverter != null)
+            do
             {
+                if (log == null)
+                {
+                    break;
+                }
+
                 var obj = log.GetData == null ? log.Data : log.GetData();
 
-                if (obj != null)
+                if (obj == null)
                 {
-                    try
-                    {
-                        data = formatter.DataConverter.Serialize(obj);
-                    }
-                    catch (Exception e)
-                    {
-                        try
-                        {
-                            data = new JsonLogDataConverter().Serialize(obj);
-                        }
-                        catch (Exception e2)
-                        {
-                            data = e.ToString("\n") + "\n\n" + e2.ToString("\n");
-                        }
-                    }
-
-                    var _formatter = formatter as BaseLogFormatter;
-
-                    if (_formatter != null && _formatter.EncodeData && !string.IsNullOrEmpty(data))
-                    {
-                        try
-                        {
-                            data = _formatter.Encode(data);
-                        }
-                        catch (Exception e)
-                        {
-                            data += ", encode error: " + e.ToString("\n");
-                        }
-                    }
+                    break;
                 }
 
-                if (string.IsNullOrEmpty(data))
+                var _formatter = formatter as IDetailedLogFormatter;
+                var dataConverter = _formatter?.DataConverter ?? new JsonLogDataConverter();
+
+                try
                 {
-                    data = null;
+                    data = dataConverter.Serialize(obj);
                 }
+                catch (Exception e)
+                {
+                    data = e.ToString("\n");
+                }
+            }
+            while (false);
+
+            if (string.IsNullOrEmpty(data))
+            {
+                data = null;
             }
 
             return data;

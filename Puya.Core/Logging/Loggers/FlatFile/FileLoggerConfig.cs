@@ -4,7 +4,9 @@
     {
         public FileLoggerConfig() : this(null)
         { }
-        public FileLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public FileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public FileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
             FileExtension = ".txt";
         }

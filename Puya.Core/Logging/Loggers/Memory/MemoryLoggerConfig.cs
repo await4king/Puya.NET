@@ -4,7 +4,9 @@
     {
         public MemoryLoggerConfig() : this(null)
         { }
-        public MemoryLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public MemoryLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public MemoryLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         { }
         public int MaxLogCount { get; set; }
     }

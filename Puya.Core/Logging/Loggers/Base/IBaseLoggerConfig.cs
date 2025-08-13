@@ -6,5 +6,6 @@
         string User { get; set; }
         LogLevel Level { get; set; }
         ILogFormatter Formatter { get; set; }
+        ILoggingPolicy Policy { get; set; }
     }
 }

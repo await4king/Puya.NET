@@ -5,7 +5,7 @@ namespace Puya.Logging
     public abstract class FileLoggerConfigBase : BaseLoggerConfig
     {
         public string FileName { get; set; }
-        public virtual string FileExtension { get; set; }
+        public string FileExtension { get; set; }
         public string Path { get; set; }
         public int MaxSize { get; set; }
         public int MaxChunk { get; set; }
@@ -13,7 +13,9 @@ namespace Puya.Logging
         #region ctor
         public FileLoggerConfigBase() : this(null)
         { }
-        public FileLoggerConfigBase(ILogFormatter formatter) : base(formatter)
+        public FileLoggerConfigBase(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public FileLoggerConfigBase(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
             FileName = "log";
             FileExtension = ".log";

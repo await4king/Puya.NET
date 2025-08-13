@@ -158,6 +158,9 @@ namespace Puya.Logging
 
             File.WriteAllText(path, "");
         }
-        public abstract List<Log> LoadLogFile(string path);
+        public virtual List<Log> LoadLogFile(string path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

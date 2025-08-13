@@ -2,12 +2,13 @@
 {
     public class JsonFileLoggerConfig : FileLoggerConfig
     {
-        public override string FileExtension { get; set; }
         public JsonFileLoggerConfig() : this(null)
         { }
-        public JsonFileLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public JsonFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public JsonFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
-            FileExtension = ".json";
+            FileExtension = ".log";
         }
         protected override ILogFormatter GetDefaultFormatter()
         {

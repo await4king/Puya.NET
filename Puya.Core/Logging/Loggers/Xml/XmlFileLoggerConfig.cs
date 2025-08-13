@@ -2,18 +2,17 @@
 {
     public class XmlFileLoggerConfig : FileLoggerConfig
     {
-        public string RootTag { get; set; }
-        public override string FileExtension { get; set; }
         public XmlFileLoggerConfig() : this(null)
         { }
-        public XmlFileLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public XmlFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public XmlFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
             FileExtension = ".xml";
-            RootTag = "Logs";
         }
         protected override ILogFormatter GetDefaultFormatter()
         {
-            return new XmlStringLogFormatter();
+            return new XmlLogFormatter();
         }
     }
 }

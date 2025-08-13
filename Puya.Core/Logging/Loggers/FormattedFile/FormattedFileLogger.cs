@@ -17,7 +17,12 @@ namespace Puya.Logging
         { }
         private string GetHeader()
         {
-            return this.Config.Formatter.LogParts
+            if (this.Config.DetailedFormatter == null)
+            {
+                throw new InvalidOperationException("specified log-formatter does not implement IDetailedLogFormatter interface.");
+            }
+
+            return this.Config.DetailedFormatter.LogParts
                                 .Where(x => BaseLogFormatter.IsValidLogItem(x.Key))
                                 .Select(x => x.Key)
                                 .ToList()

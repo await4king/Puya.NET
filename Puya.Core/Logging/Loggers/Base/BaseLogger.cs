@@ -54,7 +54,7 @@ namespace Puya.Logging
         }
         protected virtual bool CanLog(Log log)
         {
-            var result = (((byte)Config.Level) & log.Type) == log.Type;
+            var result = (((byte)Config.Level) & log.Type) == log.Type && Config.Policy.CanLog(this, log);
 
             return result;
         }
@@ -62,7 +62,7 @@ namespace Puya.Logging
         {
             if (log == null)
             {
-                return default(Log);
+                return default;
             }
 
             var _log = log.Clone();
@@ -77,9 +77,11 @@ namespace Puya.Logging
                 _log.User = Config.User;
             }
 
-            return (Log)_log;
+            Config.Policy.InitAsync(this, _log, CancellationToken.None).Wait();
+
+            return _log;
         }
-        protected virtual Task<Log> InitAsync(Log log)
+        protected virtual async Task<Log> InitAsync(Log log, CancellationToken cancellation)
         {
             if (log == null)
             {
@@ -98,7 +100,9 @@ namespace Puya.Logging
                 _log.User = Config.User;
             }
 
-            return Task.FromResult((Log)_log);
+            await Config.Policy.InitAsync(this, _log, cancellation);
+            
+            return _log;
         }
         public virtual void Log(Log log)
         {
@@ -125,7 +129,7 @@ namespace Puya.Logging
             {
                 if (CanLog(log))
                 {
-                    var _log = await InitAsync(log);
+                    var _log = await InitAsync(log, cancellation);
 
                     await LogInternalAsync(_log, cancellation);
                 }

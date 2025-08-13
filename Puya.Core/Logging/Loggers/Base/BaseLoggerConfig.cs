@@ -24,10 +24,31 @@
             }
             set { _formatter = value; }
         }
+        public IDetailedLogFormatter DetailedFormatter
+        {
+            get { return Formatter as IDetailedLogFormatter; }
+        }
+        ILoggingPolicy policy;
+        public ILoggingPolicy Policy
+        {
+            get
+            {
+                if (policy == null)
+                {
+                    policy = new NoLoggingPolicy();
+                }
+
+                return policy;
+            }
+            set { policy = value; }
+        }
+
         public BaseLoggerConfig(): this(null)
         { }
-        public BaseLoggerConfig(ILogFormatter formatter)
+        public BaseLoggerConfig(ILogFormatter formatter): this(formatter, null) { }
+        public BaseLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy)
         {
+            Policy = policy;
             Level = LogLevel.All;
             _formatter = formatter;
         }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Puya.Logging
 {
-    public abstract class BaseLogFormatter : ILogFormatter
+    public abstract class BaseLogFormatter : IDetailedLogFormatter
     {
         public virtual bool IncludeNullValues { get; set; }
         public virtual bool EncodeData { get; set; }
@@ -121,14 +121,6 @@ namespace Puya.Logging
         protected virtual string GetDefaultLogItems()
         {
             return DefaultLogItems.Join(",");
-        }
-        public virtual string Encode(string x)
-        {
-            return x;
-        }
-        public virtual string Decode(string x)
-        {
-            return x;
         }
         protected virtual string GetPartSeparator()
         {

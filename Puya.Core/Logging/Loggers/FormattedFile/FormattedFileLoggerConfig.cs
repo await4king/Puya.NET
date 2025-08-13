@@ -36,13 +36,18 @@ namespace Puya.Logging
                 }
             }
         }
-        public override string FileExtension { get; set; }
         #region ctor
         public FormattedFileLoggerConfig() : this(null)
         { }
-        public FormattedFileLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public FormattedFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public FormattedFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
-            FileExtension = ".csv";
+            if (formatter != null && formatter as IDetailedLogFormatter == null)
+            {
+                throw new InvalidOperationException("formatter must implement Puya.Logging.IDetailedLogFormatter interface");
+            }
+
             RowSeparator = Environment.NewLine;
             ColSeparator = ',';
         }

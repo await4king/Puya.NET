@@ -16,50 +16,22 @@ namespace Puya.Logging
         }
         protected override void Write(string path, string data)
         {
-            var lines = new string[]
-                {
-                    "[",
-                    "\t" + data,
-                    "]"
-                };
-
-            File.WriteAllLines(path, lines);
+            File.WriteAllText(path, data);
         }
         protected override void Append(string path, string data)
         {
-            string[] all;
+            var noAppend = !File.Exists(path) || new FileInfo(path).Length == 0;
 
-            if (File.Exists(path))
+            if (noAppend)
             {
-                all = File.ReadAllLines(path);
+                Write(path, data);
             }
             else
             {
-                all = new string[] { };
-            }
-            string[] lines;
-
-            if (all.Length > 0)
-            {
-                lines = new string[all.Length + 1];
-
-                lines[0] = all[0];
-                lines[lines.Length - 2] = "\t, " + data;
-                lines[lines.Length - 1] = all[all.Length - 1];
-
-                Array.Copy(all, 1, lines, 1, all.Length - 2);
-            }
-            else
-            {
-                lines = new string[]
-                {
-                    "[",
-                    data,
-                    "]"
-                };
+                data = "," + Environment.NewLine + data;
             }
 
-            File.WriteAllLines(path, lines);
+            File.AppendAllText(path, data);
         }
 
         public override List<Log> LoadLogFile(string path)
@@ -72,7 +44,7 @@ namespace Puya.Logging
 
                 try
                 {
-                    result = JsonConvert.DeserializeObject<List<Log>>(content);
+                    result = JsonConvert.DeserializeObject<List<Log>>("[" + content + "]");
                 }
                 catch (Exception e)
                 {

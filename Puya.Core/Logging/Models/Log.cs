@@ -1,28 +1,47 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Threading;
+using System.Xml.Serialization;
 
 namespace Puya.Logging
 {
     public enum LogType : byte
     {
+        [XmlEnum("Info")]
         Info = 1,
+        [XmlEnum("Warning")]
         Warning = 2,
+        [XmlEnum("Alert")]
         Alert = 4,
+        [XmlEnum("Debug")]
         Debug = 8,
+        [XmlEnum("Error")]
         Error = 16,
+        [XmlEnum("Trace")]
         Trace = 32,
+        [XmlEnum("Suggestion")]
         Suggestion = 64
     }
     public enum OperationResult : byte
     {
+        [XmlEnum("Normal")]
         Normal = 0,
+        [XmlEnum("Success")]
         Success = 1,
+        [XmlEnum("Cancel")]
         Cancel = 2,
+        [XmlEnum("Fatal")]
         Fatal = 3,
+        [XmlEnum("Danger")]
         Danger = 4,
+        [XmlEnum("Fault")]
         Fault = 5,
+        [XmlEnum("Failure")]
         Failure = 6,
+        [XmlEnum("Error")]
         Error = 7,
+        [XmlEnum("Abort")]
         Abort = 8
     }
     public enum LogLevel : byte
@@ -47,7 +66,11 @@ namespace Puya.Logging
         /// </summary>
         public int? AppId { get; set; }
         public int? ThreadId { get; set; }
+        [JsonIgnore]
+        [XmlIgnore]
         public byte Type { get; set; }
+        [JsonIgnore]
+        [XmlIgnore]
         public byte Result { get; set; }
         public string Category { get; set; }
         public string File { get; set; }
@@ -58,6 +81,8 @@ namespace Puya.Logging
         public string Ip { get; set; }
         public string User { get; set; }
         public DateTime LogDate { get; set; }
+        [JsonIgnore]
+        [XmlIgnore]
         public Func<object> GetData { get; set; }
         public object Data { get; set; }
         public string Method { get; set; }
@@ -70,7 +95,10 @@ namespace Puya.Logging
         public string Cookies { get; set; }
         public string Body { get; set; }
         public string ContentType { get; set; }
+        [JsonIgnore]
+        [XmlIgnore]
         public Browser Browser { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public OperationResult OperationResult
         {
             get
@@ -82,6 +110,7 @@ namespace Puya.Logging
                 this.Result = (byte)value;
             }
         }
+        [JsonConverter(typeof(StringEnumConverter))]
         public LogType LogType
         {
             get

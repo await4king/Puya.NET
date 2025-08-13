@@ -7,7 +7,9 @@
         public int MaxDailyLog { get; set; }
         public DbLoggerConfig() : this(null)
         { }
-        public DbLoggerConfig(ILogFormatter formatter) : base(formatter)
+        public DbLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        { }
+        public DbLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
         {
             MaxDailyLog = -1;
             MaxLog = -1;

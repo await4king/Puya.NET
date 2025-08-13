@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Puya.Logging
+﻿namespace Puya.Logging
 {
     public class FileLogger : FileLoggerBase<FileLoggerConfig>
     {
@@ -11,10 +8,5 @@ namespace Puya.Logging
         { }
         public FileLogger(FileLoggerConfig config, ILogger next) : base(config, next)
         { }
-
-        public override List<Log> LoadLogFile(string path)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
