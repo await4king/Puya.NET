@@ -113,6 +113,11 @@ namespace Puya.Logging
                     var _log = Init(log);
 
                     LogInternal(_log);
+
+                    if (!Config.Policy.Options.Persist)
+                    {
+                        Config.Policy.Options = null;
+                    }
                 }
 
                 Next?.Log(log);
@@ -132,6 +137,11 @@ namespace Puya.Logging
                     var _log = await InitAsync(log, cancellation);
 
                     await LogInternalAsync(_log, cancellation);
+
+                    if (!Config.Policy.Options.Persist)
+                    {
+                        Config.Policy.Options = null;
+                    }
                 }
 
                 if (Next != null)

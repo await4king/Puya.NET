@@ -5,7 +5,23 @@ namespace Puya.Logging
 {
     public class NoLoggingPolicy : ILoggingPolicy
     {
-        public LoggingPolicyOptions Options { get; set; }
+        LoggingPolicyOptions _options;
+        public LoggingPolicyOptions Options
+        {
+            get
+            {
+                if (_options == null)
+                {
+                    _options = new LoggingPolicyOptions();
+                }
+
+                return _options;
+            }
+            set
+            {
+                _options = value;
+            }
+        }
 
         public bool CanLog(ILogger logger, Log log)
         {
