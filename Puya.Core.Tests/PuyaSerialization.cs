@@ -1,6 +1,7 @@
-﻿using System.Net;
+﻿using Puya.Serialization;
+using System.Net;
 
-namespace Puya.Serialization.UnitTests
+namespace Puya.Core.Tests
 {
     public enum Color { Red, Green, Blue }
     public class PuyaSerialization

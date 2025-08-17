@@ -1,7 +1,6 @@
 ﻿using Puya.Extensions;
 
-
-namespace Puya.Core.Tests.PuyaTypeExtensions
+namespace Puya.Core.Tests
 {
     public class GetGenericTypeArguments
     {

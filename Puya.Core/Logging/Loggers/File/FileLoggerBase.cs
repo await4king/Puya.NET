@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Puya.Conversion;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Puya.Conversion;
-using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puya.Logging
 {
@@ -151,7 +153,7 @@ namespace Puya.Logging
         {
             File.AppendAllText(path, data);
         }
-        public override void Clear()
+        protected override void ClearInternal()
         {
             bool reset;
             var path = GetLogFile("", out reset);

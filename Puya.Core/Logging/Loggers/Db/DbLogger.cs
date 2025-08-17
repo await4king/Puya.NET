@@ -72,7 +72,7 @@ namespace Puya.Logging
             }
         }
         protected abstract string GetClearQuery(out CommandType commandType);
-        public override void Clear()
+        protected override void ClearInternal()
         {
             if (Db != null)
             {
@@ -95,7 +95,7 @@ namespace Puya.Logging
                 }
             }
         }
-        public override async Task ClearAsync(CancellationToken cancellation)
+        protected override async Task ClearInternalAsync(CancellationToken cancellation)
         {
             if (Db != null)
             {

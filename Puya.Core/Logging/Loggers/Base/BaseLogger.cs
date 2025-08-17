@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -125,8 +124,13 @@ namespace Puya.Logging
             }
             catch (Exception e)
             {
-                Next?.Danger(e);
-                Next?.Log(log);
+                if (Next == null)
+                {
+                    throw;
+                }
+
+                Next.Danger(e);
+                Next.Log(log);
             }
         }
         public virtual async Task LogAsync(Log log, CancellationToken cancellation)
@@ -152,18 +156,33 @@ namespace Puya.Logging
             }
             catch (Exception e)
             {
-                if (Next != null)
+                if (Next == null)
                 {
-                    await Next.DangerAsync(e, null, cancellation);
-                    await Next.LogAsync(log, cancellation);
+                    throw;
                 }
+
+                await Next.DangerAsync(e, null, cancellation);
+                await Next.LogAsync(log, cancellation);
             }
         }
-        public virtual void Clear()
-        { }
-        public virtual Task ClearAsync(CancellationToken cancellation)
+        protected abstract void ClearInternal();
+        protected virtual Task ClearInternalAsync(CancellationToken cancellation)
         {
-            return Task.Run(Clear);
+            ClearInternal();
+
+            return Task.CompletedTask;
+        }
+        public void Clear()
+        {
+            ClearInternal();
+
+            Next?.Clear();
+        }
+        public async Task ClearAsync(CancellationToken cancellation)
+        {
+            await ClearInternalAsync(cancellation);
+
+            Next?.Clear();
         }
     }
 }

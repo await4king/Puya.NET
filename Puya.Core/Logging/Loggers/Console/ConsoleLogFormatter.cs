@@ -1,6 +1,4 @@
-﻿using Puya.Extensions;
-using System;
-using System.Linq;
+﻿using System;
 
 namespace Puya.Logging
 {

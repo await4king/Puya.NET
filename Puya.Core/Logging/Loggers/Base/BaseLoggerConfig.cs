@@ -5,24 +5,24 @@
         public int? AppId { get; set; }
         public string User { get; set; }
         public LogLevel Level { get; set; }
-        private ILogFormatter _formatter;
+        private ILogFormatter formatter;
         public ILogFormatter Formatter
         {
             get
             {
-                if (_formatter == null)
+                if (formatter == null)
                 {
-                    _formatter = GetDefaultFormatter();
+                    formatter = GetDefaultFormatter();
                 }
 
-                if (_formatter == null)
+                if (formatter == null)
                 {
-                    _formatter = new StringLogFormatter();
+                    formatter = new StringLogFormatter();
                 }
 
-                return _formatter;
+                return formatter;
             }
-            set { _formatter = value; }
+            set { formatter = value; }
         }
         public IDetailedLogFormatter DetailedFormatter
         {
@@ -43,14 +43,16 @@
             set { policy = value; }
         }
 
-        public BaseLoggerConfig(): this(null)
+        public BaseLoggerConfig(): this(null, null)
+        { }
+        public BaseLoggerConfig(ILoggingPolicy policy) : this(null, null)
         { }
         public BaseLoggerConfig(ILogFormatter formatter): this(formatter, null) { }
         public BaseLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy)
         {
             Policy = policy;
             Level = LogLevel.All;
-            _formatter = formatter;
+            this.formatter = formatter;
         }
         protected virtual ILogFormatter GetDefaultFormatter()
         {

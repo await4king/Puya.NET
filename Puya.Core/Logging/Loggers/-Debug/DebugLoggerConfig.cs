@@ -4,9 +4,11 @@
     {
         public DebugLoggerConfig() : this(null)
         { }
-        public DebugLoggerConfig(ILogFormatter formatter) : this(formatter, null)
+        public DebugLoggerConfig(ILoggingPolicy policy) : base(policy)
         { }
-        public DebugLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
-        { }
+        protected override ILogFormatter GetDefaultFormatter()
+        {
+            return new StringLogFormatter();
+        }
     }
 }

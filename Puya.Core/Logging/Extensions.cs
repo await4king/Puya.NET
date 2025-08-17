@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Puya.Extensions;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Puya.Extensions;
 
 namespace Puya.Logging
 {
@@ -1539,6 +1540,32 @@ namespace Puya.Logging
             return SuggestAsync(logger, "", message, data, CancellationToken.None, memberName, sourceFilePath, sourceLineNumber);
         }
         #endregion
+        public static string FormatDate(this Log log)
+        {
+            return log.LogDate.ToString("yyyy/MM/dd HH:mm:dd.ffffff");
+        }
+        public static string SerializeData(this Log log)
+        {
+            var result = string.Empty;
+            var obj = log.GetData == null ? log.Data : log.GetData();
+
+            if (obj != null)
+            {
+                try
+                {
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    };
+
+                    result = JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
+                }
+                catch
+                { }
+            }
+
+            return result;
+        }
         public static string SerializeData(this ILogFormatter formatter, Log log)
         {
             var data = string.Empty;

@@ -194,5 +194,71 @@ namespace Puya.Logging
                 ContentType = log.ContentType;
             }
         }
+        public string Fill(string template)
+        {
+            var result = template
+                .Replace("{id}", Id > 0 ? Id.ToString(): "")
+                .Replace("{appid}", AppId?.ToString())
+                .Replace("{threadid}", ThreadId?.ToString())
+                .Replace("{type}", Type.ToString())
+                .Replace("{result}", Result.ToString())
+                .Replace("{category}", Category?.ToString())
+                .Replace("{file}", File?.ToString())
+                .Replace("{line}", Line?.ToString())
+                .Replace("{membername}", MemberName?.ToString())
+                .Replace("{message}", Message?.ToString())
+                .Replace("{stacktrace}", StackTrace?.ToString())
+                .Replace("{ip}", Ip?.ToString())
+                .Replace("{user}", User?.ToString())
+                .Replace("{logdate}", this.FormatDate())
+                .Replace("{data}", this.SerializeData())
+                .Replace("{method}", Method?.ToString())
+                .Replace("{url}", Url?.ToString())
+                .Replace("{browsername}", BrowserName?.ToString())
+                .Replace("{browserversion}", BrowserVersion?.ToString())
+                .Replace("{referrer}", Referrer?.ToString())
+                .Replace("{headers}", Headers?.ToString())
+                .Replace("{form}", Form?.ToString())
+                .Replace("{cookies}", Cookies?.ToString())
+                .Replace("{body}", Body?.ToString())
+                .Replace("{contenttype}", ContentType?.ToString())
+                .Replace("{operationresult}", OperationResult.ToString())
+                .Replace("{logtype}", LogType.ToString());
+
+            return result;
+        }
+        public string Clear(string template)
+        {
+            var result = template
+                .Replace("{id}", "")
+                .Replace("{appid}", "")
+                .Replace("{threadid}", ThreadId?.ToString())
+                .Replace("{type}", Type.ToString())
+                .Replace("{result}", Result.ToString())
+                .Replace("{category}", "")
+                .Replace("{file}", "")
+                .Replace("{line}", "")
+                .Replace("{membername}", "")
+                .Replace("{message}", "")
+                .Replace("{stacktrace}", "")
+                .Replace("{ip}", "")
+                .Replace("{user}", "")
+                .Replace("{logdate}", this.FormatDate())
+                .Replace("{data}", "")
+                .Replace("{method}", "")
+                .Replace("{url}", "")
+                .Replace("{browsername}", "")
+                .Replace("{browserversion}", "")
+                .Replace("{referrer}", "")
+                .Replace("{headers}", "")
+                .Replace("{form}", "")
+                .Replace("{cookies}", "")
+                .Replace("{body}", "")
+                .Replace("{contenttype}", "")
+                .Replace("{operationresult}", OperationResult.Normal.ToString())
+                .Replace("{logtype}", LogType.Info.ToString());
+
+            return result;
+        }
     }
 }

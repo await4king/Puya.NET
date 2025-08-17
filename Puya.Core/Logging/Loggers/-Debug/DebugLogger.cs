@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puya.Logging
 {
@@ -16,7 +19,7 @@ namespace Puya.Logging
 
             Debug.WriteLine(data);
         }
-        public override void Clear()
+        protected override void ClearInternal()
         {
             Debug.Flush();
         }

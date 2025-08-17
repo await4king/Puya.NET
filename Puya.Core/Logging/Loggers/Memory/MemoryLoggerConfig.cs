@@ -4,10 +4,12 @@
     {
         public MemoryLoggerConfig() : this(null)
         { }
-        public MemoryLoggerConfig(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public MemoryLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public MemoryLoggerConfig(ILoggingPolicy policy) : base(policy)
         { }
         public int MaxLogCount { get; set; }
+        protected override ILogFormatter GetDefaultFormatter()
+        {
+            return new StringLogFormatter();
+        }
     }
 }

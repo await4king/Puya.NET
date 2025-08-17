@@ -4,9 +4,7 @@
     {
         public ConsoleLoggerConfig() : this(null)
         { }
-        public ConsoleLoggerConfig(ILogFormatter formatter): this(formatter, null)
-        { }
-        public ConsoleLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public ConsoleLoggerConfig(ILoggingPolicy policy) : base(new ConsoleLogFormatter(), policy)
         { }
         protected override ILogFormatter GetDefaultFormatter()
         {

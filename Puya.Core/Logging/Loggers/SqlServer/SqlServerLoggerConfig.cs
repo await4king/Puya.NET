@@ -4,9 +4,7 @@
     {
         public SqlServerLoggerConfig() : this(null)
         { }
-        public SqlServerLoggerConfig(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public SqlServerLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public SqlServerLoggerConfig(ILoggingPolicy policy) : base(policy)
         {
             LogTable = "dbo.Logs";
         }

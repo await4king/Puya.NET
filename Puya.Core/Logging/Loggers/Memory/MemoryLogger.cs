@@ -48,7 +48,7 @@ namespace Puya.Logging
             return Task.CompletedTask;
         }
 
-        public override void Clear()
+        protected override void ClearInternal()
         {
             Logs.Clear();
         }

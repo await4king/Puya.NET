@@ -39,15 +39,8 @@ namespace Puya.Logging
         #region ctor
         public FormattedFileLoggerConfig() : this(null)
         { }
-        public FormattedFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public FormattedFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public FormattedFileLoggerConfig(ILoggingPolicy policy) : base(policy)
         {
-            if (formatter != null && formatter as IDetailedLogFormatter == null)
-            {
-                throw new InvalidOperationException("formatter must implement Puya.Logging.IDetailedLogFormatter interface");
-            }
-
             RowSeparator = Environment.NewLine;
             ColSeparator = ',';
         }

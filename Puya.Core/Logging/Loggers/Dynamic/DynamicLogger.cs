@@ -7,6 +7,8 @@ namespace Puya.Logging
 {
     public class DynamicLogger : BaseLogger<DynamicLoggerConfig>
     {
+        public DynamicLogger(DynamicLoggerConfig config, IDb db) : this(config, db, null)
+        { }
         public DynamicLogger(DynamicLoggerConfig config, IDb db, ILogger next) : base(config, next)
         {
             Db = db;
@@ -79,35 +81,35 @@ namespace Puya.Logging
         }
         protected virtual ILogger GetConsoleLogger()
         {
-            return new ConsoleLogger(new ConsoleLoggerConfig(Config?.Formatter), Next);
+            return new ConsoleLogger(new ConsoleLoggerConfig());
         }
         protected virtual ILogger GetDebugLogger()
         {
-            return new DebugLogger(new DebugLoggerConfig(Config?.Formatter), Next);
+            return new DebugLogger(new DebugLoggerConfig());
         }
         protected virtual ILogger GetMemoryLogger()
         {
-            return new MemoryLogger(new MemoryLoggerConfig(Config?.Formatter), Next);
+            return new MemoryLogger(new MemoryLoggerConfig());
         }
         protected virtual ILogger GetFileLogger()
         {
-            return new FileLogger(new FileLoggerConfig(Config?.Formatter), Next);
+            return new FileLogger(new FileLoggerConfig());
         }
         protected virtual ILogger GetSqlServerLogger()
         {
-            return new SqlServerLogger(new SqlServerLoggerConfig(), Db, Next);
+            return new SqlServerLogger(new SqlServerLoggerConfig(), Db);
         }
         protected virtual ILogger GetXmlLogger()
         {
-            return new XmlFileLogger(new XmlFileLoggerConfig(Config?.Formatter), Next);
+            return new XmlFileLogger(new XmlFileLoggerConfig());
         }
         protected virtual ILogger GetJsonLogger()
         {
-            return new JsonFileLogger(new JsonFileLoggerConfig(Config?.Formatter), Next);
+            return new JsonFileLogger(new JsonFileLoggerConfig());
         }
         protected virtual ILogger GetCsvLogger()
         {
-            return new FormattedFileLogger(new FormattedFileLoggerConfig(Config?.Formatter), Next);
+            return new FormattedFileLogger(new FormattedFileLoggerConfig());
         }
         #endregion
         private string type;
@@ -141,13 +143,9 @@ namespace Puya.Logging
 
         public IDb Db { get; set; }
 
-        public override void Clear()
+        protected override void ClearInternal()
         {
             logger.Clear();
-        }
-        public override Task ClearAsync(CancellationToken cancellation)
-        {
-            return logger.ClearAsync(cancellation);
         }
     }
 }

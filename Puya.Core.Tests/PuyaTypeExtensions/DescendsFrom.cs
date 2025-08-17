@@ -1,9 +1,6 @@
 ﻿using Puya.Extensions;
-using System;
-using System.Collections.Generic;
-using Xunit;
 
-namespace Puya.Core.Tests.PuyaTypeExtensions
+namespace Puya.Core.Tests
 {
     public class DescendsFrom
     {

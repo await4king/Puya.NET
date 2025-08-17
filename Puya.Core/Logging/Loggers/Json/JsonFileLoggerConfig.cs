@@ -4,9 +4,7 @@
     {
         public JsonFileLoggerConfig() : this(null)
         { }
-        public JsonFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public JsonFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public JsonFileLoggerConfig(ILoggingPolicy policy) : base(policy)
         {
             FileExtension = ".log";
         }

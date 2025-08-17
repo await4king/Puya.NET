@@ -13,9 +13,7 @@ namespace Puya.Logging
         #region ctor
         public FileLoggerConfigBase() : this(null)
         { }
-        public FileLoggerConfigBase(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public FileLoggerConfigBase(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public FileLoggerConfigBase(ILoggingPolicy policy) : base(policy)
         {
             FileName = "log";
             FileExtension = ".log";

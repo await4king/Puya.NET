@@ -16,7 +16,7 @@ namespace Puya.Logging
 
             Console.WriteLine(new string('-', 100));
         }
-        public override void Clear()
+        protected override void ClearInternal()
         {
             Console.Clear();
         }

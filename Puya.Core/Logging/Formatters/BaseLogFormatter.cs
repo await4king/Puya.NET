@@ -8,7 +8,6 @@ namespace Puya.Logging
     public abstract class BaseLogFormatter : IDetailedLogFormatter
     {
         public virtual bool IncludeNullValues { get; set; }
-        public virtual bool EncodeData { get; set; }
         public static readonly string[] DefaultLogItems;
         static BaseLogFormatter()
         {

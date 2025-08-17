@@ -7,7 +7,8 @@ namespace Puya.ConsoleTest
     {
         static void test_logger(ILogger logger)
         {
-            logger.Info("hello");
+            logger.Info("test", "hello");
+            
             logger.Debug("BeginJob", "this is a message", () => new { a = 10, b = true, c = "test" });
             logger.Log(new Log
             {
@@ -33,13 +34,14 @@ namespace Puya.ConsoleTest
                 Line = 18,
                 StackTrace = Environment.StackTrace
             });
-
+            
             logger.Error("an unexpected situation happened. please check logs!", new { size = 300, code = "iusyhdiluy87214" });
         }
         static void Main(string[] args)
         {
-            test_logger(new ConsoleLogger());
-            test_logger(new DebugLogger());
+            //test_logger(new ConsoleLogger());
+            //test_logger(new DebugLogger());
+            test_logger(new FreeConsoleLogger());
 
             Console.ReadKey();
         }

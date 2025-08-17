@@ -4,9 +4,7 @@
     {
         public XmlFileLoggerConfig() : this(null)
         { }
-        public XmlFileLoggerConfig(ILogFormatter formatter) : this(formatter, null)
-        { }
-        public XmlFileLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy) : base(formatter, policy)
+        public XmlFileLoggerConfig(ILoggingPolicy policy) : base(policy)
         {
             FileExtension = ".xml";
         }
