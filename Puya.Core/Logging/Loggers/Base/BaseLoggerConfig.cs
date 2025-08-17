@@ -45,7 +45,7 @@
 
         public BaseLoggerConfig(): this(null, null)
         { }
-        public BaseLoggerConfig(ILoggingPolicy policy) : this(null, null)
+        public BaseLoggerConfig(ILoggingPolicy policy) : this(null, policy)
         { }
         public BaseLoggerConfig(ILogFormatter formatter): this(formatter, null) { }
         public BaseLoggerConfig(ILogFormatter formatter, ILoggingPolicy policy)

@@ -39,7 +39,7 @@
           "Usings": [ ],
           "Concretes": [ "Sql" ],
           "RequestType": "ServiceRequestByPK<int>",
-          "ResponseData": "WebLog",
+          "ResponseData": "Log",
           "PartialBase": false,
           "PartialRequest": false,
           "PartialResponse": false
@@ -72,7 +72,7 @@
             "OrderDir": "string"
           },
           "ResponseType": "ServicePagingResponse",
-          "ResponseData": "WebLog",
+          "ResponseData": "Log",
           "PartialBase": false,
           "PartialRequest": true,
           "PartialResponse": false

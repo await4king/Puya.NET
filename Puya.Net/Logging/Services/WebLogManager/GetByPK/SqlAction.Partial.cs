@@ -20,11 +20,11 @@ namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
 
 			if (async)
 			{
-				response.Data = await owner.Db.ExecuteSingleSqlAsync<WebLog>(query, (object)null, cancellation);
+				response.Data = await owner.Db.ExecuteSingleSqlAsync<Log>(query, (object)null, cancellation);
 			}
 			else
 			{
-				response.Data = owner.Db.ExecuteSingleSql<WebLog>(query);
+				response.Data = owner.Db.ExecuteSingleSql<Log>(query);
 			}
 
 			response.Succeeded();

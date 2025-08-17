@@ -20,11 +20,11 @@ namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
 
 			if (async)
 			{
-				response.Data.Items = await owner.Db.ExecuteReaderCommandAsync<WebLog>("usp1_WebLogs_get_page", request, cancellation);
+				response.Data.Items = await owner.Db.ExecuteReaderCommandAsync<Log>("usp1_WebLogs_get_page", request, cancellation);
 			}
 			else
 			{
-				response.Data.Items = owner.Db.ExecuteReaderCommand<WebLog>("usp1_WebLogs_get_page");
+				response.Data.Items = owner.Db.ExecuteReaderCommand<Log>("usp1_WebLogs_get_page");
 			}
 
 			response.Data.RecordCount = SafeClrConvert.ToInt(request.RecordCount.Value);

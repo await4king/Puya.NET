@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Moq;
 using Puya.Conversion;
 using Puya.Data;
 using Puya.Logging;
 using System.Security.Claims;
+using System.Text;
 
 namespace Puya.Net.Tests
 {
@@ -39,12 +41,19 @@ namespace Puya.Net.Tests
 
             return new ClaimsPrincipal(identity);
         }
-        IHttpContextAccessor GetHttpContextAccessor(Dictionary<string, string> headers, string method, string username, Claim[] claims)
+        IHttpContextAccessor GetHttpContextAccessor(Dictionary<string, string> headers,
+                                                    string method,
+                                                    string username,
+                                                    Claim[] claims,
+                                                    IFeatureCollection features = null,
+                                                    string body = null,
+                                                    string contentType = null)
         {
             var mockAccessor = new Mock<IHttpContextAccessor>();
-            var context = new DefaultHttpContext();
+            var context = features == null ? new DefaultHttpContext() : new DefaultHttpContext(features);
 
             context.Request.Method = method;
+            context.Request.ContentType = contentType;
 
             var claimsPrincipal = GetPrincipal(username, claims);
 
@@ -53,12 +62,24 @@ namespace Puya.Net.Tests
                 context.User = claimsPrincipal;
             }
 
+            context.Request.Headers["Content-Type"] = contentType;
+
             if (headers?.Count > 0)
             {
                 foreach (var item in headers)
                 {
                     context.Request.Headers[item.Key] = item.Value;
                 }
+            }
+
+            if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(contentType))
+            {
+                var bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(body));
+
+                bodyStream.Seek(0, SeekOrigin.Begin); // Reset position
+
+                context.Request.Body = bodyStream;
+                context.Request.ContentType = contentType;
             }
 
             mockAccessor.Setup(_ => _.HttpContext).Returns(context);
@@ -69,20 +90,39 @@ namespace Puya.Net.Tests
                                                     string method,
                                                     string username,
                                                     Claim[] claims,
-                                                    string roles = null, string users = null)
+                                                    string roles = null,
+                                                    string users = null,
+                                                    IFeatureCollection features = null,
+                                                    string body = null,
+                                                    string contentType = null)
         {
-            var httpcontextAccessor = GetHttpContextAccessor(headers, method, username, claims);
-            var webPolicy = new WebLoggingUserRolePolicy(httpcontextAccessor, roles, users);
+            var httpcontextAccessor = GetHttpContextAccessor(headers, method, username, claims, features, body, contentType);
+            var policy = new WebLoggingUserRolePolicy(httpcontextAccessor, roles, users);
 
-            var result = new SqlServerWebLoggerConfig(webPolicy, new StringLogFormatter(new JsonLogDataConverter()));
+            var result = new SqlServerWebLoggerConfig(policy);
 
             result.Level = LogLevel.All;
 
             return result;
         }
-        IList<Log> GetLogs(SqlServerWebLogger logger)
+        DebugLoggerConfig GetDebugLoggerConfig(Dictionary<string, string> headers,
+                                                    string method,
+                                                    string username,
+                                                    Claim[] claims,
+                                                    string roles = null,
+                                                    string users = null,
+                                                    IFeatureCollection features = null,
+                                                    string body = null,
+                                                    string contentType = null)
         {
-            return logger.Db.ExecuteReaderSql<Log>("select * from " + logger.Config.LogTable);
+            var httpcontextAccessor = GetHttpContextAccessor(headers, method, username, claims, features, body, contentType);
+            var policy = new WebLoggingUserRolePolicy(httpcontextAccessor, roles, users);
+
+            var result = new DebugLoggerConfig(policy);
+
+            result.Level = LogLevel.All;
+
+            return result;
         }
         [Fact]
         public void Test_DbLogger_LogsTable_Exists()
@@ -121,7 +161,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 0);
         }
@@ -131,7 +171,7 @@ select case when exists
             var db = GetDb();
             var config = GetDbLoggerConfig(null, "GET", null, null);
             
-            (config.WebPolicy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
+            (config.Policy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
             
             var logger = new SqlServerWebLogger(config, db);
 
@@ -139,7 +179,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -154,7 +194,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -169,7 +209,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -184,7 +224,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 0);
         }
@@ -199,7 +239,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -214,7 +254,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 0);
         }
@@ -229,7 +269,7 @@ select case when exists
 
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -254,7 +294,7 @@ select case when exists
             var db = GetDb();
             var config = GetDbLoggerConfig(null, "GET", null, null);
 
-            (config.WebPolicy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
+            (config.Policy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
             config.MaxDailyLog = 3;
 
             var logger = new SqlServerWebLogger(config, db);
@@ -266,7 +306,7 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
         }
@@ -276,7 +316,7 @@ select case when exists
             var db = GetDb();
             var config = GetDbLoggerConfig(null, "GET", null, null);
 
-            (config.WebPolicy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
+            (config.Policy as WebLoggingUserRolePolicy).AllowNotAuthenticatedUsers = true;
             config.MaxLog = 3;
 
             var logger = new SqlServerWebLogger(config, db);
@@ -288,9 +328,253 @@ select case when exists
             logger.Info("test");
             logger.Info("test");
 
-            var logs = GetLogs(logger);
+            var logs = logger.FetchLogs();
 
             Assert.True(logs.Count == 1);
+        }
+        [Fact]
+        public void Test_DbLogger_log0()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+{
+    { "username", "testuser" },
+    { "password", "secure123" }
+};
+
+            // Create a FormCollection with your mock data
+            var formCollection = new FormCollection(formData);
+
+            // Create a FormFeature and set it in a FeatureCollection
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+
+            features.Set<IFormFeature>(formFeature);
+
+            var context = new DefaultHttpContext(features);
+
+            //context.Request.Method = "POST";
+
+            var claimsPrincipal = GetPrincipal("testuser", new Claim[] { });
+
+            if (claimsPrincipal != null)
+            {
+                context.User = claimsPrincipal;
+            }
+
+            // Now you can access form data like this:
+            var username = context.Request.Form["username"];
+
+            Assert.True(username == "testuser");
+        }
+        [Fact]
+        public void Test_DbLogger_log1()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+{
+    { "username", "testuser" },
+    { "password", "secure123" }
+};
+
+            // Create a FormCollection with your mock data
+            var formCollection = new FormCollection(formData);
+
+            // Create a FormFeature and set it in a FeatureCollection
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            features.Set<IFormFeature>(formFeature);
+            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            {
+                Scheme = url.Scheme,
+                Path = url.LocalPath,
+                QueryString = url.Query,
+                Headers = new HeaderDictionary { ["Host"] = url.Host }
+            });
+
+            var db = GetDb();
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var logger = new SqlServerWebLogger(config, db);
+
+            logger.Clear();
+
+            logger.Info("test");
+
+            var logs = logger.FetchLogs();
+
+            Assert.True(logs.Count == 1);
+
+            var log0 = logs[0] as Log;
+
+            Assert.NotNull(log0);
+
+            Assert.True(string.Equals(log0.Method, "POST", StringComparison.OrdinalIgnoreCase));
+            Assert.True(string.IsNullOrEmpty(log0.Form));
+        }
+        [Fact]
+        public void Test_DbLogger_log11()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+{
+    { "username", "testuser" },
+    { "password", "secure123" }
+};
+
+            // Create a FormCollection with your mock data
+            var formCollection = new FormCollection(formData);
+
+            // Create a FormFeature and set it in a FeatureCollection
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            features.Set<IFormFeature>(formFeature);
+            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            {
+                Scheme = url.Scheme,
+                Path = url.LocalPath,
+                QueryString = url.Query,
+                Headers = new HeaderDictionary { ["Host"] = url.Host }
+            });
+
+            var db = GetDb();
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var logger = new SqlServerWebLogger(config, db);
+            
+            logger.UseForm();
+
+            logger.Clear();
+
+            logger.Info("test");
+
+            var logs = logger.FetchLogs();
+
+            Assert.True(logs.Count == 1);
+
+            var log0 = logs[0] as Log;
+
+            Assert.NotNull(log0);
+
+            Assert.False(string.IsNullOrEmpty(log0.Form));
+            Assert.True(log0.Method == "POST");
+            Assert.True(log0.Form.Contains("username", StringComparison.OrdinalIgnoreCase));
+            Assert.True(log0.Form.Contains("password", StringComparison.OrdinalIgnoreCase));
+        }
+        [Fact]
+        public void Test_DbLogger_log12()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+{
+    { "username", "testuser" },
+    { "password", "secure123" }
+};
+
+            // Create a FormCollection with your mock data
+            var formCollection = new FormCollection(formData);
+
+            // Create a FormFeature and set it in a FeatureCollection
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            features.Set<IFormFeature>(formFeature);
+            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            {
+                Scheme = url.Scheme,
+                Path = url.LocalPath,
+                QueryString = url.Query,
+                Headers = new HeaderDictionary { ["Host"] = url.Host }
+            });
+
+            var db = GetDb();
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var logger = new SqlServerWebLogger(config, db);
+
+            logger.UseForm("username");
+
+            logger.Clear();
+
+            logger.Info("test");
+
+            var logs = logger.FetchLogs();
+
+            Assert.True(logs.Count == 1);
+
+            var log0 = logs[0] as Log;
+
+            Assert.NotNull(log0);
+
+            Assert.False(string.IsNullOrEmpty(log0.Form));
+            Assert.True(log0.Method == "POST");
+            Assert.True(log0.Form.Contains("username", StringComparison.OrdinalIgnoreCase));
+            Assert.False(log0.Form.Contains("password", StringComparison.OrdinalIgnoreCase));
+        }
+        [Fact]
+        public void Test_DbLogger_log13()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+            var formCollection = new FormCollection(formData);
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+
+            features.Set<IFormFeature>(formFeature);
+            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            {
+                Scheme = url.Scheme,
+                Path = url.LocalPath,
+                QueryString = url.Query,
+                Headers = new HeaderDictionary { ["Host"] = url.Host }
+            });
+            var body = "{\"username\":\"testuser\",\"password\":\"secure123\"}";
+            var db = GetDb();
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features, body, "application/json");
+            var logger = new SqlServerWebLogger(config, db);
+
+            logger.UseBody();
+
+            logger.Clear();
+
+            logger.Info("test");
+
+            var logs = logger.FetchLogs();
+
+            Assert.True(logs.Count == 1);
+
+            var log0 = logs[0] as Log;
+
+            Assert.NotNull(log0);
+
+            Assert.False(string.IsNullOrEmpty(log0.Body));
+            Assert.True(log0.Method == "POST");
+            Assert.True(string.Equals(body, log0.Body));
+        }
+        [Fact]
+        public void Test_DebugLogger_Log_1()
+        {
+            var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+            var formCollection = new FormCollection(formData);
+            var formFeature = new FormFeature(formCollection);
+            var features = new FeatureCollection();
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+
+            features.Set<IFormFeature>(formFeature);
+            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            {
+                Scheme = url.Scheme,
+                Path = url.LocalPath,
+                QueryString = url.Query,
+                Headers = new HeaderDictionary { ["Host"] = url.Host }
+            });
+            var body = "{\"username\":\"testuser\",\"password\":\"secure123\"}";
+            var config = GetDebugLoggerConfig(null, "POST", "ali", null, null, "ali", features, body, "application/json");
+            var logger = new DebugLogger(config);
+
+            logger.UseBody();
+
+            logger.Clear();
+
+            logger.Info("hello");
+            logger.Debug("BeginJob", "this is a message", () => new { a = 10, b = true, c = "test" });
+
+            Assert.True(true);
         }
     }
 }

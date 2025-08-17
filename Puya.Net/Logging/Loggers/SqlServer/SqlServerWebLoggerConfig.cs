@@ -1,10 +1,10 @@
 ﻿namespace Puya.Logging
 {
-    public class SqlServerWebLoggerConfig : WebDbLoggerConfig
+    public class SqlServerWebLoggerConfig : SqlServerLoggerConfig
     {
-        public SqlServerWebLoggerConfig() : this(null, null)
+        public SqlServerWebLoggerConfig() : this(null)
         { }
-        public SqlServerWebLoggerConfig(IWebLoggingPolicy webLoggingPolicy, ILogFormatter formatter) : base(formatter, webLoggingPolicy)
+        public SqlServerWebLoggerConfig(ILoggingPolicy policy) : base(policy)
         {
             LogTable = "dbo.WebLogs";
         }

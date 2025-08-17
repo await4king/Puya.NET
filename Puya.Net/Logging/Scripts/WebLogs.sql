@@ -49,6 +49,7 @@ begin
 
 	CREATE TABLE [dbo].[WebLogs](
 		[Id]				[int] IDENTITY(1,1) NOT NULL,
+		[ThreadId]			[int]				NULL,
 		[AppId]				[int]				NULL,
 		[LogDate]			[datetime]			NOT NULL,
 		[LogType]			[tinyint]			NULL,
@@ -64,11 +65,13 @@ begin
 		[Data]				[nvarchar](max)		NULL,
 		[BrowserVersionId]	[int]				NULL,
 		[Method]			[nvarchar](20)		NULL,
+		[ContentType]		[nvarchar](100)		NULL,
 		[Url]				[nvarchar](1000)	NULL,
 		[Referrer]			[nvarchar](1000)	NULL,
 		[Headers]			[nvarchar](2000)	NULL,
 		[Form]				[nvarchar](max)		NULL,
 		[Cookies]			[nvarchar](2000)	NULL,
+		[Body]				[nvarchar](max)		NULL,
 	 CONSTRAINT [PK_WebLogs] PRIMARY KEY CLUSTERED 
 	(
 		[Id] ASC

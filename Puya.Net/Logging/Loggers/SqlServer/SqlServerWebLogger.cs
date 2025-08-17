@@ -4,7 +4,7 @@ using System.Data;
 
 namespace Puya.Logging
 {
-    public class SqlServerWebLogger: WebDbLogger<SqlServerWebLoggerConfig>
+    public class SqlServerWebLogger: SqlServerLogger
     {
         #region ctor
         public SqlServerWebLogger() : this(null, null, null)
@@ -31,12 +31,12 @@ namespace Puya.Logging
         }
         protected override DynamicModel GetInsertLogArgs(Log log)
         {
-            var wlog = log as WebLog;
-            
             var args = new DynamicModel
             {
+                ["LogTable"] = Config.LogTable,
                 ["MaxLog"] = Config.MaxLog,
                 ["MaxDailyLog"] = Config.MaxDailyLog,
+                ["ThreadId"] = log.ThreadId,
                 ["AppId"] = log.AppId,
                 ["LogDate"] = log.LogDate,
                 ["LogType"] = log.LogType,
@@ -51,37 +51,16 @@ namespace Puya.Logging
                 ["StackTrace"] = log.StackTrace,
                 ["Data"] = Config.Formatter?.SerializeData(log),
 
-                ["BrowserName"] = wlog?.BrowserName,
-                ["BrowserVersion"] = wlog?.BrowserVersion,
-                ["Method"] = wlog?.Method,
-                ["Url"] = wlog?.Url,
-                ["Referrer"] = wlog?.Referrer,
-                ["Headers"] = wlog?.Headers,
-                ["Form"] = wlog?.Form,
-                ["Cookies"] = wlog?.Cookies
-            };
-
-            return args;
-        }
-
-        protected override string GetClearQuery(out CommandType commandType)
-        {
-            commandType = CommandType.Text;
-
-            if (string.IsNullOrEmpty(Config.LogTable))
-            {
-                return string.Empty;
-            }
-
-            return $@"
-if object_id(@tbl) is not null
-    truncate table {Config.LogTable}";
-        }
-        protected override DynamicModel GetClearLogArgs()
-        {
-            var args = new DynamicModel
-            {
-                ["tbl"] = Config.LogTable,
+                ["BrowserName"] = log.BrowserName,
+                ["BrowserVersion"] = log.BrowserVersion,
+                ["Method"] = log.Method,
+                ["ContentType"] = log.ContentType,
+                ["Url"] = log.Url,
+                ["Referrer"] = log.Referrer,
+                ["Headers"] = log.Headers,
+                ["Form"] = log.Form,
+                ["Cookies"] = log.Cookies,
+                ["Body"] = log.Body
             };
 
             return args;
