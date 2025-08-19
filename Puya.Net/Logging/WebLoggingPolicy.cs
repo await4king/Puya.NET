@@ -9,7 +9,7 @@ using UAParser;
 
 namespace Puya.Logging
 {
-    public class WebLoggingPolicy : ILoggingPolicy
+    public class WebLoggingPolicy : OverridableLogLevelPolicy
     {
         public WebLoggingPolicy(IHttpContextAccessor httpContextAccessor)
         {
@@ -17,64 +17,18 @@ namespace Puya.Logging
         }
 
         public IHttpContextAccessor HttpContextAccessor { get; }
-        protected virtual LogLevel? GetOverridedLogLevel()
+        protected override string GetOverridedLogLevel()
         {
-            LogLevel? result = null;
+            string result = null;
 
-            var context = HttpContextAccessor?.HttpContext;
-
-            if (!(context == null || context.Request == null || context.Request.Headers == null))
+            if (HttpContextAccessor.TryGetHttpContext(out HttpContext context))
             {
-                string level = context.Request.Headers[WebLoggingConstants.LogLevelHeaderName];
-
-                if (!string.IsNullOrEmpty(level))
-                {
-                    var _level = level.ToEnum<LogLevel>(LogLevel.None);
-
-                    if (_level != LogLevel.None)
-                    {
-                        result = _level;
-                    }
-                }
+                result = context.Request.Headers[WebLoggingConstants.LogLevelHeaderName];
             }
 
             return result;
         }
-        LoggingPolicyOptions _options;
-        public LoggingPolicyOptions Options
-        {
-            get
-            {
-                if (_options == null)
-                {
-                    _options = new LoggingPolicyOptions();
-                }
-
-                return _options;
-            }
-            set
-            {
-                _options = value;
-            }
-        }
-        public virtual bool CanLog(ILogger logger, Log log)
-        {
-            var _logger = logger as IBaseLogger;
-
-            if (_logger != null)
-            {
-                var logLevel = GetOverridedLogLevel();
-
-                if (logLevel.HasValue && logLevel.Value != LogLevel.None)
-                {
-                    return _logger.Config.Level == logLevel.Value;
-                }
-            }
-
-            return true;
-        }
-
-        public async Task InitAsync(ILogger logger, Log log, CancellationToken cancellation)
+        public async override Task InitAsync(ILogger logger, Log log, CancellationToken cancellation)
         {
             var context = HttpContextAccessor.HttpContext;
 
@@ -126,8 +80,11 @@ namespace Puya.Logging
                             var uaParser = Parser.GetDefault();
                             var ci = uaParser.Parse(context.Request.Headers["User-Agent"]);
 
-                            log.BrowserName = ci.UA.Family;
-                            log.BrowserVersion = ci.UA.Major + "." + ci.UA.Minor + "." + ci.UA.Patch;
+                            if (ci.UA != null)
+                            {
+                                log.BrowserName = ci.UA.Family;
+                                log.BrowserVersion = ci.UA.Major + "." + ci.UA.Minor + "." + ci.UA.Patch;
+                            }
                         }
                         catch
                         { }

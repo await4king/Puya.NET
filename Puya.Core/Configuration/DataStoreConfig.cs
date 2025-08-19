@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Puya.Conversion;
+using Puya.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -174,17 +175,43 @@ namespace Puya.Configuration
                     try
                     {
                         var decrypted = decryptor(dsi.Value);
-                        var items = JsonConvert.DeserializeObject<Dictionary<string, object>>(decrypted);
+                        var items = decrypted.SafeDeserialize<Dictionary<string, object>>(null);
 
                         if (items != null)
                         {
                             foreach (var item in items)
                             {
-                                var prop = dsi.GetType().GetProperty(item.Key);
-
-                                if (prop != null)
+                                switch (item.Key.ToLower())
                                 {
-                                    prop.SetValue(dsi, item.Value);
+                                    case "driver": dsi.Driver = item.Value?.ToString(); break;
+                                    case "provider": dsi.Provider = item.Value?.ToString(); break;
+                                    case "server": dsi.Server = item.Value?.ToString(); break;
+                                    case "database": dsi.Database = item.Value?.ToString(); break;
+                                    case "dataprovider": dsi.DataProvider = item.Value?.ToString(); break;
+                                    case "credentials": dsi.Credentials = item.Value?.ToString(); break;
+                                    case "userid": dsi.UserId = item.Value?.ToString(); break;
+                                    case "password": dsi.Password = item.Value?.ToString(); break;
+                                    case "uid": dsi .UID = item.Value?.ToString(); break;
+                                    case "pwd": dsi.PWD = item.Value?.ToString(); break;
+                                    case "multipleactiveresultsets": dsi.MultipleActiveResultSets = SafeClrConvert.ToBoolean(item.Value); break;
+                                    case "marsconnection": dsi.MARSConnection = SafeClrConvert.ToBoolean(item.Value); break;
+                                    case "mars_connection": dsi.MARS_Connection = item.Value?.ToString(); break;
+                                    case "encrypt": dsi.Encrypt = item.Value?.ToString(); break;
+                                    case "trustedconnection": dsi.Trusted_Connection = item.Value?.ToString(); break;
+                                    case "networklibrary": dsi.NetworkLibrary = item.Value?.ToString(); break;
+                                    case "initialcatalog": dsi.InitialCatalog = item.Value?.ToString(); break;
+                                    case "attachdbfilename": dsi.AttachDbFilename = item.Value?.ToString(); break;
+                                    case "integratedsecurity": dsi.IntegratedSecurity = item.Value?.ToString(); break;
+                                    case "datasource": dsi.DataSource = item.Value?.ToString(); break;
+                                    case "asynchronousprocessing": dsi.AsynchronousProcessing = SafeClrConvert.ToBoolean(item.Value); break;
+                                    case "packetsize": dsi.PacketSize = SafeClrConvert.ToInt(item.Value); break;
+                                    case "columnencryptionsetting": dsi.ColumnEncryptionSetting = item.Value?.ToString(); break;
+                                    case "enclaveattestationurl": dsi.EnclaveAttestationUrl = item.Value?.ToString(); break;
+                                    case "private int? connecttimeout": dsi.ConnectTimeout = SafeClrConvert.ToInt(item.Value); break;
+                                    case "multisubnetfailover": dsi.MultiSubnetFailover = item.Value?.ToString(); break;
+                                    case "applicationintent": dsi.ApplicationIntent = item.Value?.ToString(); break;
+                                    case "failoverpartner": dsi.FailoverPartner = item.Value?.ToString(); break;
+                                    case "failover_partner": dsi.Failover_Partner = item.Value?.ToString(); break;
                                 }
                             }
                         }
