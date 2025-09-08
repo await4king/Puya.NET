@@ -1,13 +1,13 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Puya.Caching;
+﻿using Puya.Caching;
 using Puya.Data;
 using Puya.Debugging;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Settings;
 using Puya.Translation;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Puya.ServiceModel
 {
@@ -15,6 +15,7 @@ namespace Puya.ServiceModel
         where TConfig : TapBaseConfig, new()
     {
         #region Properties
+        public IServiceInterceptor Interceptor { get; set; }
         public ILogProvider LogProvider { get; set; }
         IDebugger debugger;
         public IDebugger Debugger
@@ -120,35 +121,25 @@ namespace Puya.ServiceModel
             set { _translator = value; }
         }
         #endregion
-        #region Constructors
-        public TapBaseActionBasedService() : this(null, null, null, null, null)
-        { }
-        public TapBaseActionBasedService(TConfig config) : this(config, null, null, null, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger) : this(config, logger, null, null, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db) : this(config, logger, db, null, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db, ICacheManager cache) : this(config, logger, db, cache, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db, ICacheManager cache, ISettingService settings) : this(config, logger, db, cache, settings, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db, ICacheManager cache, ISettingService settings, ITranslator translator) : this(config, logger, db, cache, settings, translator, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db, ICacheManager cache, ISettingService settings, ITranslator translator, ILogProvider logProvider) : this(config, logger, db, cache, settings, translator, logProvider, null)
-        { }
-        public TapBaseActionBasedService(TConfig config, ILogger logger, IDb db, ICacheManager cache, ISettingService settings, ITranslator translator, ILogProvider logProvider, IDebugger debugger) : base(config)
+        public TapBaseActionBasedService(TConfig config,
+                                        ILogger logger,
+                                        IDb db,
+                                        ICacheManager cache,
+                                        ISettingService settings,
+                                        ITranslator translator,
+                                        IServiceInterceptor interceptor,
+                                        ILogProvider logProvider,
+                                        IDebugger debugger) : base(config)
         {
             Config.Logger = Logger = logger ?? Config.Logger;
             Config.Db = Db = db ?? Config.Db;
             Config.Cache = Cache = cache ?? Config.Cache;
             Config.Settings = Settings = settings ?? Config.Settings;
             Config.Translator = Translator = translator ?? Config.Translator;
-
+            Interceptor = interceptor;
             LogProvider = logProvider;
             Debugger = debugger;
         }
-        #endregion
     }
     public abstract class TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse> : ServiceAction<TBaseService, TConfig, TRequest, TResponse>
         where TConfig : TapBaseConfig, new()
@@ -275,9 +266,19 @@ namespace Puya.ServiceModel
         {
             return string.Empty;
         }
-        protected override bool OnBeforeRun(TRequest request, TResponse response)
+        protected override async Task<bool> OnBeforeRun(TRequest request, TResponse response)
         {
             Owner.LogProvider?.EnterScope();
+
+            Owner.Debug($"{Owner.Name}.{Name}: Request", request);
+
+            if (Owner.Interceptor != null)
+            {
+                if (!await Owner.Interceptor.OnRunning(this, request, response))
+                {
+                    return false;
+                }
+            }
 
             if (string.IsNullOrEmpty(response.MessageKey))
             {
@@ -289,28 +290,36 @@ namespace Puya.ServiceModel
                 }
             }
 
-            Owner.Debug($"{Owner.Name}.{Name}: Request", request);
-
             return true;
         }
-        protected override void OnAfterRun(TRequest request, TResponse response)
+        protected override async Task OnAfterRun(TRequest request, TResponse response)
         {
             // there is no need to log response. because response will be sent back to client.
             // Owner.Debug($"{Owner.Name}.{Name}: Response", response);
 
             try
             {
+                if (Owner.Interceptor != null)
+                {
+                    await Owner.Interceptor.OnRan(this, request, response);
+                }
+            }
+            catch (Exception e)
+            {
+                Owner.Error("interceptor OnRan failed", e);
+            }
+
+            try
+            {
                 Translator.Translate(response);
 
-                if (!string.IsNullOrEmpty(response.Message))
+                if (!string.IsNullOrEmpty(response.MessageKey) && !Owner.Debugger.IsDebugging)
                 {
-#if !DEBUG
                     // if we have a Message, we clear MessageKey (we don't need it).
                     // if we don't have a Message, we let MessageKey be sent back to client
                     // so that we can later check why Message translation did not produce anything.
 
                     response.MessageKey = "";
-#endif
                 }
             }
             catch (Exception e)

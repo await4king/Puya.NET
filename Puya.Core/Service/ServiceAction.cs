@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Puya.Base;
@@ -45,12 +43,13 @@ namespace Puya.Service
         protected virtual void OnError(TRequest request, TResponse response, Exception e)
         {
         }
-        protected virtual bool OnBeforeRun(TRequest request, TResponse response)
+        protected virtual Task<bool> OnBeforeRun(TRequest request, TResponse response)
         {
-            return true;
+            return Task.FromResult(true);
         }
-        protected virtual void OnAfterRun(TRequest request, TResponse response)
+        protected virtual Task OnAfterRun(TRequest request, TResponse response)
         {
+            return Task.CompletedTask;
         }
         public virtual TResponse Run(TRequest request)
         {
@@ -58,11 +57,11 @@ namespace Puya.Service
 
             try
             {
-                if (OnBeforeRun(request, response))
+                if (OnBeforeRun(request, response).Result)
                 {
                     RunInternal(request, response);
 
-                    OnAfterRun(request, response);
+                    OnAfterRun(request, response).Wait();
                 }
             }
             catch (Exception e)
@@ -176,11 +175,11 @@ namespace Puya.Service
 
             try
             {
-                if (OnBeforeRun(request, response))
+                if (await OnBeforeRun(request, response))
                 {
                     await RunInternalAsync(request, response, token);
 
-                    OnAfterRun(request, response);
+                    await OnAfterRun(request, response);
                 }
             }
             catch (Exception e)

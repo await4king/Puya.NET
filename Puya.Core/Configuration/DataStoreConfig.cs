@@ -165,6 +165,7 @@ namespace Puya.Configuration
 
         #endregion
         public string Name { get; set; }
+        public string Id { get; set; }
         private string _value;
         public string GetConnectionString(Func<string, string> decryptor)
         {

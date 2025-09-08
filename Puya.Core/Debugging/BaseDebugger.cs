@@ -18,25 +18,28 @@ namespace Puya.Core.Debugging
         protected abstract string GetUserName();
         protected abstract bool IsInRole(string roleName);
         private bool _isDebugging;
-        public bool IsDebugging
+        public virtual bool IsDebugging
         {
             get
             {
-                var debuggers = Options.DebuggerUsers?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()) ?? new string[] { };
-                var username = GetUserName();
-                var isDebugging = GetIsDebugging();
+                if (Options != null)
+                {
+                    var debuggers = Options.DebuggerUsers?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()) ?? new string[] { };
+                    var username = GetUserName();
+                    var isDebugging = GetIsDebugging();
 
-                _isDebugging = Options.DebuggingEnabled
-                                    &&
-                                    (isDebugging == null || isDebugging.Value)
-                                    &&
-                                    (
-                                        Options.GlobalDebugging
-                                            ||
-                                        IsInRole(Options.DebuggerRoleName)
-                                            ||
-                                        debuggers.Contains(username, StringComparer.OrdinalIgnoreCase)
-                                    );
+                    _isDebugging = Options.DebuggingEnabled
+                                        &&
+                                        (isDebugging == null || isDebugging.Value)
+                                        &&
+                                        (
+                                            Options.GlobalDebugging
+                                                ||
+                                            IsInRole(Options.DebuggerRoleName)
+                                                ||
+                                            debuggers.Contains(username, StringComparer.OrdinalIgnoreCase)
+                                        );
+                }
 
                 return _isDebugging;
             }

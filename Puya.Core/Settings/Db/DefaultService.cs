@@ -1,15 +1,17 @@
+using Puya.Caching;
+using Puya.Data;
+using Puya.Debugging;
+using Puya.Logging;
 using Puya.Service;
 using Puya.ServiceModel;
+using Puya.Settings;
+using Puya.Translation;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Puya.Data;
-using Puya.Logging;
-using Puya.Caching;
-using Puya.Settings;
 
 namespace Puya.Settings.Service.Db
 {
@@ -27,7 +29,18 @@ namespace Puya.Settings.Service.Db
         public override TapDbSettingsDeleteByKeyBaseAction DeleteByKey { get; protected set; }
         public override TapDbSettingsGetPageBaseAction GetPage { get; protected set; }
         public override TapDbSettingsGetByPKBaseAction GetByPK { get; protected set; }
-		public TapDbSettingsDefault(TapDbSettingsDefaultConfig config, ILogger logger, IDb dbContext, ICacheManager cache, ISettingService settings) : base(config, logger, dbContext, cache, settings)
+		public TapDbSettingsDefault
+            (
+                TapDbSettingsDefaultConfig config,
+                ILogger logger,
+                IDb dbContext,
+                ICacheManager cache,
+                ISettingService settings,
+                ITranslator translator,
+                IServiceInterceptor interceptor,
+                ILogProvider logProvider,
+                IDebugger debugger
+            ) : base(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger)
 		{
         	Add = new TapDbSettingsDefaultAddAction(this);
         	Actions.Add("Add", Add);
@@ -45,9 +58,20 @@ namespace Puya.Settings.Service.Db
         	Actions.Add("GetPage", GetPage);
         	GetByPK = new TapDbSettingsDefaultGetByPKAction(this);
         	Actions.Add("GetByPK", GetByPK);
-			Init(config, logger, dbContext, cache, settings);
+			Init(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger);
         }
-		partial void Init(TapDbSettingsDefaultConfig config, ILogger logger, IDb dbContext, ICacheManager cache, ISettingService settings);
+		partial void Init
+            (
+                TapDbSettingsDefaultConfig config,
+                ILogger logger,
+                IDb dbContext,
+                ICacheManager cache,
+                ISettingService settings,
+                ITranslator translator,
+                IServiceInterceptor interceptor,
+                ILogProvider logProvider,
+                IDebugger debugger
+            );
     }
 }
 
