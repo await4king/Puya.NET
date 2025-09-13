@@ -13,6 +13,7 @@ namespace Puya.Service
     public interface IServiceAction
     {
         object Owner { get; }
+        string Name { get; }
         ServiceResponse Run(object request);
         Task<ServiceResponse> RunAsync(object request, CancellationToken token);
     }
