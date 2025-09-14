@@ -288,5 +288,58 @@ namespace Puya.Extensions
 
             return result;
         }
+        public static object Query(this Object obj, string path, bool ignoreCase = false)
+        {
+            TryQuery(obj, path, ignoreCase, out object result);
+
+            return result;
+        }
+        public static bool TryQuery(this Object obj, string path, bool ignoreCase, out object result)
+        {
+            var _result = false;
+
+            result = null as object;
+
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                var cur = obj;
+                var propNames = path.Split('.');
+                var index = 0;
+
+                foreach (var propName in propNames)
+                {
+                    if (cur == null)
+                    {
+                        break;
+                    }
+
+                    var flags = BindingFlags.Instance | BindingFlags.Public;
+
+                    if (ignoreCase)
+                    {
+                        flags |= BindingFlags.IgnoreCase;
+                    }
+
+                    var prop = cur.GetType().GetProperty(propName, flags);
+
+                    if (prop == null)
+                    {
+                        break;
+                    }
+
+                    cur = prop.GetValue(cur);
+
+                    index++;
+                }
+
+                if (index == propNames.Length)
+                {
+                    result = cur;
+                    _result = true;
+                }
+            }
+
+            return _result;
+        }
     }
 }
