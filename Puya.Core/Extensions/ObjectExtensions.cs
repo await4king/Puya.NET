@@ -313,21 +313,33 @@ namespace Puya.Extensions
                         break;
                     }
 
-                    var flags = BindingFlags.Instance | BindingFlags.Public;
+                    var type = cur.GetType();
+                    Object[] args = null;
+                    PropertyInfo prop;
 
-                    if (ignoreCase)
+                    if (type.IsDictionary())
                     {
-                        flags |= BindingFlags.IgnoreCase;
+                        prop = type.GetProperty("Item");
+                        args = new object[] { propName };
+                    }
+                    else
+                    {
+                        var flags = BindingFlags.Instance | BindingFlags.Public;
+
+                        if (ignoreCase)
+                        {
+                            flags |= BindingFlags.IgnoreCase;
+                        }
+
+                        prop = type.GetProperty(propName, flags);
                     }
 
-                    var prop = cur.GetType().GetProperty(propName, flags);
-
-                    if (prop == null)
+                    if (prop == null || !prop.CanRead)
                     {
                         break;
                     }
 
-                    cur = prop.GetValue(cur);
+                    cur = args == null ? prop.GetValue(cur): prop.GetValue(cur, args);
 
                     index++;
                 }
