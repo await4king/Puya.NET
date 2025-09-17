@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Puya.Logging;
 
-namespace Puya.Core.Tests
+namespace Puya.Core.Tests.Logging
 {
     public class MyLogger : ILogger
     {
@@ -39,7 +39,7 @@ namespace Puya.Core.Tests
 
             Assert.True(logger.Loggers.Length > 0);
             Assert.True(logger.Loggers.Length == 3);
-            Assert.True((logger.Loggers[logger.Loggers.Length - 1] as NullLogger) != null);
+            Assert.True(logger.Loggers[logger.Loggers.Length - 1] as NullLogger != null);
 
             logger.Log(log);
 

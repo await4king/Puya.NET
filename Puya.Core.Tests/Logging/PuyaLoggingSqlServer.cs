@@ -2,7 +2,7 @@
 using Puya.Data;
 using Puya.Logging;
 
-namespace Puya.Core.Tests
+namespace Puya.Core.Tests.Logging
 {
     public class PuyaLoggingSqlServer
     {

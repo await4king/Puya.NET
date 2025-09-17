@@ -1,6 +1,6 @@
 ﻿using Puya.Extensions;
 
-namespace Puya.Core.Tests
+namespace Puya.Core.Tests.PuyaExtensions.Type
 {
     public class DescendsFrom
     {

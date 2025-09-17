@@ -13,20 +13,89 @@ namespace Puya.Extensions
 {
     public static class ObjectExtensions
     {
-        public static Dictionary<string, object> ToDictionary(this object obj)
+        static bool IsExcluded(string key, string[] arrExcludes, bool ignoreCase)
         {
-            var result = new Dictionary<string, object>();
+            return arrExcludes.Length != 0 && Array.Exists(arrExcludes, ex => string.Compare(ex, key, ignoreCase) == 0);
+        }
+        public static IDictionary<string, object> ToDictionary(this object obj)
+        {
+            return ToDictionary(obj, false, null);
+        }
+        public static IDictionary<string, object> ToDictionary(this object obj, bool nested)
+        {
+            return ToDictionary(obj, nested, null);
+        }
+        public static IDictionary<string, object> ToDictionary(this object obj, string excludes, bool ignoreCase = false)
+        {
+            return ToDictionary(obj, false, excludes, ignoreCase);
+        }
+        public static IDictionary<string, object> ToDictionary(this object obj, bool nested, string excludes, bool ignoreCase = false)
+        {
+            var result = null as IDictionary<string, object>;
 
             if (obj != null)
             {
-                var props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead);
+                var arrExcludes = new string[] { };
 
-                foreach (var prop in props)
+                if (!string.IsNullOrEmpty(excludes))
                 {
-                    if (prop.CustomAttributes.Count(a => a.AttributeType == typeof(IgnoreAttribute)) == 0)
+                    arrExcludes = excludes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                var type = obj.GetType();
+
+                if (type.Implements<IDictionary<string, object>>())
+                {
+                    result = (obj as IDictionary<string, object>).Where(item => !IsExcluded(item.Key, arrExcludes, ignoreCase)).ToDictionary();
+                }
+                else if (type.IsDictionary())
+                {
+                    result = new DynamicModel();
+
+                    var enumerable = obj as IEnumerable;
+
+                    foreach (var entry in enumerable)
                     {
-                        result.Add(prop.Name, prop.GetValue(obj));
+                        if (entry != null)
+                        {
+                            var entryType = entry.GetType();
+                            var keyProp = entryType.GetProperty("Key");
+                            var valueProp = entryType.GetProperty("Value");
+
+                            var key = keyProp?.GetValue(entry);
+                            var value = valueProp?.GetValue(entry);
+
+                            if (value != null && !value.GetType().IsSimpleType() && nested)
+                            {
+                                result.Add(key?.ToString(), value.ToDictionary());
+                            }
+                            else
+                            {
+                                result.Add(key?.ToString(), value);
+                            }
+                        }
                     }
+                }
+                else
+                {
+                    result = new DynamicModel();
+
+                    ReflectionHelper.ForEachPublicInstanceReadableNotIgnorableProperty(type, prop =>
+                    {
+                        if (!IsExcluded(prop.Name, arrExcludes, ignoreCase))
+                        {
+                            var value = prop.GetValue(obj);
+
+                            if (value != null && !value.GetType().IsSimpleType() && nested)
+                            {
+                                result.Add(prop.Name, value.ToDictionary());
+                            }
+                            else
+                            {
+                                result.Add(prop.Name, value);
+                            }
+                        }
+                    });
                 }
             }
 

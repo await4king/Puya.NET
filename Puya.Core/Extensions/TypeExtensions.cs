@@ -341,7 +341,7 @@ namespace Puya.Extensions
         {
             return type.DescendsFrom(typeof(T));
         }
-        public static Dictionary<string, object> ToDictionary(this object x, string excludes = "")
+        private static Dictionary<string, object> ToDictionary(this object x, string excludes = "")
         {
             var result = new Dictionary<string, object>();
             var arrExcludes = new string[] { };

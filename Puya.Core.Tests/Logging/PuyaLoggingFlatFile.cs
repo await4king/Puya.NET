@@ -1,31 +1,32 @@
 ﻿using Puya.Logging;
 
-namespace Puya.Core.Tests
+namespace Puya.Core.Tests.Logging
 {
-    public class PuyaLoggingJsonFile
+    public class PuyaLoggingFlatFile
     {
         [Fact]
         public void Test_Log_1()
         {
-            var logger = new JsonFileLogger();
+            var logger = new FileLogger(new FileLoggerConfig { });
 
             logger.Info("hello");
             logger.Debug("BeginJob", "this is a message", () => new { a = 10, b = true, c = "test" });
 
-            var logfile = Path.Combine(Environment.CurrentDirectory, "log.log");
+            var logfile = Path.Combine(Environment.CurrentDirectory, "log.txt");
 
             Assert.True(File.Exists(logfile));
 
-            var logs = logger.LoadLogFile(logfile);
+            var hasContent = File.ReadAllLines(logfile).Length > 0;
 
             File.Delete(logfile);
-            
-            Assert.True(logs.Count > 0);
+
+            Assert.True(hasContent);
         }
         [Fact]
         public void Test_Log_2()
         {
-            var logger = new JsonFileLogger(new JsonFileLoggerConfig { MaxChunk = 5, MaxSize = 1024 });
+            var config = new FileLoggerConfig { MaxChunk = 5, MaxSize = 1024 };
+            var logger = new FileLogger(config);
 
             logger.Info("hello");
             logger.Info("hello");
@@ -38,7 +39,39 @@ namespace Puya.Core.Tests
             logger.Info("hello");
 
             var date = DateTime.Now.ToString("yyyyMMdd");
-            var existingLogFiles = Directory.GetFiles(Environment.CurrentDirectory, logger.Config.FileName + "-" + date + "-*" + logger.Config.FileExtension);
+            var existingLogFiles = Directory.GetFiles(Environment.CurrentDirectory, config.FileName + "-" + date + "-*" + config.FileExtension);
+
+            foreach (var item in existingLogFiles)
+            {
+                File.Delete(item);
+            }
+
+            Assert.True(existingLogFiles.Length > 0);
+            Assert.True(existingLogFiles.Length == 2);
+        }
+        [Fact]
+        public void Test_Log_3()
+        {
+            var config = new FileLoggerConfig { MaxChunk = 3, MaxSize = 600 };
+            var logger = new FileLogger(config);
+
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+            logger.Info("hello");
+
+            var date = DateTime.Now.ToString("yyyyMMdd");
+            var existingLogFiles = Directory.GetFiles(Environment.CurrentDirectory, config.FileName + "-" + date + "-*" + config.FileExtension);
 
             foreach (var item in existingLogFiles)
             {
@@ -47,37 +80,6 @@ namespace Puya.Core.Tests
 
             Assert.True(existingLogFiles.Length > 0);
             Assert.True(existingLogFiles.Length == 3);
-        }
-        [Fact]
-        public void Test_Log_3()
-        {
-            var logger = new JsonFileLogger(new JsonFileLoggerConfig { MaxChunk = 5, MaxSize = 950 });
-
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-            logger.Info("hello");
-
-            var date = DateTime.Now.ToString("yyyyMMdd");
-            var existingLogFiles = Directory.GetFiles(Environment.CurrentDirectory, logger.Config.FileName + "-" + date + "-*" + logger.Config.FileExtension);
-
-            foreach (var item in existingLogFiles)
-            {
-                File.Delete(item);
-            }
-
-            Assert.True(existingLogFiles.Length > 0);
-            Assert.True(existingLogFiles.Length == 5);
         }
     }
 }

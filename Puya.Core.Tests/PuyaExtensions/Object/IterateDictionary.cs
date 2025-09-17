@@ -1,8 +1,8 @@
 ﻿using Puya.Extensions;
 
-namespace Puya.Core.Tests
+namespace Puya.Core.Tests.PuyaExtensions.Object
 {
-    public class PuyaExtensions
+    public class IterateDictionary
     {
         [Fact]
         public void Test_IterateDictionary()
@@ -92,6 +92,5 @@ namespace Puya.Core.Tests
 
             Assert.Equal(3, count);
         }
-
     }
 }
