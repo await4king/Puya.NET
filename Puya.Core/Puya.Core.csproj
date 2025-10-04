@@ -6,13 +6,13 @@
 		<Authors>Mansoor Omrani</Authors>
 		<Company>PuyaSoft</Company>
 		<Product>Puya.Core</Product>
-		<Version>3.6.5</Version>
+		<Version>3.6.6</Version>
 		<WebPage>https://puyasoft.com</WebPage>
 		<PackageProjectUrl>https://github.com/puyacodes/Puya.NET</PackageProjectUrl>
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
 		<SignAssembly>False</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\snk.pfx</AssemblyOriginatorKeyFile>
-		<AssemblyVersion>3.6.5.0</AssemblyVersion>
+		<AssemblyVersion>3.6.6.0</AssemblyVersion>
 		<Nullable>disable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Copyright>2018-2025</Copyright>

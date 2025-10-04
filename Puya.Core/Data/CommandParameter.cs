@@ -30,7 +30,7 @@ namespace Puya.Data
                 {
                     var valueType = value.GetType();
 
-                    if (valueType.IsEnumerable() && valueType != TypeHelper.TypeOfString)
+                    if (valueType.IsEnumerable() && valueType != TypeHelper.TypeOfString && valueType != TypeHelper.TypeOfByteArray)
                     {
                         var e = value as System.Collections.IEnumerable;
 
