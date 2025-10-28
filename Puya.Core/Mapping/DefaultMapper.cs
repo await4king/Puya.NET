@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -15,11 +12,6 @@ namespace Puya.Mapping
 {
     public class DefaultMapper : IMapper
     {
-        static ConcurrentDictionary<Type, ConcurrentDictionary<BindingFlags, PropertyInfo[]>> propertyCache;
-        static DefaultMapper()
-        {
-            propertyCache = new ConcurrentDictionary<Type, ConcurrentDictionary<BindingFlags, PropertyInfo[]>>();
-        }
         public void Copy(object source, object target)
         {
             throw new NotImplementedException();
@@ -36,7 +28,7 @@ namespace Puya.Mapping
         public object Map(Type type, object source)
         {
             var result = null as object;
-            var targetProps = ReflectionHelper.GetProperties(type, System.Reflection.BindingFlags.Instance);
+            var targetProps = ReflectionHelper.GetPublicInstanceReadableProperties(type);
 
             if (source != null)
             {
@@ -180,9 +172,8 @@ namespace Puya.Mapping
                 return;
             }
 
-            var props = propertyCache.GetOrAdd(type, new ConcurrentDictionary<BindingFlags, PropertyInfo[]>());
-            var properties = props.GetOrAdd(BindingFlags.Instance, type.GetProperties(BindingFlags.Instance));
-
+            var properties = ReflectionHelper.GetPublicInstanceReadableProperties(type);
+            
             for (var index = 0; index < reader.FieldCount; index++)
             {
                 var name = reader.GetName(index);

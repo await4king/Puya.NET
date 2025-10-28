@@ -21,7 +21,12 @@ namespace Puya.Mapping
                 return mapper.Map<T>(source as IDataReader);
             }
 
-            return (T)mapper.Map(typeof(T), source);
+            if (mapper != null)
+            {
+                return (T)mapper.Map(typeof(T), source);
+            }
+
+            return default(T);
         }
     }
 }

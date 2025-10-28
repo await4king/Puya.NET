@@ -338,7 +338,7 @@ namespace Puya.Data
         }
         public static T ExecuteSingle<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
         {
-            var result = ExecuteSingle(cmd, behavior, reader => mapper.Map<T>(mapper));
+            var result = ExecuteSingle(cmd, behavior, reader => mapper.Map<T>(reader));
 
             return result;
         }
@@ -363,7 +363,7 @@ namespace Puya.Data
         }
         public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteSingleAsync(cmd, reader => mapper.Map<T>(mapper), cancellation);
+            return ExecuteSingleAsync(cmd, reader => mapper.Map<T>(reader), cancellation);
         }
         public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, IMapper mapper = null)
         {
@@ -406,7 +406,7 @@ namespace Puya.Data
         }
         public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper, CancellationToken cancellation)
         {
-            return ExecuteSingleAsync(cmd, behavior, reader => mapper.Map<T>(mapper));
+            return ExecuteSingleAsync(cmd, behavior, reader => mapper.Map<T>(reader));
         }
         public static Task<T> ExecuteSingleAsync<T>(this DbCommand cmd, CommandBehavior behavior, IMapper mapper = null)
         {
