@@ -1,11 +1,12 @@
-﻿using Puya.Serialization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Puya.Extensions;
+using Puya.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Web;
-using System.Linq;
 
 namespace Puya.Service
 {
@@ -141,14 +142,24 @@ namespace Puya.Service
 
             if (Exception != null)
             {
-                exception = ",\"Exception\": " + JsonConvert.SerializeObject(Exception);
+                try
+                {
+                    exception = ",\"Exception\": " + JsonConvert.SerializeObject(Exception);
+                }
+                catch (Exception e)
+                {
+                    exception = $@", ""Exception"": {{
+        ""Message"": ""{Exception.ToString("\n").Replace("\"", "'")}"",
+        ""StackTrace"": ""{e.StackTrace.Replace("\"", "'")}""
+    }}";
+                }
             }
 
             var info = "";
 
-            if (Info != null)
+            if (!string.IsNullOrEmpty(Info))
             {
-                info = ",\"Info\": " + JsonConvert.SerializeObject(Info);
+                info = ",\"Info\": \"" + Info.Replace("\"", "'") + "\"";
             }
 
             var data = "";
@@ -157,6 +168,7 @@ namespace Puya.Service
             if (prop != null)
             {
                 var dataValue = prop.GetValue(this, null);
+
                 if (dataValue != null)
                 {
                     data = ",\"Data\": " + JsonConvert.SerializeObject(dataValue);

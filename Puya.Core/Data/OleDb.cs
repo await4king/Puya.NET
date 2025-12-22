@@ -12,6 +12,26 @@ namespace Puya.Data.Ole
         public OleDb() : this(null)
         {
         }
+        public override DbSpecification Specification => new DbSpecification
+        {
+            Vendor = DbVendor.Unknown,
+            Product = DbProduct.OleDb,
+            ArchitectureModel = ArchitectureModel.Unknown,
+            ConsistencyModel = ConsistencyModel.Unknown,
+            DataModel = DataModel.Unknown,
+            DataRelationshipModel = DataRelationshipModel.Unknown,
+            DbCharacteristics = new DbCharacteristics(),
+            DbModelType = DbModelType.Unknown,
+            DbUsageType = DbUsageType.Any,
+            IndexingModel = IndexingModel.Unknown,
+            NoSqlModel = NoSqlModel.None,
+            PersistenceModel = PersistenceModel.Unknown,
+            QueryCapabilities = new QueryCapabilities(),
+            QueryLanguageModel = QueryLanguageModel.Unknown,
+            SchemaChangeApproach = SchemaChangeApproach.Unknown,
+            SchemaCheckApproach = SchemaCheckApproach.Unknown,
+            StorageModel = StorageModel.Unknown,
+        };
         public OleDb(IConnectionStringProvider constrProvider) : this(constrProvider, null)
         { }
         public OleDb(IConnectionStringProvider constrProvider, IDbContextInfoProvider dbContextInfoProvider) : this(constrProvider, dbContextInfoProvider, null)

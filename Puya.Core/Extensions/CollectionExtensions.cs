@@ -1,10 +1,14 @@
 ﻿using Puya.Base;
+using Puya.Collections;
 using Puya.Conversion;
+using Puya.Data;
+using Puya.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -772,6 +776,103 @@ namespace Puya.Extensions
                         }
                     }
                 }
+            }
+
+            return result;
+        }
+        public static T To<T>(this DynamicModel model)
+        {
+            return (T)model.To(typeof(T));
+        }
+        public static object To(this DynamicModel model, Type type)
+        {
+            var result = null as object;
+
+            if (model != null && type != null)
+            {
+                result = ObjectActivator.Instance.Activate(type);
+
+                ReflectionHelper.ForEachPublicInstanceReadableNotIgnorableProperty(type, prop =>
+                {
+                    if (model.ContainsKey(prop.Name))
+                    {
+                        var value = model[prop.Name];
+
+                        try
+                        {
+                            if (value != null)
+                            {
+                                value = SafeClrConvert.ChangeType(value, prop.PropertyType);
+
+                                prop.SetValue(result, value);
+                            }
+                            else
+                            {
+                                prop.SetValue(result, ObjectActivator.Instance.Activate(prop.PropertyType));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine($"Prop = {prop.Name}, Value = {value}, Value Type = {value?.GetType().Name}: {e.Message}");
+                        }
+                    }
+                });
+            }
+
+            return result;
+        }
+        public static DynamicModel NormalizeKeys(this DynamicModel model)
+        {
+            var _model = new DynamicModel();
+
+            foreach (var item in model)
+            {
+                _model.Add(item.Key[0].ToString().ToUpper() + item.Key.ToLower().Substring(1), item.Value);
+            }
+
+            return _model;
+        }
+        public static int GetInt(this IDictionary<string, object> dic, string key)
+        {
+            var result = 0;
+
+            if (dic != null && dic.ContainsKey(key))
+            {
+                var value = dic[key];
+
+                var ca = value as CommandParameter;
+
+                result = SafeClrConvert.ToInt(ca?.Value ?? value);
+            }
+
+            return result;
+        }
+        public static string GetString(this IDictionary<string, object> dic, string key)
+        {
+            var result = string.Empty;
+
+            if (dic != null && dic.ContainsKey(key))
+            {
+                var value = dic[key];
+
+                var ca = value as CommandParameter;
+
+                result = SafeClrConvert.ToString(ca?.Value ?? value);
+            }
+
+            return result;
+        }
+        public static bool GetBool(this IDictionary<string, object> dic, string key)
+        {
+            var result = false;
+
+            if (dic != null && dic.ContainsKey(key))
+            {
+                var value = dic[key];
+
+                var ca = value as CommandParameter;
+
+                result = SafeClrConvert.ToBoolean(ca?.Value ?? value);
             }
 
             return result;

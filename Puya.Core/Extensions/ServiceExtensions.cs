@@ -1,13 +1,16 @@
-﻿using Puya.Service;
+﻿using Puya.Base;
+using Puya.Conversion;
 using Puya.Data;
+using Puya.Reflection;
+using Puya.Service;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using Puya.Base;
 using System.Data;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Puya.Extensions
 {
@@ -96,6 +99,102 @@ namespace Puya.Extensions
             }
 
             return items;
+        }
+        public static void Finalize(this ServiceResponse response, object args)
+        {
+            if (response != null && args != null)
+            {
+                var props = ReflectionHelper.GetPublicInstanceReadableProperties(args.GetType());
+                var resultProp = props.FirstOrDefault(p => p.Name.Equalz("Result"));
+                var fieldProp = props.FirstOrDefault(p => p.Name.Equalz("Field"));
+                var messageProp = props.FirstOrDefault(p => p.Name.Equalz("Message"));
+
+                if (resultProp != null)
+                {
+                    var resultParam = resultProp.GetValue(args) as CommandParameter;
+
+                    if (resultParam != null)
+                    {
+                        response.Finalize(resultParam);
+                    }
+                }
+                else
+                {
+                    var statusProp = props.FirstOrDefault(p => p.Name.Equalz("Status"));
+
+                    if (statusProp != null)
+                    {
+                        var statusParam = statusProp.GetValue(args) as CommandParameter;
+
+                        if (statusParam != null)
+                        {
+                            response.Finalize(statusParam);
+                        }
+                    }
+                }
+
+                if (fieldProp != null)
+                {
+                    var fieldParam = fieldProp.GetValue(args) as CommandParameter;
+
+                    if (fieldParam != null)
+                    {
+                        response.Info = SafeClrConvert.ToString(fieldParam.Value);
+                    }
+                }
+
+                if (messageProp != null)
+                {
+                    var messageParam = messageProp.GetValue(args) as CommandParameter;
+
+                    if (messageParam != null)
+                    {
+                        response.Message = SafeClrConvert.ToString(messageParam.Value);
+                    }
+                }
+            }
+        }
+        public static void Finalize(this ServiceResponse response, CommandParameter resultParam)
+        {
+            if (response != null && resultParam != null)
+            {
+                var result = SafeClrConvert.ToString(resultParam.Value);
+
+                if (result.IsJsonObject())
+                {
+                    var res = result.SafeDeserialize<ServiceResponse>();
+
+                    if (res != null)
+                    {
+                        response.Copy(res);
+                    }
+                    else
+                    {
+                        response.SetStatus("ProblematicResult");
+                        response.Info = result;
+                    }
+                }
+                else
+                {
+                    response.SetStatus(result);
+
+                    if (string.IsNullOrEmpty(response.Status))
+                    {
+                        response.Succeeded();
+                    }
+                }
+            }
+            else if (response != null)
+            {
+                response.SetStatus("NoResultParam");
+            }
+        }
+        public static void GetPagination<T>(this PagingResult<T> pagination, IDictionary<string, object> args)
+        {
+            pagination.Page = args.GetInt("Page");
+            pagination.PageSize = args.GetInt("PageSize");
+            pagination.PageCount = args.GetInt("PageCount");
+            pagination.RecordCount = args.GetInt("RecordCount");
         }
     }
 }

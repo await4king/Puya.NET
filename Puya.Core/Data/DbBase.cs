@@ -5,6 +5,7 @@ namespace Puya.Data
 {
     public abstract class DbBase : IDb
     {
+        public abstract DbSpecification Specification { get; }
         public virtual bool PersistConnection { get; set; }
         public virtual bool AutoNullEmptyStrings { get; set; }
         public IMapper Mapper { get; set; }

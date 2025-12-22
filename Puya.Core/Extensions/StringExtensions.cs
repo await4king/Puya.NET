@@ -1098,5 +1098,56 @@ namespace Puya.Extensions
 
             return x;
         }
+        public static bool Equalz(this string x, params string[] y)
+        {
+            if (y == null || y.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var _y in y)
+            {
+                if (string.Equals(x, _y, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public static bool StartzWith(this string x, params string[] y)
+        {
+            if (y == null || y.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var _y in y)
+            {
+                if (x.StartsWith(_y, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public static bool EndzWith(this string x, params string[] y)
+        {
+            if (y == null || y.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var _y in y)
+            {
+                if (x.EndsWith(_y, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

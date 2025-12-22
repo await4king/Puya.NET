@@ -4,11 +4,23 @@ using System.Threading.Tasks;
 
 namespace Puya.ServiceModel
 {
+    public class ChainInterceptorOptions
+    {
+        public bool ContinueOnFailure { get; set; } = true;
+    }
     public class ChainInterceptor: NoInterceptor
     {
         private readonly IServiceChainInterceptor chain;
 
-        public ChainInterceptor(IServiceChainInterceptor chain)
+        public ChainInterceptor(IServiceChainInterceptor chain): this(chain, null)
+        { }
+        public ChainInterceptor(params IServiceInterceptor[] interceptors): this(null, interceptors)
+        { }
+        public ChainInterceptor(ChainInterceptorOptions options, params IServiceInterceptor[] interceptors)
+        {
+            this.chain = new ServiceChainInterceptor(interceptors);
+        }
+        public ChainInterceptor(IServiceChainInterceptor chain, ChainInterceptorOptions options)
         {
             if (chain == null)
             {
@@ -16,7 +28,28 @@ namespace Puya.ServiceModel
             }
 
             this.chain = chain;
+
+            Options = options;
         }
+
+        ChainInterceptorOptions options;
+        public ChainInterceptorOptions Options
+        {
+            get
+            {
+                if (options == null)
+                {
+                    options = new ChainInterceptorOptions();
+                }
+
+                return options;
+            }
+            set
+            {
+                options = value;
+            }
+        }
+
         public override async Task OnRan(IServiceAction action, ServiceRequest request, ServiceResponse response)
         {
             foreach (var interceptor in chain.Interceptors)
@@ -24,6 +57,11 @@ namespace Puya.ServiceModel
                 if (interceptor != null)
                 {
                     await interceptor.OnRan(action, request, response);
+
+                    if (!response.Success && !Options.ContinueOnFailure)
+                    {
+                        break;
+                    }
                 }
             }
         }

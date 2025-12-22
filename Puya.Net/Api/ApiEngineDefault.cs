@@ -18,6 +18,7 @@ using Puya.Extensions;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Net.Api;
+using Puya.Debugging;
 
 namespace Puya.Api
 {
@@ -28,12 +29,14 @@ namespace Puya.Api
         protected readonly IApiCryptor cryptor;
         protected readonly ILogger logger;
         protected readonly IApiResponseSerializer serializer;
+        private readonly IDebugger debugger;
         protected readonly IMiddlewaresStore middlewaresStore;
         public ApiEngineOptions Options { get; set; }
         public ApiEngineDefault(IServiceProvider serviceProvider,
                                 IApiManager apis,
                                 IApiCryptor cryptor,
                                 IApiResponseSerializer serializer,
+                                IDebugger debugger,
                                 ILogger logger,
                                 IMiddlewaresStore middlewaresStore)
         {
@@ -42,11 +45,19 @@ namespace Puya.Api
             this.cryptor = cryptor;
             this.logger = logger;
             this.serializer = serializer;
+            this.debugger = debugger;
             this.middlewaresStore = middlewaresStore;
         }
         public string DefaultApp { get; set; }
-        void Danger(Exception e, object data = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        void Danger(ApiCallContext context, Exception e, string status = null, object data = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (!string.IsNullOrEmpty(status))
+            {
+                context.Response.SetStatus(status);
+            }
+
+            RevealException(context, e);
+
             try
             {
                 logger?.Danger(e, null, data, memberName, sourceFilePath, sourceLineNumber);
@@ -58,7 +69,7 @@ namespace Puya.Api
         }
         void RevealException(ApiCallContext context, Exception e)
         {
-            if (ApiEngineConstants.RevealExceptions || context.RevealExceptions)
+            if (context.RevealExceptions)
             {
                 if (context.Response.Exception == null)
                 {
@@ -66,10 +77,8 @@ namespace Puya.Api
                 }
                 else
                 {
-                    context.Response.Exception = new AggregateException("Api failed. See details.", context.Response.Exception, e);
+                    context.Response.Exception = new AggregateException("Api failed. See inner exceptions for more details.", context.Response.Exception, e);
                 }
-
-                context.Response.Message = e.ToString("\n");
             }
         }
         private bool DecryptRequest(ApiCallContext context, string body, out string decryptedBody)
@@ -103,11 +112,7 @@ namespace Puya.Api
                     }
                     catch (Exception e)
                     {
-                        Danger(e);
-
-                        context.Response.SetStatus("BadRequest");
-
-                        RevealException(context, e);
+                        Danger(context, e, "BadRequest");
                     }
                 }
             }
@@ -147,11 +152,7 @@ namespace Puya.Api
                 }
                 catch (Exception e)
                 {
-                    Danger(e);
-
-                    context.Response.SetStatus("InvalidRequest");
-
-                    RevealException(context, e);
+                    Danger(context, e, "InvalidRequest");
                 }
             }
             else
@@ -226,10 +227,9 @@ namespace Puya.Api
                     }
                     catch (Exception e)
                     {
-                        Danger(e);
+                        Danger(context, e, "RequestDataError");
 
                         context._state = ApiState.DeserializingRequestData;
-                        context.Response.SetStatus("RequestDataError");
                         result = false;
                         break;
                     }
@@ -245,6 +245,15 @@ namespace Puya.Api
             }
 
             return result;
+        }
+        void AppendResponse(ApiCallContext context, ServiceResponse innerResponse, string subject)
+        {
+            if (context.ShowDetailedEnginePipeline && !innerResponse.Success)
+            {
+                innerResponse.Subject = subject;
+
+                context.Response.InnerResponses.Add(innerResponse);
+            }
         }
         protected virtual async Task<bool> RunMiddlewares(ApiEngineEvents engineEvent, ApiCallContext context, CancellationToken cancellation)
         {
@@ -267,13 +276,8 @@ namespace Puya.Api
 
                             if (sr != null)
                             {
-                                if ((ApiEngineConstants.ShowDetailedEnginePipeline || context.ShowDetailedEnginePipeline) && !sr.Success)
-                                {
-                                    sr.Subject = middleware.ToString();
-
-                                    context.Response.InnerResponses.Add(sr);
-                                }
-
+                                AppendResponse(context, sr, middleware.ToString());
+                                
                                 if (sr.ShouldEndPipeline)
                                 {
                                     if (string.IsNullOrEmpty(context.Response.Status))
@@ -291,12 +295,9 @@ namespace Puya.Api
                         {
                             shouldEndPipeline = true;
 
-                            context.Response.SetStatus("MiddlewareFailed");
                             context.Response.Info = middleware.GetType().Name;
 
-                            RevealException(context, e);
-
-                            Danger(e, new { Event = engineEvent, Middleware = middleware.GetType().Name });
+                            Danger(context, e, "MiddlewareFailed", new { Event = engineEvent, Middleware = middleware.GetType().Name });
                         }
                     }
                     else
@@ -407,12 +408,7 @@ namespace Puya.Api
 
                 var fapr = await apis.FindAppByPathAsync(new ApiManagerFindAppByPathRequest { Path = context.ApiRequest.App }, cancellation);
 
-                if ((ApiEngineConstants.ShowDetailedEnginePipeline || context.ShowDetailedEnginePipeline) && !fapr.Success)
-                {
-                    fapr.Subject = "FindApp";
-
-                    context.Response.InnerResponses.Add(fapr);
-                }
+                AppendResponse(context, fapr, "FindApp");
 
                 if (!fapr.IsSucceeded())
                 {
@@ -442,12 +438,7 @@ namespace Puya.Api
 
                 var far = await apis.FindApiAsync(new ApiManagerFindApiRequest { Request = context.ApiRequest }, cancellation);
 
-                if ((ApiEngineConstants.ShowDetailedEnginePipeline || context.ShowDetailedEnginePipeline) && !far.Success)
-                {
-                    far.Subject = "FindApi";
-
-                    context.Response.InnerResponses.Add(far);
-                }
+                AppendResponse(context, far, "FindApi");
 
                 if (!far.IsSucceeded())
                 {
@@ -535,11 +526,7 @@ namespace Puya.Api
                 }
                 catch (Exception e)
                 {
-                    Danger(e);
-
-                    context.Response.SetStatus("ServiceResolutionFailed");
-
-                    RevealException(context, e);
+                    Danger(context, e, "ServiceResolutionFailed");
 
                     break;
                 }
@@ -560,11 +547,7 @@ namespace Puya.Api
                 }
                 catch (Exception e)
                 {
-                    Danger(e);
-
-                    context.Response.SetStatus("ServiceActionResolutionFailed");
-
-                    RevealException(context, e);
+                    Danger(context, e, "ServiceActionResolutionFailed");
 
                     break;
                 }
@@ -607,7 +590,7 @@ namespace Puya.Api
                     }
                     catch (Exception e2)
                     {
-                        Danger(e2);
+                        Danger(context, e2);
                     }
                 }
 
@@ -646,11 +629,7 @@ namespace Puya.Api
             }
             catch (Exception e)
             {
-                Danger(e);
-
-                context.Response.SetStatus("ActionFailed");
-
-                RevealException(context, e);
+                Danger(context, e, "ActionFailed");
             }
 
             if (context.Response?.Status != "ActionFailed")
@@ -681,43 +660,75 @@ namespace Puya.Api
 
             return false;
         }
-        protected virtual string Serialize(HttpContext httpContext, ApiCallContext apiContext)
+        protected virtual async Task<string> Serialize(HttpContext httpContext, ApiCallContext apiCallContext, CancellationToken cancellation)
         {
-            if (apiContext.Response.Exception != null && ApiEngineConstants.RevealExceptions)
+            await RunMiddlewares(ApiEngineEvents.Serializing, apiCallContext, cancellation);
+
+            if (!apiCallContext.RevealExceptions)
             {
-                apiContext.Response.Exception = null;
+                apiCallContext.Response.Exception = null;
             }
 
-            apiContext._state = ApiState.SerializingResponse;
+            apiCallContext._state = ApiState.SerializingResponse;
 
             var content = "";
 
             try
             {
-                content = serializer.Serialize(apiContext.Response);
+                content = serializer.Serialize(apiCallContext.Response);
 
-                if (apiContext.Api != null && SafeClrConvert.ToBoolean(apiContext.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedResponseName]))
+                if (apiCallContext.Api != null && SafeClrConvert.ToBoolean(apiCallContext.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedResponseName]))
                 {
                     try
                     {
-                        apiContext._state = ApiState.EncryptingResponse;
+                        apiCallContext._state = ApiState.EncryptingResponse;
 
-                        content = cryptor.Encrypt(apiContext, content);
+                        content = cryptor.Encrypt(apiCallContext, content);
                         httpContext.Response.Headers[ApiEngineConstants.EncryptedResponseHeaderName] = "true";
                     }
                     catch (Exception e)
                     {
-                        Danger(e);
+                        Danger(apiCallContext, e);
 
-                        content = "{ \"Success\": false, \"Status\": \"ResponseEncryptionFailed\"}";
+                        if (apiCallContext.RevealExceptions)
+                        {
+                            content = $@"{{
+    ""Success"": false,
+    ""Status"": ""ResponseEncryptionFailed"",
+    ""Exception"": {{
+        ""Message"": ""{apiCallContext.Response.Exception.ToString("\n").Replace("\"", "'")}"",
+        ""StackTrace"": ""{apiCallContext.Response.Exception.StackTrace.Replace("\"", "'")}""
+    }}
+}}";
+                        }
+                        else
+                        {
+                            content = "{ \"Success\": false, \"Status\": \"ResponseEncryptionFailed\" }";
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                Danger(e);
+                // worst scenario. serializing response failed. nothing is possible.
 
-                content = "{ \"Success\": false, \"Status\": \"ResponseSerializingFailed\"}";
+                Danger(apiCallContext, e);
+
+                if (apiCallContext.RevealExceptions)
+                {
+                    content = $@"{{
+    ""Success"": false,
+    ""Status"": ""ResponseSerializationFailed"",
+    ""Exception"": {{
+        ""Message"": ""{apiCallContext.Response.Exception.ToString("\n").Replace("\"", "'")}"",
+        ""StackTrace"": ""{apiCallContext.Response.Exception.StackTrace.Replace("\"", "'")}""
+    }}
+}}";
+                }
+                else
+                {
+                    content = "{ \"Success\": false, \"Status\": \"ResponseSerializationFailed\" }";
+                }
             }
 
             return content;
@@ -726,7 +737,14 @@ namespace Puya.Api
         {
             using (var scope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope())
             {
-                var apiCallContext = new ApiCallContext { HttpContext = httpContext, Response = new ServiceResponse(), Scope = scope };
+                var apiCallContext = new ApiCallContext
+                {
+                    HttpContext = httpContext,
+                    Response = new ServiceResponse(),
+                    Scope = scope,
+                    RevealExceptions = debugger.IsDebugging,
+                    ShowDetailedEnginePipeline = debugger.IsDebugging
+                };
 
                 httpContext.Items.Add("Tap-ApiCallContext", apiCallContext);
 
@@ -770,30 +788,14 @@ namespace Puya.Api
                         }
 
                         await RunActionAsync(apiCallContext, cancellation);
-
-                        if (await RunMiddlewares(ApiEngineEvents.Serializing, apiCallContext, cancellation))
-                        {
-                            break;
-                        }
                     } while (false);
                 }
                 catch (Exception e)
                 {
-                    try
-                    {
-                        Danger(e, apiCallContext);
-                    }
-                    catch
-                    {
-                        Danger(e);
-                    }
-
-                    apiCallContext.Response.SetStatus("Halted");
-
-                    RevealException(apiCallContext, e);
+                    Danger(apiCallContext, e, "Halted");
                 }
 
-                var content = Serialize(httpContext, apiCallContext);
+                var content = await Serialize(httpContext, apiCallContext, cancellation);
 
                 return content;
             }

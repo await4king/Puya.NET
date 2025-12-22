@@ -8,6 +8,9 @@ namespace Puya.Data
     public class SqlServerDb : DbBase
     {
         public int MaxContextInfoSize { get; set; }
+        DbSpecification specs;
+        public override DbSpecification Specification => specs;
+
         public SqlServerDb(): this(null)
         {
         }
@@ -21,6 +24,43 @@ namespace Puya.Data
             DbContextInfoProvider = dbContextInfoProvider;
             Mapper = mapper;
             MaxContextInfoSize = 128;
+
+            specs = new DbSpecification
+            {
+                Vendor = DbVendor.Microsoft,
+                Product = DbProduct.SqlServer,
+                ArchitectureModel = ArchitectureModel.ClientServer,
+                ConsistencyModel = ConsistencyModel.ACID,
+                DataModel = DataModel.Relational,
+                DataRelationshipModel = DataRelationshipModel.Joins,
+                DbCharacteristics = new DbCharacteristics
+                {
+                    Hosted = true,
+                    Hubrid = false,
+                    Parallel = true,
+                    Polyglot = false
+                },
+                DbModelType = DbModelType.Relational,
+                DbUsageType = DbUsageType.Any,
+                IndexingModel = IndexingModel.BTree | IndexingModel.FullText | IndexingModel.Spatial,
+                NoSqlModel = NoSqlModel.None,
+                PersistenceModel = PersistenceModel.DiskBased,
+                QueryCapabilities = new QueryCapabilities
+                {
+                    SupportsJoins = true,
+                    SupportsAggregations = true,
+                    SupportsTransactions = true,
+                    SupportsFullTextSearch = true,
+                    SupportsGeospatialQueries = true,
+                    SupportsTemporalQueries = true,
+                    SupportsAdHocQueries = true,
+                    SupportsWindowFunctions = true
+                },
+                QueryLanguageModel = QueryLanguageModel.TSql,
+                SchemaChangeApproach = SchemaChangeApproach.Fixed,
+                SchemaCheckApproach = SchemaCheckApproach.SchemaOnWrite,
+                StorageModel = StorageModel.RowOriented,
+            };
         }
         protected override void SetContextInfo(DbConnection con)
         {
