@@ -29,5 +29,42 @@ namespace Puya.Api
 
             return string.IsNullOrEmpty(origins) || origins == "*" || !string.IsNullOrEmpty(acceptedOrigin);
         }
+        public static string GetApiSetting(this ApiCallContext context, string key)
+        {
+            if (context?.Api?.Settings?.ContainsKey(key) ?? false)
+            {
+                return context.Api.Settings[key];
+            }
+
+            return "";
+        }
+        public static bool IsAuthenticated(this ApiCallContext context)
+        {
+            return context?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+        }
+        public static string GetUserName(this ApiCallContext context)
+        {
+            return context?.HttpContext?.User?.Identity?.Name;
+        }
+        public static string GetHeader(this ApiCallContext context, string key)
+        {
+            return context?.HttpContext?.Request?.Headers[key];
+        }
+        public static void SetHeader(this ApiCallContext context, string key, string value)
+        {
+            if (context?.HttpContext?.Response?.Headers == null)
+            {
+                return;
+            }
+
+            if (!context.HttpContext.Response.Headers.ContainsKey(key))
+            {
+                context.HttpContext.Response.Headers.Add(key, value);
+
+                return;
+            }
+
+            context.HttpContext.Response.Headers[key] = value;
+        }
     }
 }

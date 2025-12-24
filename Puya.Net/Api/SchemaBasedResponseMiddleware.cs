@@ -13,9 +13,9 @@ namespace Puya.Api
 
         public Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation)
         {
-            if (SafeClrConvert.ToBoolean(context.Api.Settings["SchemaBasedResponse"]))
+            if (SafeClrConvert.ToBoolean(context.GetApiSetting("SchemaBasedResponse")))
             {
-                var dataProp = context.ServiceCallResponse.GetType().GetProperty("Data");
+                var dataProp = context.ServiceCallResponse?.GetType()?.GetProperty("Data");
 
                 if (dataProp != null)
                 {
@@ -42,10 +42,7 @@ namespace Puya.Api
 
             result.Succeeded();
 
-            if (!context.HttpContext.Response.Headers.ContainsKey(ApiEngineConstants.SchemaListResponseHeader))
-            {
-                context.HttpContext.Response.Headers.Add(ApiEngineConstants.SchemaListResponseHeader, "true");
-            }
+            context.SetHeader(ApiEngineConstants.SchemaListResponseHeader, "true");
 
             return Task.FromResult(result);
         }

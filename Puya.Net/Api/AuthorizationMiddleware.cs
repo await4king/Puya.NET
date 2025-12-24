@@ -15,11 +15,11 @@ namespace Puya.Api
         {
             var result = new ApiEngineMiddlewareResponse();
 
-            if (SafeClrConvert.ToBoolean(context.Api.Settings["RequiresAuthentication"]))
+            if (SafeClrConvert.ToBoolean(context.GetApiSetting("RequiresAuthentication")))
             {
                 do
                 {
-                    if (!context.HttpContext.User.Identity.IsAuthenticated)
+                    if (!context.IsAuthenticated())
                     {
                         result.SetStatus("NotAuthenticated");
                         result.ShouldEndPipeline = true;
@@ -27,11 +27,11 @@ namespace Puya.Api
                         break;
                     }
 
-                    var users = context.Api.Settings["AllowedUsers"];
+                    var users = context.GetApiSetting("AllowedUsers");
                     
                     if (!string.IsNullOrEmpty(users))
                     {
-                        if (!users.Split(",", MyStringSplitOptions.TrimToLowerAndRemoveEmptyEntries).Contains(context.HttpContext.User.Identity.Name))
+                        if (!users.Split(",", MyStringSplitOptions.TrimToLowerAndRemoveEmptyEntries).Contains(context.GetUserName()))
                         {
                             result.SetStatus("UserAccessDenied");
                             result.ShouldEndPipeline = true;
@@ -40,7 +40,7 @@ namespace Puya.Api
                         }
                     }
 
-                    var roles = context.Api.Settings["AllowedRoles"];
+                    var roles = context.GetApiSetting("AllowedRoles");
 
                     if (!string.IsNullOrEmpty(roles))
                     {

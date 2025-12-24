@@ -313,8 +313,9 @@ namespace Puya.Api
         }
         protected virtual bool IsEncryptedRequest(ApiCallContext context)
         {
-            return string.Compare(context.HttpContext.Request.Headers[ApiEngineConstants.EncryptedRequestHeaderName], "true", StringComparison.CurrentCultureIgnoreCase) == 0 ||
-                   string.Compare(context.HttpContext.Request.Headers[ApiEngineConstants.EncryptedRequestHeaderName], "yes", StringComparison.CurrentCultureIgnoreCase) == 0;
+            var value = context.GetHeader(ApiEngineConstants.EncryptedRequestHeaderName);
+
+            return value.Equalz("true", "yes", "1");
         }
         protected virtual async Task<bool> GetApiRequestAsync(ApiCallContext context, CancellationToken cancellation)
         {
@@ -660,44 +661,45 @@ namespace Puya.Api
 
             return false;
         }
-        protected virtual async Task<string> Serialize(HttpContext httpContext, ApiCallContext apiCallContext, CancellationToken cancellation)
+        protected virtual async Task<string> Serialize(HttpContext httpContext, ApiCallContext context, CancellationToken cancellation)
         {
-            await RunMiddlewares(ApiEngineEvents.Serializing, apiCallContext, cancellation);
+            await RunMiddlewares(ApiEngineEvents.Serializing, context, cancellation);
 
-            if (!apiCallContext.RevealExceptions)
+            if (!context.RevealExceptions)
             {
-                apiCallContext.Response.Exception = null;
+                context.Response.Exception = null;
             }
 
-            apiCallContext._state = ApiState.SerializingResponse;
+            context._state = ApiState.SerializingResponse;
 
             var content = "";
 
             try
             {
-                content = serializer.Serialize(apiCallContext.Response);
+                content = serializer.Serialize(context.Response);
 
-                if (apiCallContext.Api != null && SafeClrConvert.ToBoolean(apiCallContext.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedResponseName]))
+                if (context.Api != null && SafeClrConvert.ToBoolean(context.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedResponseName]))
                 {
                     try
                     {
-                        apiCallContext._state = ApiState.EncryptingResponse;
+                        context._state = ApiState.EncryptingResponse;
 
-                        content = cryptor.Encrypt(apiCallContext, content);
-                        httpContext.Response.Headers[ApiEngineConstants.EncryptedResponseHeaderName] = "true";
+                        content = cryptor.Encrypt(context, content);
+
+                        context.SetHeader(ApiEngineConstants.EncryptedResponseHeaderName, "true");
                     }
                     catch (Exception e)
                     {
-                        Danger(apiCallContext, e);
+                        Danger(context, e);
 
-                        if (apiCallContext.RevealExceptions)
+                        if (context.RevealExceptions)
                         {
                             content = $@"{{
     ""Success"": false,
     ""Status"": ""ResponseEncryptionFailed"",
     ""Exception"": {{
-        ""Message"": ""{apiCallContext.Response.Exception.ToString("\n").Replace("\"", "'")}"",
-        ""StackTrace"": ""{apiCallContext.Response.Exception.StackTrace.Replace("\"", "'")}""
+        ""Message"": ""{context.Response.Exception.ToString("\n").Replace("\"", "'")}"",
+        ""StackTrace"": ""{context.Response.Exception.StackTrace.Replace("\"", "'")}""
     }}
 }}";
                         }
@@ -712,16 +714,16 @@ namespace Puya.Api
             {
                 // worst scenario. serializing response failed. nothing is possible.
 
-                Danger(apiCallContext, e);
+                Danger(context, e);
 
-                if (apiCallContext.RevealExceptions)
+                if (context.RevealExceptions)
                 {
                     content = $@"{{
     ""Success"": false,
     ""Status"": ""ResponseSerializationFailed"",
     ""Exception"": {{
-        ""Message"": ""{apiCallContext.Response.Exception.ToString("\n").Replace("\"", "'")}"",
-        ""StackTrace"": ""{apiCallContext.Response.Exception.StackTrace.Replace("\"", "'")}""
+        ""Message"": ""{context.Response.Exception.ToString("\n").Replace("\"", "'")}"",
+        ""StackTrace"": ""{context.Response.Exception.StackTrace.Replace("\"", "'")}""
     }}
 }}";
                 }

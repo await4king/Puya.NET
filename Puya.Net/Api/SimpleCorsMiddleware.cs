@@ -12,15 +12,15 @@ namespace Puya.Api
             var result = new ApiEngineMiddlewareResponse();
             var origin = "";
 
-            if (context.App.Allows(context.HttpContext.Request.Headers["origin"], out origin))
+            if (context != null && context.App != null && context.App.Allows(context.GetHeader("origin"), out origin))
             {
                 if (!string.IsNullOrEmpty(origin))
                 {
-                    context.HttpContext.Response.Headers["Access-Control-Allow-Origin"] = origin;
+                    context.SetHeader("Access-Control-Allow-Origin", origin);
 
                     if (origin != "*")
                     {
-                        context.HttpContext.Response.Headers["Vary"] = "Origin";
+                        context.SetHeader("Vary", "Origin");
                     }
                 }
             }
