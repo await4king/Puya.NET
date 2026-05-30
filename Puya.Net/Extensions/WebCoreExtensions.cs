@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -6,6 +7,10 @@ namespace Puya.Extensions
 {
     public static class WbCoreExtensions
     {
+        public static T GetSection<T>(this IConfiguration configuration, string name)
+        {
+            return configuration.GetSection(name).Get<T>();
+        }
         public static IEnumerable<string> Roles(this ClaimsPrincipal principal)
         {
             var result = new List<string>();

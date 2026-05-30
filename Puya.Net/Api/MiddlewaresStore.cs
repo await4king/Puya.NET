@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Puya.Net.Api;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace Puya.Api
     {
         public MiddlewaresStore()
         {
-            Middlewares = new List<IApiEngineMiddleware>();
-            
-            Middlewares.Add(new AuthorizationMiddleware());
-            Middlewares.Add(new SchemaBasedResponseMiddleware());
-            Middlewares.Add(new SimpleCorsMiddleware());
+            Middlewares = new List<IApiEngineMiddleware>
+            {
+                new AuthorizationMiddleware(),
+                new SchemaBasedResponseMiddleware(),
+                new SimpleCorsMiddleware(),
+                new TapApiEngineDebuggerMiddleware(),
+            };
 
             middlewaresCache = new ConcurrentDictionary<ApiEngineEvents, List<IApiEngineMiddleware>>();
         }
