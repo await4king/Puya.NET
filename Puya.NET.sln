@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.Core.Tests", "Puya.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.ConsoleTest", "Puya.ConsoleTest\Puya.ConsoleTest.csproj", "{36F28AE8-D590-4CD7-9C5C-E4AF39B8DECB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puya.Samples", "Puya.Samples\Puya.Samples.csproj", "{76EA8DA1-F04E-77D9-E498-650A3384D915}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{36F28AE8-D590-4CD7-9C5C-E4AF39B8DECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36F28AE8-D590-4CD7-9C5C-E4AF39B8DECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36F28AE8-D590-4CD7-9C5C-E4AF39B8DECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76EA8DA1-F04E-77D9-E498-650A3384D915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76EA8DA1-F04E-77D9-E498-650A3384D915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76EA8DA1-F04E-77D9-E498-650A3384D915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76EA8DA1-F04E-77D9-E498-650A3384D915}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
