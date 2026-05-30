@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Puya.Base;
+using Puya.Extensions;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Puya.Base;
 
 namespace Puya.Reflection
 {
@@ -262,6 +262,33 @@ namespace Puya.Reflection
         public static List<TResult> ForEachPublicInstanceWritableProperty<TModel, TResult>(Func<PropertyInfo, PropertyIterationResult<TResult>> callback)
         {
             return ForEachProperty(typeof(TModel), callback);
+        }
+        public static object GetProp(this object obj, string name, bool ignoreCase = true)
+        {
+            var result = null as object;
+            if (obj != null)
+            {
+                var prop = GetPublicInstanceReadableProperties(obj.GetType())
+                                .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
+                if (prop != null)
+                {
+                    result = prop.GetValue(obj);
+                }
+            }
+
+            return result;
+        }
+        public static void SetProp(this object obj, string name, object value, bool ignoreCase = true)
+        {
+            if (obj != null)
+            {
+                var prop = GetPublicInstanceReadableProperties(obj.GetType())
+                                .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
+                if (prop != null)
+                {
+                    prop.SetValue(obj, value);
+                }
+            }
         }
     }
 }

@@ -91,6 +91,9 @@ namespace Puya.Configuration
 
         public string Trusted_Connection { get { return _Trusted_Connection; } set { _Trusted_Connection = value; _value = null; } }
 
+        private bool? _TrustServerCertificate;
+
+        public bool? TrustServerCertificate { get { return _TrustServerCertificate; } set { _TrustServerCertificate = value; _value = null; } }
 
         private string _NetworkLibrary;
         [Spacer]
@@ -199,6 +202,7 @@ namespace Puya.Configuration
                                     case "mars_connection": dsi.MARS_Connection = item.Value?.ToString(); break;
                                     case "encrypt": dsi.Encrypt = item.Value?.ToString(); break;
                                     case "trustedconnection": dsi.Trusted_Connection = item.Value?.ToString(); break;
+                                    case "trustservercertificate": dsi.TrustServerCertificate = SafeClrConvert.ToBoolean(item.Value); break;
                                     case "networklibrary": dsi.NetworkLibrary = item.Value?.ToString(); break;
                                     case "initialcatalog": dsi.InitialCatalog = item.Value?.ToString(); break;
                                     case "attachdbfilename": dsi.AttachDbFilename = item.Value?.ToString(); break;
@@ -208,7 +212,7 @@ namespace Puya.Configuration
                                     case "packetsize": dsi.PacketSize = SafeClrConvert.ToInt(item.Value); break;
                                     case "columnencryptionsetting": dsi.ColumnEncryptionSetting = item.Value?.ToString(); break;
                                     case "enclaveattestationurl": dsi.EnclaveAttestationUrl = item.Value?.ToString(); break;
-                                    case "private int? connecttimeout": dsi.ConnectTimeout = SafeClrConvert.ToInt(item.Value); break;
+                                    case "connecttimeout": dsi.ConnectTimeout = SafeClrConvert.ToInt(item.Value); break;
                                     case "multisubnetfailover": dsi.MultiSubnetFailover = item.Value?.ToString(); break;
                                     case "applicationintent": dsi.ApplicationIntent = item.Value?.ToString(); break;
                                     case "failoverpartner": dsi.FailoverPartner = item.Value?.ToString(); break;

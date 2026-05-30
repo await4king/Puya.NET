@@ -130,9 +130,13 @@ namespace Puya.Service
             }
         }
         #region Is
+        public static bool HasStatus(this ServiceResponse sr)
+        {
+            return !string.IsNullOrEmpty(sr.Status);
+        }
         public static bool HasStatus(this ServiceResponse sr, string status)
         {
-            return string.Equals(sr.Status, status, StringComparison.OrdinalIgnoreCase);
+            return sr.Status.Equalz(status);
         }
         public static bool IsNotFound(this ServiceResponse sr)
         {

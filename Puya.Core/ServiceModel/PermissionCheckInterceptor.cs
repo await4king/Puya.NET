@@ -1,45 +1,96 @@
-﻿using Puya.Core.ServiceModel;
+﻿using Puya.Extensions;
 using Puya.Service;
+using Puya.ServiceModel;
 using System.Threading.Tasks;
 
-namespace Puya.ServiceModel
+namespace Puya.Core.ServiceModel
 {
-    public class PermissionCheckInterceptor : NoInterceptor
+    public class ServicePermissionCheckInterceptor : NoInterceptor
     {
-        public PermissionCheckInterceptor(IServiceContext context, PermissionAttribute permission)
+        protected readonly IServiceContext serviceContext;
+        protected readonly PermissionAttribute permission;
+
+        public ServicePermissionCheckInterceptor(IServiceContext serviceContext, PermissionAttribute permission)
         {
-            Context = context;
-            Permission = permission;
+            this.serviceContext = serviceContext;
+            this.permission = permission;
         }
-
-        public IServiceContext Context { get; }
-        public PermissionAttribute Permission { get; }
-
+        public virtual bool HasAccess(string access)
+        {
+            return serviceContext.User.HasClaim("Permission", access);
+        }
         public override Task<bool> OnRunning(IServiceAction action, ServiceRequest request, ServiceResponse response)
         {
-            var result = true;
+            var result = false;
 
-            if (action != null && Permission != null && Context != null && Context.User != null)
+            do
             {
-                if (!string.IsNullOrEmpty(Permission.Role))
+                if (response == null)
                 {
-                    var roles = Permission.Role.Split(',');
+                    break;
+                }
+
+                if (serviceContext == null)
+                {
+                    response.SetStatus("NoServiceContext");
+                    break;
+                }
+
+                var user = serviceContext.User;
+
+                if (user == null)
+                {
+                    response.SetStatus("NoUserContext");
+                    break;
+                }
+
+                if (user.Identity == null)
+                {
+                    response.SetStatus("NoIdentity");
+                    break;
+                }
+
+                if (!user.Identity.IsAuthenticated)
+                {
+                    response.NotAuthenticated();
+                    break;
+                }
+
+                if (permission == null)
+                {
+                    response.SetStatus("NoPermissionSpecified");
+                    break;
+                }
+
+                var username = user.Identity.Name;
+
+                if (!string.IsNullOrEmpty(permission.Role))
+                {
+                    var roles = permission.Role.Split(',', MyStringSplitOptions.TrimAndRemoveEmptyEntries);
 
                     foreach (var role in roles)
                     {
-                        if (!Context.User.IsInRole(role))
+                        if (!user.IsInRole(role))
                         {
-                            result = false;
+                            response.NotAuthorized();
                             break;
                         }
                     }
 
-                    if (result)
+                    if (response.HasStatus())
                     {
-                        result = Context.User.HasClaim("Permission", Permission.Access);
+                        break;
                     }
                 }
-            }
+
+                if (!string.IsNullOrEmpty(permission.Access) && !HasAccess(permission.Access))
+                {
+                    response.NotAuthorized();
+                    break;
+                }
+
+                result = true;
+            } while (false);
 
             return Task.FromResult(result);
         }
