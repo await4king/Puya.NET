@@ -35,7 +35,7 @@ namespace Puya.Core.Tests.Logging
                 tbl = tbl.Substring(index + 1);
             }
 
-            var exists = db.ExecuteScalerSql(@"
+            var exists = db.ExecuteScalarSql(@"
 select case when exists
 (
     select 1

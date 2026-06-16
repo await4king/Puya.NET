@@ -1,9 +1,8 @@
-﻿using Puya.Api;
-using Puya.Extensions;
+﻿using Puya.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Puya.Net.Api
+namespace Puya.Api
 {
     public class TapApiEngineYeKeMiddleware : ApiEngineMiddleware
     {

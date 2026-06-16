@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Puya.Data;
 using Puya.Conversion;
+using Puya.Extensions;
 
 namespace Puya.Logging.Services.LogManager
 {

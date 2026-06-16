@@ -86,7 +86,7 @@ if object_id(@tbl) is not null
 
             if (Db != null)
             {
-                var exists = Db.ExecuteScalerSql("select case when object_id(@tbl) is null then 0 else 1 end", new { tbl = Config.LogTable });
+                var exists = Db.ExecuteScalarSql("select case when object_id(@tbl) is null then 0 else 1 end", new { tbl = Config.LogTable });
 
                 if (!SafeClrConvert.ToBoolean(exists))
                 {

@@ -158,7 +158,7 @@ foreach (var execType in execTypes)
 
 			return result;
         }
-		public static <#=(execType == "Async" ? "async Task<object>": "object")#> ExecuteScaler<#=execKind#><#=execType#>(this IDb db, string <#=textParamName#>, object parameters<#=cancellationParam#>)
+		public static <#=(execType == "Async" ? "async Task<object>": "object")#> ExecuteScalar<#=execKind#><#=execType#>(this IDb db, string <#=textParamName#>, object parameters<#=cancellationParam#>)
         {
             if (db == null)
 	        {
@@ -191,9 +191,9 @@ foreach (var execType in execTypes)
         {
             return ExecuteNonQuery<#=execKind#>Async(db, <#=textParamName#>, parameters, CancellationToken.None);
         }
-		public static Task<object> ExecuteScaler<#=execKind#>Async(this IDb db, string <#=textParamName#>, object parameters = null)
+		public static Task<object> ExecuteScalar<#=execKind#>Async(this IDb db, string <#=textParamName#>, object parameters = null)
         {
-            return ExecuteScaler<#=execKind#>Async(db, <#=textParamName#>, parameters, CancellationToken.None);
+            return ExecuteScalar<#=execKind#>Async(db, <#=textParamName#>, parameters, CancellationToken.None);
         }
 <#      }
 	}

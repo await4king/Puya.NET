@@ -567,7 +567,7 @@ namespace Puya.Data
                 
 			return result;
         }
-		public static object ExecuteScalerCommand(this DbConnection con, string sproc, object parameters = null)
+		public static object ExecuteScalarCommand(this DbConnection con, string sproc, object parameters = null)
         {
             if (con == null)
 	        {
@@ -596,7 +596,7 @@ namespace Puya.Data
                 
 			return result;
         }
-		public static object ExecuteScalerSql(this DbConnection con, string query, object parameters = null)
+		public static object ExecuteScalarSql(this DbConnection con, string query, object parameters = null)
         {
             if (con == null)
 	        {
@@ -625,7 +625,7 @@ namespace Puya.Data
                 
 			return result;
         }
-		public static async Task<object> ExecuteScalerCommandAsync(this DbConnection con, string sproc, object parameters, CancellationToken cancellation)
+		public static async Task<object> ExecuteScalarCommandAsync(this DbConnection con, string sproc, object parameters, CancellationToken cancellation)
         {
             if (con == null)
 	        {
@@ -643,9 +643,9 @@ namespace Puya.Data
         {
             return ExecuteNonQueryCommandAsync(con, sproc, parameters, CancellationToken.None);
         }
-		public static Task<object> ExecuteScalerCommandAsync(this DbConnection con, string sproc, object parameters = null)
+		public static Task<object> ExecuteScalarCommandAsync(this DbConnection con, string sproc, object parameters = null)
         {
-            return ExecuteScalerCommandAsync(con, sproc, parameters, CancellationToken.None);
+            return ExecuteScalarCommandAsync(con, sproc, parameters, CancellationToken.None);
         }
         public static async Task<int> ExecuteNonQuerySqlAsync(this DbConnection con, string query, object parameters, CancellationToken cancellation)
         {
@@ -662,7 +662,7 @@ namespace Puya.Data
                 
 			return result;
         }
-		public static async Task<object> ExecuteScalerSqlAsync(this DbConnection con, string query, object parameters, CancellationToken cancellation)
+		public static async Task<object> ExecuteScalarSqlAsync(this DbConnection con, string query, object parameters, CancellationToken cancellation)
         {
             if (con == null)
 	        {
@@ -680,9 +680,9 @@ namespace Puya.Data
         {
             return ExecuteNonQuerySqlAsync(con, query, parameters, CancellationToken.None);
         }
-		public static Task<object> ExecuteScalerSqlAsync(this DbConnection con, string query, object parameters = null)
+		public static Task<object> ExecuteScalarSqlAsync(this DbConnection con, string query, object parameters = null)
         {
-            return ExecuteScalerSqlAsync(con, query, parameters, CancellationToken.None);
+            return ExecuteScalarSqlAsync(con, query, parameters, CancellationToken.None);
         }
 	}
 }

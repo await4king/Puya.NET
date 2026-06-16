@@ -26,7 +26,7 @@ namespace Puya.Service
     }
     public abstract class ServiceAction<TService, TRequest, TResponse> : IServiceAction<TService, TRequest, TResponse>
         where TService: class, IService
-        where TRequest : ServiceRequest
+        where TRequest : class, ServiceRequest
         where TResponse : ServiceResponse, new()
     {
         public TService Owner { get; private set; }
@@ -196,7 +196,7 @@ namespace Puya.Service
     public abstract class ServiceAction<TService, TConfig, TRequest, TResponse>: ServiceAction<TService, TRequest, TResponse>
         where TConfig : class, IServiceConfig, new()
         where TService : class, IService<TConfig>
-        where TRequest : ServiceRequest
+        where TRequest : class, ServiceRequest
         where TResponse : ServiceResponse, new()
     {
         public ServiceAction(TService owner): base(owner)

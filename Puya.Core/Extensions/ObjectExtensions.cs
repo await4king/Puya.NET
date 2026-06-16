@@ -1,13 +1,15 @@
 ﻿using Puya.Base;
+using Puya.Collections;
+using Puya.Extensions;
+using Puya.Reflection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using ClrConvertor = Puya.Conversion.SafeClrConvert;
-using Puya.Reflection;
-using Puya.Collections;
-using System.Collections;
 
 namespace Puya.Extensions
 {
@@ -16,6 +18,55 @@ namespace Puya.Extensions
         static bool IsExcluded(string key, string[] arrExcludes, bool ignoreCase)
         {
             return arrExcludes.Length != 0 && Array.Exists(arrExcludes, ex => string.Compare(ex, key, ignoreCase) == 0);
+        }
+        static void Merge(IDictionary<string, object> result, object source, int index)
+        {
+            if (source == null) return;
+
+            var sourceType = source.GetType();
+
+            if (sourceType.IsDictionary())
+            {
+                source.IterateDictionary(kv =>
+                {
+                    result[kv.Key?.ToString()] = kv.Value;
+                });
+            }
+            else if (sourceType.IsEnumerable())
+            {
+                var e = source as IEnumerable;
+                var arr = new ArrayList();
+
+                e.ForEach(item => arr.Add(item));
+
+                result[index.ToString()] = arr;
+            }
+            else
+            {
+                var properties = ReflectionHelper.GetPublicInstanceReadableProperties(sourceType);
+
+                foreach (var prop in properties)
+                {
+                    var value = prop.GetValue(source);
+
+                    result[prop.Name] = value;
+                }
+            }
+        }
+        public static object Merge(this object obj, params object[] others)
+        {
+            var result = new ExpandoObject() as IDictionary<string, object>;
+
+            Merge(result, obj, 0);
+
+            var index = 1;
+
+            foreach (var other in others)
+            {
+                Merge(result, other, index++);
+            }
+
+            return result;
         }
         public static IDictionary<string, object> ToDictionary(this object obj)
         {
@@ -408,7 +459,7 @@ namespace Puya.Extensions
                         break;
                     }
 
-                    cur = args == null ? prop.GetValue(cur): prop.GetValue(cur, args);
+                    cur = args == null ? prop.GetValue(cur) : prop.GetValue(cur, args);
 
                     index++;
                 }
@@ -421,6 +472,24 @@ namespace Puya.Extensions
             }
 
             return _result;
+        }
+        public static bool IsValidJsonType(this JsonType type, object obj, bool allowNull)
+        {
+            if (obj != null)
+            {
+                var objType = obj.GetType();
+                var isString = (type & JsonType.String) == JsonType.String && objType == TypeHelper.TypeOfString;
+                var isNumber = (type & JsonType.Number) == JsonType.Number && objType.IsNumeric();
+                var isBoolean = (type & JsonType.Boolean) == JsonType.Boolean && objType == TypeHelper.TypeOfBool;
+                var isObject = (type & JsonType.Object) == JsonType.Object && !objType.IsBasicType() && !objType.IsEnumerable();
+                var isArray = (type & JsonType.Array) == JsonType.Array && objType.IsEnumerable();
+
+                return isString || isNumber || isBoolean || isObject || isArray;
+            }
+            else
+            {
+                return allowNull;
+            }
         }
     }
 }

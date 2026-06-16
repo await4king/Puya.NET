@@ -21,7 +21,7 @@ namespace Puya.ApiClient
 
         public TapJSvcConActApiClientConfig Config { get; }
         public async Task<TResponse> InvokeAsync<TRequest, TResponse>(TRequest request, Func<HttpClient, CancellationToken, Task<HttpResponseMessage>> fnInvoke, CancellationToken cancellation)
-            where TRequest : ServiceRequest
+            where TRequest : class, ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             var response = new TResponse();
@@ -60,7 +60,7 @@ namespace Puya.ApiClient
             return response;
         }
         public Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest request, CancellationToken cancellation)
-            where TRequest : ServiceRequest
+            where TRequest : class, ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             return InvokeAsync<TRequest, TResponse>(request, (client, CancellationToken) =>
@@ -71,7 +71,7 @@ namespace Puya.ApiClient
             }, cancellation);
         }
         public Task<TResponse> PutAsync<TRequest, TResponse>(string path, TRequest request, CancellationToken cancellation)
-            where TRequest : ServiceRequest
+            where TRequest : class, ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             return InvokeAsync<TRequest, TResponse>(request, (client, CancellationToken) =>
@@ -82,7 +82,7 @@ namespace Puya.ApiClient
             }, cancellation);
         }
         public Task<TResponse> DeleteAsync<TRequest, TResponse>(string path, CancellationToken cancellation)
-            where TRequest : ServiceRequest
+            where TRequest : class, ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             return InvokeAsync<TRequest, TResponse>(null, (client, CancellationToken) =>
@@ -91,7 +91,7 @@ namespace Puya.ApiClient
             }, cancellation);
         }
         public Task<TResponse> GetAsync<TRequest, TResponse>(string path, TRequest request, CancellationToken cancellation)
-            where TRequest : ServiceRequest
+            where TRequest : class, ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             return InvokeAsync<TRequest, TResponse>(request, (client, CancellationToken) =>

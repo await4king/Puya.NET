@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Puya.Service
 {
-    public class ServiceRequest
+    public interface ServiceRequest
     {
     }
     public class ServiceRequest<T> : ServiceRequest

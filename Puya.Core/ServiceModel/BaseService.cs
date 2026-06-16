@@ -5,6 +5,7 @@ using Puya.Base;
 using Puya.Caching;
 using Puya.Data;
 using Puya.Debugging;
+using Puya.Extensions;
 using Puya.Logging;
 using Puya.Service;
 using Puya.Settings;

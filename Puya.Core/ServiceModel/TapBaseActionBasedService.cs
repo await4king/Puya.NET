@@ -144,7 +144,7 @@ namespace Puya.ServiceModel
     public abstract class TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse> : ServiceAction<TBaseService, TConfig, TRequest, TResponse>
         where TConfig : TapBaseConfig, new()
         where TBaseService : TapBaseActionBasedService<TConfig>, IService<TConfig>
-        where TRequest : ServiceRequest
+        where TRequest : class, ServiceRequest
         where TResponse : ServiceResponse, new()
     {
         #region Props

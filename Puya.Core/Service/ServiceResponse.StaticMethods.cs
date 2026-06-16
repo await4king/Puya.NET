@@ -1,8 +1,10 @@
-﻿namespace Puya.Service
+﻿using Puya.Extensions;
+
+namespace Puya.Service
 {
     public partial class ServiceResponse
     {
-        public static ServiceResponse Succeeded()
+        public static ServiceResponse FromSucceeded()
         {
             var result = new ServiceResponse();
 
@@ -10,7 +12,7 @@
 
             return result;
         }
-        public static ServiceResponse Succeeded<T>(T data)
+        public static ServiceResponse FromSucceeded<T>(T data)
         {
             var result = new ServiceResponse();
 

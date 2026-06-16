@@ -251,11 +251,11 @@ namespace Puya.Data
 
             if (async)
             {
-                id = await db.ExecuteScalerSqlAsync(query, args);
+                id = await db.ExecuteScalarSqlAsync(query, args);
             }
             else
             {
-                id = db.ExecuteScalerSql(query, args);
+                id = db.ExecuteScalarSql(query, args);
             }
 
             var result = !(id == null || DBNull.Value.Equals(id));
@@ -268,11 +268,11 @@ namespace Puya.Data
 
             if (async)
             {
-                id = await db.ExecuteScalerCommandAsync(query, args);
+                id = await db.ExecuteScalarCommandAsync(query, args);
             }
             else
             {
-                id = db.ExecuteScalerCommand(query, args);
+                id = db.ExecuteScalarCommand(query, args);
             }
 
             var result = !(id == null || DBNull.Value.Equals(id));
@@ -285,11 +285,11 @@ namespace Puya.Data
 
             if (async)
             {
-                id = await db.ExecuteScalerSqlAsync(query, args);
+                id = await db.ExecuteScalarSqlAsync(query, args);
             }
             else
             {
-                id = db.ExecuteScalerSql(query, args);
+                id = db.ExecuteScalarSql(query, args);
             }
 
             var result = !(id == null || DBNull.Value.Equals(id) || id != value);
@@ -302,11 +302,11 @@ namespace Puya.Data
 
             if (async)
             {
-                id = await db.ExecuteScalerCommandAsync(query, args);
+                id = await db.ExecuteScalarCommandAsync(query, args);
             }
             else
             {
-                id = db.ExecuteScalerCommand(query, args);
+                id = db.ExecuteScalarCommand(query, args);
             }
 
             var result = !(id == null || DBNull.Value.Equals(id) || id != value);
@@ -315,14 +315,14 @@ namespace Puya.Data
         }
         public static bool RecordExists(this IDb db, string query, object args)
         {
-            var id = db.ExecuteScalerSql(query, args);
+            var id = db.ExecuteScalarSql(query, args);
             var result = !(id == null || DBNull.Value.Equals(id));
 
             return result;
         }
         public static bool RecordExists(this IDb db, string query, object args, object value)
         {
-            var id = db.ExecuteScalerSql(query, args);
+            var id = db.ExecuteScalarSql(query, args);
             var result = !(id == null || DBNull.Value.Equals(id) || id != value);
 
             return result;

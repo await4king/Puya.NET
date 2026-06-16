@@ -17,7 +17,7 @@ namespace Puya.Extensions
             {
                 return sprocExists.GetOrAdd(spName, (name) =>
                 {
-                    var exists = db.ExecuteScalerSql("select case when exists (select 1 from sys.procedures where name = @name) then 1 else 0 end", new { name });
+                    var exists = db.ExecuteScalarSql("select case when exists (select 1 from sys.procedures where name = @name) then 1 else 0 end", new { name });
 
                     return SafeClrConvert.ToBoolean(exists);
                 });
@@ -68,7 +68,7 @@ namespace Puya.Extensions
 
                 return tableExists.GetOrAdd(name, (old) =>
                 {
-                    var exists = db.ExecuteScalerSql(@"
+                    var exists = db.ExecuteScalarSql(@"
 select case when exists
 (
     select 1

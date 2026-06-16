@@ -46,7 +46,7 @@ namespace Puya.Data
                 {
                     foreach (var prop in props)
                     {
-                        var sizeAttr = prop.GetCustomAttribute<SizeAttribute>();
+                        var sizeAttr = prop.GetCustomAttribute<ParamSizeAttribute>();
                         var size = sizeAttr?.Value;
 
                         if (prop.CustomAttributes.Count(a => a.AttributeType == typeof(IgnoreAttribute)) == 0)

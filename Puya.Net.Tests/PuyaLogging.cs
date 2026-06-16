@@ -139,7 +139,7 @@ namespace Puya.Net.Tests
                 tbl = tbl.Substring(index + 1);
             }
 
-            var exists = db.ExecuteScalerSql(@"
+            var exists = db.ExecuteScalarSql(@"
 select case when exists
 (
     select 1
@@ -284,7 +284,7 @@ select case when exists
             
             logger.Clear();
 
-            var count = db.ExecuteScalerSql("select count(*) from " + config.LogTable);
+            var count = db.ExecuteScalarSql("select count(*) from " + config.LogTable);
 
             Assert.True(SafeClrConvert.ToInt(count) == 0);
         }

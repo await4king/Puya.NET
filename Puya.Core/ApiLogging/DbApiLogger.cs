@@ -89,7 +89,7 @@ namespace Puya.ApiLogging
         }
         public override void Log(ApiLog log)
         {
-            var id = Db.ExecuteScalerSql(Query, new
+            var id = Db.ExecuteScalarSql(Query, new
             {
                 log.Direction,
                 Client = Serialize(log.Client),
@@ -103,7 +103,7 @@ namespace Puya.ApiLogging
 
         public override async Task LogAsync(ApiLog log, CancellationToken cancellation)
         {
-            var id = await Db.ExecuteScalerSqlAsync(Query, new
+            var id = await Db.ExecuteScalarSqlAsync(Query, new
             {
                 log.Direction,
                 Client = Serialize(log.Client),

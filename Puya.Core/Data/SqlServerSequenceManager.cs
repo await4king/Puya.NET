@@ -27,7 +27,7 @@ end
 else
     select 0
 ";
-            var result = await db.ExecuteScalerSqlAsync(query, null, cancellation);
+            var result = await db.ExecuteScalarSqlAsync(query, null, cancellation);
 
             return SafeClrConvert.ToBoolean(result);
         }
@@ -45,7 +45,7 @@ end
 else
     select 0
 ";
-            var result = await db.ExecuteScalerSqlAsync(query, null, cancellation);
+            var result = await db.ExecuteScalarSqlAsync(query, null, cancellation);
 
             return SafeClrConvert.ToBoolean(result);
         }
@@ -59,7 +59,7 @@ else
         {
             var _options = options ?? new SequenceCreateOptions();
             var _name = $"{_options.Schema}.{name}";
-            var value = await db.ExecuteScalerSqlAsync($"select next value for {_name}", null, cancellation);
+            var value = await db.ExecuteScalarSqlAsync($"select next value for {_name}", null, cancellation);
 
             return value;
         }

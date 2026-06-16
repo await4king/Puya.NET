@@ -5,7 +5,7 @@ using Puya.Translation;
 
 namespace Puya.ServiceModel
 {
-    public static class Extensions
+    public static class ServiceModelExtensions
     {
         public static void Translate(this ITranslator translator, ServiceResponse response, string lang = "", bool recursive = true, string defaultMessageKey = "")
         {

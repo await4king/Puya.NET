@@ -7,6 +7,7 @@ namespace Puya.Data
 {
     public class SqlServerDb : DbBase
     {
+        public bool IgnoreArithAbort { get; set; }
         public int MaxContextInfoSize { get; set; }
         DbSpecification specs;
         public override DbSpecification Specification => specs;
@@ -93,6 +94,13 @@ namespace Puya.Data
         protected override DbConnection GetConnectionInternal(string conenctionString)
         {
             return new SqlConnection(conenctionString);
+        }
+        protected override void OnAfterConnection(DbConnection con)
+        {
+            if (!IgnoreArithAbort)
+            {
+                con.ExecuteNonQuerySql("SET ARITHABORT ON");
+            }
         }
     }
 }

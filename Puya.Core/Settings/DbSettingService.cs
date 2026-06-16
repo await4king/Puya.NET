@@ -99,7 +99,7 @@ namespace Puya.Settings
         {
             var keyCondition = string.IsNullOrEmpty(key) ? "" : " and [Key] = @Key";
 
-            var result = Db.ExecuteScalerSql($"select count(*) from {TableName} where 1 = 1 {keyCondition} {AppCondition()}", new
+            var result = Db.ExecuteScalarSql($"select count(*) from {TableName} where 1 = 1 {keyCondition} {AppCondition()}", new
             {
                 Key = key
             });
@@ -115,7 +115,7 @@ namespace Puya.Settings
             try
             {
                 var cacheKey = GetCacheKey(key);
-                var result = Cache.GetOrSet(cacheKey, () => Db.ExecuteScalerSql($"select top 1 [Value] from {TableName} where [Key] = @Key {AppCondition()}", new { Key = key }), CacheDuration);
+                var result = Cache.GetOrSet(cacheKey, () => Db.ExecuteScalarSql($"select top 1 [Value] from {TableName} where [Key] = @Key {AppCondition()}", new { Key = key }), CacheDuration);
                 
                 return result?.ToString();
             }
@@ -140,7 +140,7 @@ namespace Puya.Settings
                 }
                 else
                 {
-                    result = await Db.ExecuteScalerSqlAsync($"select top 1 [Value] from {TableName} where [Key] = @Key {AppCondition()}", new { Key = key }, cancellation);
+                    result = await Db.ExecuteScalarSqlAsync($"select top 1 [Value] from {TableName} where [Key] = @Key {AppCondition()}", new { Key = key }, cancellation);
 
                     Cache.Set(cacheKey, result, CacheDuration);
                 }

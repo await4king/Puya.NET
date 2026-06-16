@@ -1,0 +1,760 @@
+﻿using Puya.Base;
+using Puya.Extensions;
+using Puya.Reflection;
+using Puya.Validation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace Puya.Service
+{
+    public class ValidationRequest<TAttribute>
+    {
+        public PropertyInfo Prop { get; set; }
+        public object Value { get; set; }
+        public ServiceResponse Response { get; set; }
+        public object Request { get; set; }
+        public TAttribute Attribute { get; set; }
+    }
+    public class ValidationItemRequest<TAttribute>
+    {
+        public PropertyInfo Prop { get; set; }
+        public string Value { get; set; }
+        public TAttribute Attribute { get; set; }
+        public object Bag { get; set; }
+    }
+    public class ServiceRequestValidator : IServiceRequestValidator
+    {
+        protected bool TryGetCustomAttribute<TAttribute>(PropertyInfo prop, out TAttribute attribute) where TAttribute : ValidationAttribute
+        {
+            attribute = prop.GetCustomAttribute<TAttribute>();
+
+            return attribute != null;
+        }
+        bool GetDecimal(object obj, out decimal value)
+        {
+            var result = false;
+            value = default;
+
+            if (obj != null)
+            {
+                if (obj.GetType().IsBasicType())
+                {
+                    try
+                    {
+                        value = (decimal)Convert.ChangeType(obj, TypeHelper.TypeOfDecimal);
+
+                        result = true;
+                    }
+                    catch (Exception)
+                    { }
+                }
+                else if (obj.GetType() == TypeHelper.TypeOfString)
+                {
+                    result = decimal.TryParse(obj.ToString(), out value);
+                }
+            }
+
+            return result;
+        }
+        protected void ReportError(PropertyInfo prop, ServiceResponse res, string status, object bag = null)
+        {
+            var sr = new ServiceResponse();
+
+            sr.SetStatus(status);
+            sr.Info = prop.Name;
+            sr.Bag = bag;
+            sr.MessageKey = "Validation";
+            sr.MessageArgs.Add("prop", prop.Name);
+
+            if (bag != null)
+            {
+                ReflectionHelper.ForEachPublicInstanceReadableProperty(bag.GetType(), p => sr.MessageArgs.Add(p.Name, p.GetValue(bag)));
+            }
+
+            res.InnerResponses.Add(sr);
+        }
+        protected bool Validate<TAttribute>(PropertyInfo prop,
+                                object req,
+                                ServiceResponse res,
+                                Func<ValidationRequest<TAttribute>, ServiceResponse> fnValidate)
+             where TAttribute : ValidationAttribute
+        {
+            var isValid = true;
+
+            if (prop != null && req != null && res != null && fnValidate != null && TryGetCustomAttribute(prop, out TAttribute attr))
+            {
+                var reqAttr = attr as RequiredAttribute;
+                var jsontypeAttr = attr as JsonTypeAttribute;
+                var value = prop.GetValue(req);
+                var vreq = new ValidationRequest<TAttribute> { Prop = prop, Value = value, Response = res, Request = req, Attribute = attr };
+                var errorStatus = string.Empty;
+                var errorBag = null as object;
+                var errorException = null as Exception;
+                var extraBag = new { attr = typeof(TAttribute).Name.Replace("Attribute", "") };
+
+                if (reqAttr != null)
+                {
+                    isValid = value != null;
+
+                    if (isValid && vreq.Value is string strValue)
+                    {
+                        if (reqAttr.IncludeEmptyStrings)
+                        {
+                            isValid = !string.IsNullOrEmpty(strValue);
+                        }
+                        if (isValid && reqAttr.IncludeWhiteStrings)
+                        {
+                            isValid = !string.IsNullOrWhiteSpace(strValue);
+                        }
+                    }
+
+                    if (!isValid)
+                    {
+                        errorStatus = "Required";
+                    }
+                }
+                else if (value != null || attr.RequiresNullCheck)
+                {
+                    if (jsontypeAttr != null && !jsontypeAttr.Type.IsValidJsonType(value, attr.RequiresNullCheck))
+                    {
+                        errorStatus = "TypeMismatch";
+                        errorBag = new { Expected = jsontypeAttr.Type.ToString() };
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var vres = fnValidate(vreq);
+
+                            isValid = vres.Success;
+                            errorBag = vres.Bag;
+                            errorStatus = vres.Status;
+                            errorException = vres.Exception;
+
+                            if (!isValid && string.IsNullOrEmpty(errorStatus))
+                            {
+                                errorStatus = "Invalid";
+                                errorBag = vres.Bag.Merge(extraBag);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            errorStatus = "ValidationFailed";
+                            errorException = e;
+                            errorBag = extraBag;
+                        }
+                    }
+                }
+
+                if (!isValid)
+                {
+                    if (errorStatus.StartsWith(":"))
+                    {
+                        errorStatus = prop.Name + errorStatus.Substring(1);
+                    }
+
+                    ReportError(prop, res, errorStatus, errorBag);
+
+                    if (errorException != null)
+                    {
+                        res.InnerResponses[res.InnerResponses.Count - 1].Exception = errorException;
+                    }
+                }
+            }
+
+            return isValid;
+        }
+        protected bool ValiedateList<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate)
+            where TAttribute : ListAttribute
+        {
+            return Validate<TAttribute>(prop, req, res, (vr) =>
+            {
+                var attr = vr.Attribute;
+                var value = vr.Value as string;
+
+                if (string.IsNullOrEmpty(value))
+                {
+                    return ServiceResponse.FromStatus("NoItems");
+                }
+
+                var items = value.Split(new string[] { attr.Separator }, StringSplitOptions.None);
+                var isValid = items.Length >= attr.MinCount && (attr.MaxCount == -1 || items.Length <= attr.MaxCount);
+                var invalidItem = "";
+
+                if (isValid)
+                {
+                    var vir = new ValidationItemRequest<TAttribute> { Attribute = attr, Prop = prop };
+
+                    foreach (var item in items)
+                    {
+                        vir.Value = item?.Trim();
+
+                        bool itemIsValid = !string.IsNullOrEmpty(attr.Pattern)
+                            ? System.Text.RegularExpressions.Regex.IsMatch(item.Trim(), attr.Pattern)
+                            : fnValidate(vir);
+
+                        if (!itemIsValid)
+                        {
+                            invalidItem = item;
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    return ServiceResponse.FromStatus(isValid ? "Success" : "InvalidItem")
+                                        .SetBag(new { invalidItem }.Merge(vir.Bag));
+                }
+                else
+                {
+                    return ServiceResponse.FromStatus(isValid ? "Success" : "ItemCountMismatch")
+                                        .SetBag(new { minCount = attr.MinCount, maxCount = attr.MaxCount });
+                }
+            });
+        }
+        protected bool ValidatePattern<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate, string name)
+            where TAttribute : RegExpAttribute
+        {
+            return Validate<TAttribute>(prop, req, res, (vr) =>
+            {
+                var isValid = true;
+                var attr = vr.Attribute;
+                var value = vr.Value as string;
+                var vir = new ValidationItemRequest<TAttribute>
+                {
+                    Attribute = attr,
+                    Value = value,
+                    Prop = prop,
+                };
+
+                if (!string.IsNullOrEmpty(attr.Pattern))
+                {
+                    isValid = string.IsNullOrEmpty(value) || System.Text.RegularExpressions.Regex.IsMatch(value, attr.Pattern);
+                }
+                else if (fnValidate != null)
+                {
+                    isValid = string.IsNullOrEmpty(value) || fnValidate(vir);
+                }
+
+                if (name.StartsWith(":"))
+                {
+                    return ServiceResponse.FromStatus(isValid ? "Success" : "Invalid" + name)
+                                          .SetBag(vir.Bag);
+                }
+                else
+                {
+                    return ServiceResponse.FromStatus(isValid ? "Success" : name);
+                }
+            });
+        }
+        protected bool CheckRequired(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<RequiredAttribute>(prop, req, res, (vr) => ServiceResponse.FromSucceeded());
+        }
+        protected bool CheckMinValueRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<MinValueAttribute>(prop, req, res, (vr) =>
+            {
+                var response = new ServiceResponse();
+
+                if (GetDecimal(vr.Value, out decimal numericValue))
+                {
+                    if (numericValue >= vr.Attribute.MinValue)
+                    {
+                        response.Succeeded();
+                    }
+                    else
+                    {
+                        response.SetStatus("ValueTooSmall");
+                        response.Bag = new { Min = vr.Attribute.MinValue };
+                    }
+                }
+                else
+                {
+                    response.SetStatus("NotNumeric");
+                }
+
+                return response;
+            });
+        }
+        protected bool CheckMaxValueRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<MaxValueAttribute>(prop, req, res, (vr) =>
+            {
+                var response = new ServiceResponse();
+
+                if (GetDecimal(vr.Value, out decimal numericValue))
+                {
+                    if (numericValue <= vr.Attribute.MaxValue)
+                    {
+                        response.Succeeded();
+                    }
+                    else
+                    {
+                        response.SetStatus("ValueTooLarge");
+                        response.Bag = new { Min = vr.Attribute.MaxValue };
+                    }
+                }
+                else
+                {
+                    response.SetStatus("NotNumeric");
+                }
+
+                return response;
+            });
+        }
+        protected bool CheckMinLenRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<MinLenAttribute>(prop, req, res, (vr) =>
+            {
+                var response = new ServiceResponse();
+                var value = vr.Value as string;
+
+                if (value?.Length >= vr.Attribute.MinLen)
+                {
+                    response.Succeeded();
+                }
+                else
+                {
+                    response.SetStatus("LengthTooSmall");
+                    response.Bag = new { vr.Attribute.MinLen, CurrentLength = value?.Length ?? 0 };
+                }
+
+                return response;
+            });
+        }
+        protected bool CheckMaxLenRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<MaxLenAttribute>(prop, req, res, (vr) =>
+            {
+                var response = new ServiceResponse();
+                var value = vr.Value as string;
+
+                if (value.Length <= vr.Attribute.MaxLen)
+                {
+                    response.Succeeded();
+                }
+                else
+                {
+                    response.SetStatus("LengthTooLarge");
+                    response.Bag = new { vr.Attribute.MaxLen, CurrentLength = value.Length };
+                }
+
+                return response;
+            });
+        }
+        protected bool CheckAlphaRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<AlphaAttribute>(prop, req, res, (vr) =>
+                ServiceResponse.FromStatus((vr.Value as string).All(char.IsLetter) ? "Success" : "NotAlpha")
+            );
+        }
+        protected bool CheckAlphaNumRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<AlphaNumAttribute>(prop, req, res, (vr) =>
+                ServiceResponse.FromStatus((vr.Value as string).All(char.IsLetterOrDigit) ? "Success" : "NotAlphaNum")
+            );
+        }
+        protected bool CheckNumericRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<NumericAttribute>(prop, req, res, (vr) =>
+                ServiceResponse.FromStatus(vr.Value.GetType().IsNumeric() || Validation.Validation.IsNumeric(vr.Value as string) ? "Success" : "NotNumeric")
+            );
+        }
+        protected bool CheckNumericIntRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<NumericIntAttribute>(prop, req, res, (vr) =>
+                ServiceResponse.FromStatus(vr.Value.GetType().IsInteger() || Validation.Validation.IsInteger(vr.Value as string) ? "Success" : "NotInteger")
+            );
+        }
+        protected bool CheckNotNegativeRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<NotNegativeAttribute>(prop, req, res, (vr) =>
+            {
+                var value = vr.Value;
+                var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(value as string);
+
+                if (isValid)
+                {
+                    if (value is int i) isValid = i >= 0;
+                    else if (value is long l) isValid = l >= 0;
+                    else if (value is decimal d) isValid = d >= 0;
+                    else if (value is double db) isValid = db >= 0;
+                    else if (value is float f) isValid = f >= 0;
+                    else if (value is short s) isValid = s >= 0;
+                    else if (value is byte b) isValid = b >= 0;
+                    else if (value is string str)
+                    {
+                        if (decimal.TryParse(str, out decimal decVal))
+                            isValid = decVal >= 0;
+                    }
+                }
+
+                return ServiceResponse.FromStatus(isValid ? "Success" : "IsNegative");
+            });
+        }
+        protected bool CheckNotZeroRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<NotZeroAttribute>(prop, req, res, (vr) =>
+            {
+                var value = vr.Value;
+                var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(value as string);
+
+                if (isValid)
+                {
+                    if (value is int i) isValid = i != 0;
+                    else if (value is long l) isValid = l != 0;
+                    else if (value is decimal d) isValid = d != 0;
+                    else if (value is double db) isValid = db != 0;
+                    else if (value is float f) isValid = f != 0;
+                    else if (value is short s) isValid = s != 0;
+                    else if (value is byte b) isValid = b != 0;
+                    else if (value is string str)
+                    {
+                        if (decimal.TryParse(str, out decimal decVal))
+                            isValid = decVal != 0;
+                    }
+                }
+
+                return ServiceResponse.FromStatus(isValid ? "Success" : "IsZero");
+            });
+        }
+        protected bool CheckRangeRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<RangeAttribute>(prop, req, res, (vr) =>
+            {
+                var value = vr.Value;
+                var str = vr.Value as string;
+                var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(str);
+                var attr = vr.Attribute;
+
+                if (isValid)
+                {
+                    switch (attr.RangeType)
+                    {
+                        case RangeType.Byte:
+                            if (value is byte b) isValid = b >= attr.FromByte && b <= attr.ToByte;
+                            else if (byte.TryParse(str, out byte bVal)) isValid = bVal >= attr.FromByte && bVal <= attr.ToByte;
+                            break;
+                        case RangeType.Short:
+                            if (value is short s) isValid = s >= attr.FromShort && s <= attr.ToShort;
+                            else if (short.TryParse(str, out short sVal)) isValid = sVal >= attr.FromShort && sVal <= attr.ToShort;
+                            break;
+                        case RangeType.Integer:
+                            if (value is int i) isValid = i >= attr.FromInt && i <= attr.ToInt;
+                            else if (int.TryParse(str, out int iVal)) isValid = iVal >= attr.FromInt && iVal <= attr.ToInt;
+                            break;
+                        case RangeType.Long:
+                            if (value is long l) isValid = l >= attr.FromLong && l <= attr.ToLong;
+                            else if (long.TryParse(str, out long lVal)) isValid = lVal >= attr.FromLong && lVal <= attr.ToLong;
+                            break;
+                        case RangeType.Float:
+                            if (value is float f) isValid = f >= attr.FromFloat && f <= attr.ToFloat;
+                            else if (float.TryParse(str, out float fVal)) isValid = fVal >= attr.FromFloat && fVal <= attr.ToFloat;
+                            break;
+                        case RangeType.Double:
+                            if (value is double d) isValid = d >= attr.FromDouble && d <= attr.ToDouble;
+                            else if (double.TryParse(str, out double dVal)) isValid = dVal >= attr.FromDouble && dVal <= attr.ToDouble;
+                            break;
+                        case RangeType.Decimal:
+                            if (value is decimal dec) isValid = dec >= attr.FromDec && dec <= attr.ToDec;
+                            else if (decimal.TryParse(str, out decimal decVal)) isValid = decVal >= attr.FromDec && decVal <= attr.ToDec;
+                            break;
+                    }
+                }
+
+                return ServiceResponse.FromStatus(isValid ? "Success" : "RangeViolation").SetBag(new { from = attr.FromDec, to = attr.ToDec });
+            });
+        }
+        protected bool CheckEmailRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<EmailAttribute>(prop, req, res, vi => Validation.Validation.IsEmail(vi.Value), "Email");
+        }
+        protected bool CheckEmailsRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<EmailsAttribute>(prop, req, res, vi => Validation.Validation.IsEmail(vi.Value));
+        }
+        protected bool CheckMobileRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<MobileAttribute>(prop, req, res, vi => Validation.Validation.IsMobile(vi.Value), "Mobile");
+        }
+        protected bool CheckMobilesRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<MobilesAttribute>(prop, req, res, vi => Validation.Validation.IsMobile(vi.Value));
+        }
+        protected bool CheckPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<PhoneAttribute>(prop, req, res, vi => Validation.Validation.IsPhone(vi.Value), "Phone");
+        }
+        protected bool CheckPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<PhonesAttribute>(prop, req, res, vi => Validation.Validation.IsPhone(vi.Value));
+        }
+        protected bool CheckIPv4Rule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<IPv4Attribute>(prop, req, res, vi => Validation.Validation.IsIPv4(vi.Value), "IPv4");
+        }
+        protected bool CheckIPv4sRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => Validation.Validation.IsIPv4(vi.Value));
+        }
+        protected bool CheckRegExpRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<RegExpAttribute>(prop, req, res, vi =>
+            {
+                var isValid = System.Text.RegularExpressions.Regex.IsMatch(vi.Value, vi.Attribute.Pattern);
+
+                if (!isValid)
+                {
+                    vi.Bag = new { pattern = vi.Attribute.Pattern };
+                }
+
+                return isValid;
+            }, "PatternMismatch");
+        }
+        protected bool CheckRegExpsRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<RegExpsAttribute>(prop, req, res, vi =>
+            {
+                var isValid = System.Text.RegularExpressions.Regex.IsMatch(vi.Value, vi.Attribute.Pattern);
+
+                if (!isValid)
+                {
+                    vi.Bag = new { pattern = vi.Attribute.Pattern };
+                }
+
+                return isValid;
+            });
+        }
+        protected bool CheckNationalCodeRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            var attr = prop.GetCustomAttribute<NationalCodeAttribute>();
+
+            if (attr == null) return true;
+
+            var value = prop.GetValue(req) as string;
+            var result = Validation.Validation.IsNationalCode(value);
+            var isValid = result == IsNationalCodeResult.Valid;
+
+            if (!isValid)
+            {
+                ReportError(prop, res, "InvalidNationalCode", new { reason = result.ToString() });
+            }
+
+            return isValid;
+        }
+        protected bool CheckOneOfRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            var attr = prop.GetCustomAttribute<OneOfAttribute>();
+
+            if (attr == null) return true;
+
+            var value = prop.GetValue(req) as string;
+            var items = attr.Items.Split(new string[] { attr.Separator }, StringSplitOptions.None).Select(i => i.Trim());
+            var allowedItems = new HashSet<string>(items, attr.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+            var isValid = value != null && allowedItems.Contains(value);
+
+            if (!isValid)
+            {
+                ReportError(prop, res, "InvalidValue", new { allowed = attr.Items });
+            }
+
+            return isValid;
+        }
+        protected bool CheckManyOfRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            HashSet<string> allowedItems = null;
+
+            return ValiedateList<ManyOfAttribute>(prop, req, res, vi =>
+            {
+                if (allowedItems == null)
+                {
+                    allowedItems = new HashSet<string>(vi.Attribute.Items.Split(new string[] { vi.Attribute.Separator }, StringSplitOptions.None)
+                                        .Select(i => i.Trim()),
+                                        vi.Attribute.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+                }
+
+                return allowedItems.Contains(vi.Value);
+            });
+        }
+        protected bool CheckMinCountRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<MinCountAttribute>(prop, req, res, vi => true);
+        }
+        protected bool CheckMaxCountRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<MaxCountAttribute>(prop, req, res, vi => true);
+        }
+        protected bool CheckPreventCharsRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            var attr = prop.GetCustomAttribute<PreventCharsAttribute>();
+            if (attr == null) return true;
+
+            var value = prop.GetValue(req) as string;
+            if (string.IsNullOrEmpty(value)) return true;
+
+            var isValid = !value.Any(c => attr.ExcludedCharacters.Contains(c));
+
+            if (!isValid)
+            {
+                ReportError(prop, res, "ContainsExcludedChars", new { excluded = attr.ExcludedCharacters });
+            }
+
+            return isValid;
+        }
+        public Task<bool> Validate<TRequest, TResponse>(TRequest req, TResponse res)
+            where TRequest : class, ServiceRequest
+            where TResponse : ServiceResponse, new()
+        {
+            var result = false;
+
+            if (req == null)
+            {
+                res.SetStatus("NoRequest");
+            }
+            else
+            {
+                var props = ReflectionHelper.GetPublicInstanceReadableProperties(req.GetType());
+                var prevInnerResponseCount = res.InnerResponses.Count;
+                var fullValidation = req.GetType().GetCustomAttribute<FullValidation>() != null;
+
+                foreach (var prop in props.OrderBy(p =>
+                {
+                    var order = 0;
+                    if (TryGetCustomAttribute(p, out ValidationOrderAttribute attr))
+                    {
+                        order = attr.Order;
+                    }
+                    return order;
+                }).ThenBy(p => p.Name))
+                {
+                    if (!CheckRequired(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMinValueRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMaxValueRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMinLenRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMaxLenRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckAlphaRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckAlphaNumRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckNumericRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckNumericIntRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckNotNegativeRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckNotZeroRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckRangeRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckEmailRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckEmailsRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMobileRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMobilesRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckPhoneRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckPhonesRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckIPv4Rule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckIPv4sRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckNationalCodeRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckOneOfRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckManyOfRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMinCountRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckMaxCountRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckRegExpRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckRegExpsRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckPreventCharsRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                }
+
+                if (res.InnerResponses.Count > prevInnerResponseCount)
+                {
+                    res.SetStatus("InvalidRequest");
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+
+            return Task.FromResult(result);
+        }
+    }
+}

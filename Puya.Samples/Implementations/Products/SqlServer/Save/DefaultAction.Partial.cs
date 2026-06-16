@@ -81,7 +81,7 @@ namespace Puya.Samples.Products.Products
 
                         Owner.Debug("query", new { query });
 
-                        var id = await Db.ExecuteScalerSqlAsync(query, request, cancellation);
+                        var id = await Db.ExecuteScalarSqlAsync(query, request, cancellation);
 
                         response.Data = SafeClrConvert.ToInt(id);
                     }
