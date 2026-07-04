@@ -3,7 +3,7 @@
 namespace Puya.Base
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class ListAttribute : JsonTypeAttribute // requires a prop to be a string containing a comma separated list of items
+    public class ListAttribute : DataTypeAttribute // requires a prop to be a string containing a comma separated list of items
     {
         public ListAttribute(int minCount, int maxCount = -1, string pattern = "", bool ignoreCase = false, string separator = ",")
         {
@@ -11,7 +11,7 @@ namespace Puya.Base
             Separator = separator;
             MinCount = minCount;
             MaxCount = maxCount;
-            Type = JsonType.String;
+            Type = DataType.String;
             IgnoreCase = ignoreCase;
         }
         public string Separator { get; set; }

@@ -14,7 +14,7 @@ namespace Puya.Base
     }
     // requires a prop to be a numeric value ranging between a from/to values.
     [AttributeUsage(AttributeTargets.Property)]
-    public class RangeAttribute : JsonTypeAttribute
+    public class RangeAttribute : DataTypeAttribute
     {
         public decimal FromDec { get; set; }
         public decimal ToDec { get; set; }
@@ -24,7 +24,7 @@ namespace Puya.Base
             FromDec = from;
             ToDec = to;
             RangeType = RangeType.Decimal;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public short FromShort { get; set; }
         public short ToShort { get; set; }
@@ -33,7 +33,7 @@ namespace Puya.Base
             FromShort = from;
             ToShort = to;
             RangeType = RangeType.Short;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public int FromInt { get; set; }
         public int ToInt { get; set; }
@@ -42,7 +42,7 @@ namespace Puya.Base
             FromInt = from;
             ToInt = to;
             RangeType = RangeType.Integer;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public byte FromByte { get; set; }
         public byte ToByte { get; set; }
@@ -51,7 +51,7 @@ namespace Puya.Base
             FromByte = from;
             ToByte = to;
             RangeType = RangeType.Byte;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public long FromLong { get; set; }
         public long ToLong { get; set; }
@@ -60,7 +60,7 @@ namespace Puya.Base
             FromLong = from;
             ToLong = to;
             RangeType = RangeType.Long;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public float FromFloat { get; set; }
         public float ToFloat { get; set; }
@@ -69,7 +69,7 @@ namespace Puya.Base
             FromFloat = from;
             ToFloat = to;
             RangeType = RangeType.Float;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
         public double FromDouble { get; set; }
         public double ToDouble { get; set; }
@@ -78,7 +78,7 @@ namespace Puya.Base
             FromDouble = from;
             ToDouble = to;
             RangeType = RangeType.Double;
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
     }
 }

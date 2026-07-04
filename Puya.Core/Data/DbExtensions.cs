@@ -88,6 +88,22 @@ namespace Puya.Data
 
             return result;
         }
+        public static IList<DynamicModel> ExecuteReaderCommandDynamic(this IDb db, string sproc, object args)
+        {
+            var result = db.ExecuteReaderCommand(sproc, (reader) =>
+            {
+                var item = new DynamicModel();
+
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    item.Add(reader.GetName(i), reader.GetValue(i));
+                }
+
+                return item;
+            }, args);
+
+            return result;
+        }
         public static async Task<IList<DynamicModel>> ExecuteReaderSqlDynamicAsync(this IDb db, string query, object args, bool async, CancellationToken cancellation)
         {
             IList<DynamicModel> result;
@@ -119,6 +135,149 @@ namespace Puya.Data
 
                     return item;
                 }, args);
+            }
+
+            return result;
+        }
+        public static IList<DynamicModel> ExecuteReaderSqlDynamic(this IDb db, string query, object args)
+        {
+            var result = db.ExecuteReaderSql(query, (reader) =>
+            {
+                var item = new DynamicModel();
+
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    item.Add(reader.GetName(i), reader.GetValue(i));
+                }
+
+                return item;
+            }, args);
+
+            return result;
+        }
+        public static async Task<DynamicModel> ExecuteSingleCommandDynamicAsync(this IDb db, string sproc, object args, bool async, CancellationToken cancellation)
+        {
+            DynamicModel result = null;
+            IList<DynamicModel> data;
+
+            if (async)
+            {
+                data = await db.ExecuteReaderCommandAsync(sproc, (reader) =>
+                {
+                    var item = new DynamicModel();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        item.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    return item;
+                }, args, cancellation);
+            }
+            else
+            {
+                data = db.ExecuteReaderCommand(sproc, (reader) =>
+                {
+                    var item = new DynamicModel();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        item.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    return item;
+                }, args);
+            }
+
+            if (data?.Count > 0)
+            {
+                result = data[0];
+            }
+
+            return result;
+        }
+        public static DynamicModel ExecuteSingleCommandDynamic(this IDb db, string sproc, object args)
+        {
+            DynamicModel result = null;
+            var data = db.ExecuteReaderCommand(sproc, (reader) =>
+                {
+                    var item = new DynamicModel();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        item.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    return item;
+                }, args);
+
+            if (data?.Count > 0)
+            {
+                result = data[0];
+            }
+
+            return result;
+        }
+        public static async Task<DynamicModel> ExecuteSingleSqlDynamicAsync(this IDb db, string query, object args, bool async, CancellationToken cancellation)
+        {
+            DynamicModel result = null;
+            IList<DynamicModel> data;
+
+            if (async)
+            {
+                data = await db.ExecuteReaderSqlAsync(query, (reader) =>
+                {
+                    var item = new DynamicModel();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        item.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    return item;
+                }, args, cancellation);
+            }
+            else
+            {
+                data = db.ExecuteReaderSql(query, (reader) =>
+                {
+                    var item = new DynamicModel();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        item.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    return item;
+                }, args);
+            }
+
+            if (data?.Count > 0)
+            {
+                result = data[0];
+            }
+
+            return result;
+        }
+        public static DynamicModel ExecuteSingleSqlDynamic(this IDb db, string query, object args)
+        {
+            DynamicModel result = null;
+
+            var data = db.ExecuteReaderSql(query, (reader) =>
+            {
+                var item = new DynamicModel();
+
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    item.Add(reader.GetName(i), reader.GetValue(i));
+                }
+
+                return item;
+            }, args);
+
+            if (data?.Count > 0)
+            {
+                result = data[0];
             }
 
             return result;

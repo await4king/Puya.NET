@@ -1124,6 +1124,11 @@ namespace Puya.Extensions
 
             foreach (var _y in y)
             {
+                if (x == null)
+                {
+                    return _y?.Length == 0;
+                }
+
                 if (x.StartsWith(_y, System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
@@ -1141,7 +1146,34 @@ namespace Puya.Extensions
 
             foreach (var _y in y)
             {
+                if (x == null)
+                {
+                    return _y?.Length == 0;
+                }
+
                 if (x.EndsWith(_y, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public static bool Containz(this string x, params string[] y)
+        {
+            if (y == null || y.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var _y in y)
+            {
+                if (x == null)
+                {
+                    return _y?.Length == 0;
+                }
+
+                if (x.IndexOf(_y, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     return true;
                 }

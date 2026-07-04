@@ -1,4 +1,5 @@
-﻿using Puya.Base;
+﻿using Newtonsoft.Json.Linq;
+using Puya.Base;
 using Puya.Extensions;
 using Puya.Reflection;
 using Puya.Validation;
@@ -27,6 +28,7 @@ namespace Puya.Service
     }
     public class ServiceRequestValidator : IServiceRequestValidator
     {
+        #region Helpers
         protected bool TryGetCustomAttribute<TAttribute>(PropertyInfo prop, out TAttribute attribute) where TAttribute : ValidationAttribute
         {
             attribute = prop.GetCustomAttribute<TAttribute>();
@@ -53,7 +55,12 @@ namespace Puya.Service
                 }
                 else if (obj.GetType() == TypeHelper.TypeOfString)
                 {
-                    result = decimal.TryParse(obj.ToString(), out value);
+                    var str = obj.ToString();
+
+                    if (!string.IsNullOrEmpty(str))
+                    {
+                        result = decimal.TryParse(str, out value);
+                    }
                 }
             }
 
@@ -87,7 +94,7 @@ namespace Puya.Service
             if (prop != null && req != null && res != null && fnValidate != null && TryGetCustomAttribute(prop, out TAttribute attr))
             {
                 var reqAttr = attr as RequiredAttribute;
-                var jsontypeAttr = attr as JsonTypeAttribute;
+                var jsontypeAttr = attr as DataTypeAttribute;
                 var value = prop.GetValue(req);
                 var vreq = new ValidationRequest<TAttribute> { Prop = prop, Value = value, Response = res, Request = req, Attribute = attr };
                 var errorStatus = string.Empty;
@@ -116,12 +123,13 @@ namespace Puya.Service
                         errorStatus = "Required";
                     }
                 }
-                else if (value != null || attr.RequiresNullCheck)
+                else if (!string.IsNullOrEmpty(value?.ToString()) || attr.RequiresNullCheck)
                 {
-                    if (jsontypeAttr != null && !jsontypeAttr.Type.IsValidJsonType(value, attr.RequiresNullCheck))
+                    if (jsontypeAttr != null && !jsontypeAttr.Type.IsValidJsonType(value))
                     {
                         errorStatus = "TypeMismatch";
                         errorBag = new { Expected = jsontypeAttr.Type.ToString() };
+                        isValid = false;
                     }
                     else
                     {
@@ -240,8 +248,9 @@ namespace Puya.Service
 
                 if (name.StartsWith(":"))
                 {
-                    return ServiceResponse.FromStatus(isValid ? "Success" : "Invalid" + name)
-                                          .SetBag(vir.Bag);
+                    return ServiceResponse.FromStatus(isValid ? "Success" : "Invalid" + name.Substr(1))
+                                          .SetBag(vir.Bag)
+                                          .SetInfo(name.Substring(1));
                 }
                 else
                 {
@@ -249,7 +258,8 @@ namespace Puya.Service
                 }
             });
         }
-        protected bool CheckRequired(PropertyInfo prop, object req, ServiceResponse res)
+        #endregion
+        protected bool CheckRequiredRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<RequiredAttribute>(prop, req, res, (vr) => ServiceResponse.FromSucceeded());
         }
@@ -261,14 +271,14 @@ namespace Puya.Service
 
                 if (GetDecimal(vr.Value, out decimal numericValue))
                 {
-                    if (numericValue >= vr.Attribute.MinValue)
+                    if (numericValue >= vr.Attribute.Value)
                     {
                         response.Succeeded();
                     }
                     else
                     {
                         response.SetStatus("ValueTooSmall");
-                        response.Bag = new { Min = vr.Attribute.MinValue };
+                        response.Bag = new { Min = vr.Attribute.Value };
                     }
                 }
                 else
@@ -287,14 +297,14 @@ namespace Puya.Service
 
                 if (GetDecimal(vr.Value, out decimal numericValue))
                 {
-                    if (numericValue <= vr.Attribute.MaxValue)
+                    if (numericValue <= vr.Attribute.Value)
                     {
                         response.Succeeded();
                     }
                     else
                     {
                         response.SetStatus("ValueTooLarge");
-                        response.Bag = new { Min = vr.Attribute.MaxValue };
+                        response.Bag = new { Max = vr.Attribute.Value };
                     }
                 }
                 else
@@ -319,7 +329,7 @@ namespace Puya.Service
                 else
                 {
                     response.SetStatus("LengthTooSmall");
-                    response.Bag = new { vr.Attribute.MinLen, CurrentLength = value?.Length ?? 0 };
+                    response.Bag = new { MinLength = vr.Attribute.MinLen, CurrentLength = value?.Length ?? 0 };
                 }
 
                 return response;
@@ -339,7 +349,7 @@ namespace Puya.Service
                 else
                 {
                     response.SetStatus("LengthTooLarge");
-                    response.Bag = new { vr.Attribute.MaxLen, CurrentLength = value.Length };
+                    response.Bag = new { MaxLength = vr.Attribute.MaxLen, CurrentLength = value.Length };
                 }
 
                 return response;
@@ -360,65 +370,64 @@ namespace Puya.Service
         protected bool CheckNumericRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<NumericAttribute>(prop, req, res, (vr) =>
-                ServiceResponse.FromStatus(vr.Value.GetType().IsNumeric() || Validation.Validation.IsNumeric(vr.Value as string) ? "Success" : "NotNumeric")
-            );
+            {
+                if (GetDecimal(vr.Value, out decimal d))
+                {
+                    return ServiceResponse.FromStatus("Success");
+                }
+
+                return ServiceResponse.FromStatus("NotNumeric");
+            });
         }
         protected bool CheckNumericIntRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<NumericIntAttribute>(prop, req, res, (vr) =>
-                ServiceResponse.FromStatus(vr.Value.GetType().IsInteger() || Validation.Validation.IsInteger(vr.Value as string) ? "Success" : "NotInteger")
-            );
+            {
+                if (GetDecimal(vr.Value, out decimal d))
+                {
+                    if (Math.Floor(d) != d)
+                    {
+                        return ServiceResponse.FromStatus("NotNumericInt");
+                    }
+                    
+                    return ServiceResponse.FromStatus("Success");
+                }
+
+                return ServiceResponse.FromStatus("NotNumeric");
+            });
         }
         protected bool CheckNotNegativeRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<NotNegativeAttribute>(prop, req, res, (vr) =>
             {
-                var value = vr.Value;
-                var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(value as string);
-
-                if (isValid)
+                if (GetDecimal(vr.Value, out decimal d))
                 {
-                    if (value is int i) isValid = i >= 0;
-                    else if (value is long l) isValid = l >= 0;
-                    else if (value is decimal d) isValid = d >= 0;
-                    else if (value is double db) isValid = db >= 0;
-                    else if (value is float f) isValid = f >= 0;
-                    else if (value is short s) isValid = s >= 0;
-                    else if (value is byte b) isValid = b >= 0;
-                    else if (value is string str)
+                    if (d < 0)
                     {
-                        if (decimal.TryParse(str, out decimal decVal))
-                            isValid = decVal >= 0;
+                        return ServiceResponse.FromStatus("IsNegative");
                     }
+
+                    return ServiceResponse.FromStatus("Success");
                 }
 
-                return ServiceResponse.FromStatus(isValid ? "Success" : "IsNegative");
+                return ServiceResponse.FromStatus("NotNumeric");
             });
         }
         protected bool CheckNotZeroRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<NotZeroAttribute>(prop, req, res, (vr) =>
             {
-                var value = vr.Value;
-                var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(value as string);
-
-                if (isValid)
+                if (GetDecimal(vr.Value, out decimal d))
                 {
-                    if (value is int i) isValid = i != 0;
-                    else if (value is long l) isValid = l != 0;
-                    else if (value is decimal d) isValid = d != 0;
-                    else if (value is double db) isValid = db != 0;
-                    else if (value is float f) isValid = f != 0;
-                    else if (value is short s) isValid = s != 0;
-                    else if (value is byte b) isValid = b != 0;
-                    else if (value is string str)
+                    if (d == 0)
                     {
-                        if (decimal.TryParse(str, out decimal decVal))
-                            isValid = decVal != 0;
+                        return ServiceResponse.FromStatus("IsZero");
                     }
+
+                    return ServiceResponse.FromStatus("Success");
                 }
 
-                return ServiceResponse.FromStatus(isValid ? "Success" : "IsZero");
+                return ServiceResponse.FromStatus("NotNumeric");
             });
         }
         protected bool CheckRangeRule(PropertyInfo prop, object req, ServiceResponse res)
@@ -470,35 +479,35 @@ namespace Puya.Service
         }
         protected bool CheckEmailRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<EmailAttribute>(prop, req, res, vi => Validation.Validation.IsEmail(vi.Value), "Email");
+            return ValidatePattern<EmailAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsEmail(vi.Value), ":Email");
         }
         protected bool CheckEmailsRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<EmailsAttribute>(prop, req, res, vi => Validation.Validation.IsEmail(vi.Value));
+            return ValiedateList<EmailsAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsEmail(vi.Value));
         }
         protected bool CheckMobileRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<MobileAttribute>(prop, req, res, vi => Validation.Validation.IsMobile(vi.Value), "Mobile");
+            return ValidatePattern<MobileAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value), "Mobile");
         }
         protected bool CheckMobilesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<MobilesAttribute>(prop, req, res, vi => Validation.Validation.IsMobile(vi.Value));
+            return ValiedateList<MobilesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value));
         }
         protected bool CheckPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<PhoneAttribute>(prop, req, res, vi => Validation.Validation.IsPhone(vi.Value), "Phone");
+            return ValidatePattern<PhoneAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value), "Phone");
         }
         protected bool CheckPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<PhonesAttribute>(prop, req, res, vi => Validation.Validation.IsPhone(vi.Value));
+            return ValiedateList<PhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value));
         }
         protected bool CheckIPv4Rule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<IPv4Attribute>(prop, req, res, vi => Validation.Validation.IsIPv4(vi.Value), "IPv4");
+            return ValidatePattern<IPv4Attribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value), "IPv4");
         }
         protected bool CheckIPv4sRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => Validation.Validation.IsIPv4(vi.Value));
+            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value));
         }
         protected bool CheckRegExpRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -508,7 +517,7 @@ namespace Puya.Service
 
                 if (!isValid)
                 {
-                    vi.Bag = new { pattern = vi.Attribute.Pattern };
+                    vi.Bag = new { vi.Attribute.Pattern };
                 }
 
                 return isValid;
@@ -522,7 +531,7 @@ namespace Puya.Service
 
                 if (!isValid)
                 {
-                    vi.Bag = new { pattern = vi.Attribute.Pattern };
+                    vi.Bag = new { vi.Attribute.Pattern };
                 }
 
                 return isValid;
@@ -536,7 +545,7 @@ namespace Puya.Service
 
             var value = prop.GetValue(req) as string;
             var result = Validation.Validation.IsNationalCode(value);
-            var isValid = result == IsNationalCodeResult.Valid;
+            var isValid = result == IsNationalCodeResult.Valid || result == IsNationalCodeResult.NoCode;
 
             if (!isValid)
             {
@@ -554,7 +563,7 @@ namespace Puya.Service
             var value = prop.GetValue(req) as string;
             var items = attr.Items.Split(new string[] { attr.Separator }, StringSplitOptions.None).Select(i => i.Trim());
             var allowedItems = new HashSet<string>(items, attr.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
-            var isValid = value != null && allowedItems.Contains(value);
+            var isValid = string.IsNullOrEmpty(value) || allowedItems.Contains(value);
 
             if (!isValid)
             {
@@ -569,15 +578,19 @@ namespace Puya.Service
 
             return ValiedateList<ManyOfAttribute>(prop, req, res, vi =>
             {
-                if (allowedItems == null)
+                if (allowedItems == null && !string.IsNullOrEmpty(vi.Value?.ToString()))
                 {
                     allowedItems = new HashSet<string>(vi.Attribute.Items.Split(new string[] { vi.Attribute.Separator }, StringSplitOptions.None)
                                         .Select(i => i.Trim()),
                                         vi.Attribute.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
                 }
 
-                return allowedItems.Contains(vi.Value);
+                return string.IsNullOrEmpty(vi.Value?.ToString()) || allowedItems.Contains(vi.Value);
             });
+        }
+        protected bool CheckListRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<ListAttribute>(prop, req, res, vi => true);
         }
         protected bool CheckMinCountRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -630,7 +643,7 @@ namespace Puya.Service
                     return order;
                 }).ThenBy(p => p.Name))
                 {
-                    if (!CheckRequired(prop, req, res) && !fullValidation)
+                    if (!CheckRequiredRule(prop, req, res) && !fullValidation)
                     {
                         break;
                     }

@@ -473,22 +473,22 @@ namespace Puya.Extensions
 
             return _result;
         }
-        public static bool IsValidJsonType(this JsonType type, object obj, bool allowNull)
+        public static bool IsValidJsonType(this DataType type, object obj)
         {
             if (obj != null)
             {
                 var objType = obj.GetType();
-                var isString = (type & JsonType.String) == JsonType.String && objType == TypeHelper.TypeOfString;
-                var isNumber = (type & JsonType.Number) == JsonType.Number && objType.IsNumeric();
-                var isBoolean = (type & JsonType.Boolean) == JsonType.Boolean && objType == TypeHelper.TypeOfBool;
-                var isObject = (type & JsonType.Object) == JsonType.Object && !objType.IsBasicType() && !objType.IsEnumerable();
-                var isArray = (type & JsonType.Array) == JsonType.Array && objType.IsEnumerable();
+                var isString = (type & DataType.String) == DataType.String && objType == TypeHelper.TypeOfString;
+                var isNumber = (type & DataType.Number) == DataType.Number && objType.IsNumeric();
+                var isBoolean = (type & DataType.Boolean) == DataType.Boolean && objType == TypeHelper.TypeOfBool;
+                var isObject = (type & DataType.Object) == DataType.Object && !objType.IsBasicType() && !objType.IsEnumerable();
+                var isArray = (type & DataType.Array) == DataType.Array && objType.IsEnumerable();
 
                 return isString || isNumber || isBoolean || isObject || isArray;
             }
             else
             {
-                return allowNull;
+                return true;
             }
         }
     }

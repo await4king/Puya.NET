@@ -5,11 +5,11 @@ namespace Puya.Base
     // requires a prop to be a  string containing a numeric vlaue.
     // validation is done using Validation.IsNumeric() method.
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class NumericAttribute : JsonTypeAttribute
+    public class NumericAttribute : DataTypeAttribute
     {
-        public NumericAttribute(decimal value)
+        public NumericAttribute()
         {
-            Type = JsonType.Number | JsonType.String;
+            Type = DataType.Number | DataType.String;
         }
     }
 }
