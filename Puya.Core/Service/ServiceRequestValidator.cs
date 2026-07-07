@@ -460,43 +460,98 @@ namespace Puya.Service
                 var str = vr.Value as string;
                 var isValid = value.GetType().IsNumeric() || Validation.Validation.IsNumeric(str);
                 var attr = vr.Attribute;
+                var status = "";
+                object bag = null;
 
                 if (isValid)
                 {
                     switch (attr.RangeType)
                     {
                         case RangeType.Byte:
+                            bag = new { From = attr.FromByte, To = attr.ToByte };
+
                             if (value is byte b) isValid = b >= attr.FromByte && b <= attr.ToByte;
                             else if (byte.TryParse(str, out byte bVal)) isValid = bVal >= attr.FromByte && bVal <= attr.ToByte;
+                            else status = "NotByte";
+                            break;
+                        case RangeType.SByte:
+                            bag = new { From = attr.FromSByte, To = attr.ToSByte };
+
+                            if (value is sbyte sb) isValid = sb >= attr.FromSByte && sb <= attr.ToSByte;
+                            else if (sbyte.TryParse(str, out sbyte sbVal)) isValid = sbVal >= attr.FromSByte && sbVal <= attr.ToSByte;
+                            else status = "NotSByte";
                             break;
                         case RangeType.Short:
+                            bag = new { From = attr.FromShort, To = attr.ToShort };
+
                             if (value is short s) isValid = s >= attr.FromShort && s <= attr.ToShort;
                             else if (short.TryParse(str, out short sVal)) isValid = sVal >= attr.FromShort && sVal <= attr.ToShort;
+                            else status = "NotShort";
                             break;
-                        case RangeType.Integer:
+                        case RangeType.UShort:
+                            bag = new { From = attr.FromUShort, To = attr.ToUShort };
+
+                            if (value is ushort us) isValid = us >= attr.FromUShort && us <= attr.ToUShort;
+                            else if (ushort.TryParse(str, out ushort usVal)) isValid = usVal >= attr.FromUShort && usVal <= attr.ToUShort;
+                            else status = "NotUShort";
+                            break;
+                        case RangeType.Int:
+                            bag = new { From = attr.FromInt, To = attr.ToInt };
+
                             if (value is int i) isValid = i >= attr.FromInt && i <= attr.ToInt;
                             else if (int.TryParse(str, out int iVal)) isValid = iVal >= attr.FromInt && iVal <= attr.ToInt;
+                            else status = "NotInt";
+                            break;
+                        case RangeType.UInt:
+                            bag = new { From = attr.FromUInt, To = attr.ToUInt };
+
+                            if (value is uint ui) isValid = ui >= attr.FromUInt && ui <= attr.ToUInt;
+                            else if (uint.TryParse(str, out uint uiVal)) isValid = uiVal >= attr.FromUInt && uiVal <= attr.ToUInt;
+                            else status = "NotUInt";
                             break;
                         case RangeType.Long:
+                            bag = new { From = attr.FromLong, To = attr.ToLong };
+
                             if (value is long l) isValid = l >= attr.FromLong && l <= attr.ToLong;
                             else if (long.TryParse(str, out long lVal)) isValid = lVal >= attr.FromLong && lVal <= attr.ToLong;
+                            else status = "NotLong";
+                            break;
+                        case RangeType.ULong:
+                            bag = new { From = attr.FromULong, To = attr.ToULong };
+
+                            if (value is ulong ul) isValid = ul >= attr.FromULong && ul <= attr.ToULong;
+                            else if (ulong.TryParse(str, out ulong ulVal)) isValid = ulVal >= attr.FromULong && ulVal <= attr.ToULong;
+                            else status = "NotULong";
                             break;
                         case RangeType.Float:
+                            bag = new { From = attr.FromFloat, To = attr.ToFloat };
+
                             if (value is float f) isValid = f >= attr.FromFloat && f <= attr.ToFloat;
                             else if (float.TryParse(str, out float fVal)) isValid = fVal >= attr.FromFloat && fVal <= attr.ToFloat;
+                            else status = "NotFloat";
                             break;
                         case RangeType.Double:
+                            bag = new { From = attr.FromDouble, To = attr.ToDouble };
+
                             if (value is double d) isValid = d >= attr.FromDouble && d <= attr.ToDouble;
                             else if (double.TryParse(str, out double dVal)) isValid = dVal >= attr.FromDouble && dVal <= attr.ToDouble;
+                            else status = "NotDouble";
                             break;
                         case RangeType.Decimal:
+                            bag = new { From = attr.FromDec, To = attr.ToDec };
+
                             if (value is decimal dec) isValid = dec >= attr.FromDec && dec <= attr.ToDec;
                             else if (decimal.TryParse(str, out decimal decVal)) isValid = decVal >= attr.FromDec && decVal <= attr.ToDec;
+                            else status = "NotDecimal";
                             break;
                     }
                 }
+                else
+                {
+                    status = "NotNumeric";
+                }
 
-                return ServiceResponse.FromStatus(isValid ? "Success" : "RangeViolation").SetBag(new { From = attr.FromDec, To = attr.ToDec });
+                return ServiceResponse.FromStatus(isValid ? "Success" : string.IsNullOrEmpty(status) ? "RangeViolation": status).SetBag(bag);
             });
         }
         protected bool CheckEmailRule(PropertyInfo prop, object req, ServiceResponse res)
