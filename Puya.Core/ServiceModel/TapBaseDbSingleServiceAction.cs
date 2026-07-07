@@ -10,9 +10,8 @@ using Puya.Conversion;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseDbSingleServiceAction<TBaseService, TConfig, TRequest, TResponse, TData> : TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse>
-        where TConfig : TapBaseConfig, new()
-        where TBaseService : TapBaseActionBasedService<TConfig>, IService<TConfig>
+    public abstract class TapBaseDbSingleServiceAction<TBaseService, TRequest, TResponse, TData> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
+        where TBaseService : TapBaseActionBasedService, IService
         where TRequest : TapBaseDbServiceRequest
         where TResponse : ServiceResponse<TData>, new()
     {

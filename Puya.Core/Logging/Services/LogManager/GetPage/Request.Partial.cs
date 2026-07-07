@@ -1,6 +1,4 @@
 using Puya.Service;
-using System;
-using System.Collections.Generic;
 using System.Data;
 
 namespace Puya.Logging.Services.LogManager

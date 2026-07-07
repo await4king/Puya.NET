@@ -4,18 +4,11 @@ using Puya.Debugging;
 using Puya.Logging;
 using Puya.Service;
 using Puya.ServiceModel;
-using Puya.Settings;
 using Puya.Translation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Puya.Settings.Service.Db
 {
-	public abstract partial class TapDbSettingsBase : TapBaseActionBasedService<TapDbSettingsBaseConfig>, ITapDbSettings
+	public abstract partial class TapDbSettingsBase : TapBaseActionBasedService, ITapDbSettings
     {
         public abstract TapDbSettingsAddBaseAction Add { get; protected set; }
         public abstract TapDbSettingsUpdateByPKBaseAction UpdateByPK { get; protected set; }
@@ -27,7 +20,6 @@ namespace Puya.Settings.Service.Db
         public abstract TapDbSettingsGetByPKBaseAction GetByPK { get; protected set; }
 		public TapDbSettingsBase
             (
-                TapDbSettingsBaseConfig config,
                 ILogger logger,
                 IDb dbContext,
                 ICacheManager cache,
@@ -36,13 +28,12 @@ namespace Puya.Settings.Service.Db
                 IServiceInterceptor interceptor,
                 ILogProvider logProvider,
                 IDebugger debugger
-            ) : base(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger)
+            ) : base(logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger)
 		{
-			Init(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger);
+			Init(logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger);
         }
 		partial void Init
             (
-                TapDbSettingsBaseConfig config,
                 ILogger logger,
                 IDb dbContext,
                 ICacheManager cache,

@@ -56,7 +56,7 @@ namespace Puya.Validation
             if (string.IsNullOrEmpty(x))
                 return false;
             else
-                return Regex.IsMatch(x, @"^(0|(\+?\d{1,5}))?\s?\(?\d{3}\)?(-|\s)?\d{3}(-|\s)?\d{4}$", RegexOptions.IgnoreCase);
+                return Regex.IsMatch(x, @"^(\+?\d{1,5})?-?\d{3,4}-?\d{3}-?\d{4}$", RegexOptions.IgnoreCase);
         }
         public static bool IsPhone(string x)
         {
@@ -66,6 +66,15 @@ namespace Puya.Validation
                 // This pattern matches common phone number formats including:
                 // +1-555-555-5555, (555) 555-5555, 555-555-5555, etc.
                 return Regex.IsMatch(x, @"^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$", RegexOptions.IgnoreCase);
+        }
+        public static bool IsIrPhone(string x)
+        {
+            if (string.IsNullOrEmpty(x))
+                return false;
+            else
+                // This pattern matches common phone number formats including:
+                // 021-22334455, 21-22334455, 2122334455, 22334455
+                return Regex.IsMatch(x, @"^(\d{2,3})?-?\d{8}$", RegexOptions.IgnoreCase);
         }
         public static bool IsUserName(string x, byte minLength = 6, byte maxLength = 15)
         {

@@ -45,7 +45,7 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void value_with_float_should_fail()
         {
-            ShouldFail(new ModelWithFloatCode { Code = 1.23f }, "Code", "NotInteger");
+            ShouldFail(new ModelWithFloatCode { Code = 1.23f }, "Code", "NotNumericInt");
         }
         [Fact]
         public void value_with_nullable_int_should_pass()
@@ -100,12 +100,12 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void value_with_object_string_non_numeric_should_not_pass()
         {
-            ShouldFail(new ModelWithObjectCode { Code = "a1" }, "Code", "NotInteger");
+            ShouldFail(new ModelWithObjectCode { Code = "a1" }, "Code", "NotNumeric");
         }
         [Fact]
         public void value_with_object_string_non_integer_should_not_pass()
         {
-            ShouldFail(new ModelWithObjectCode { Code = "1.23" }, "Code", "NotInteger");
+            ShouldFail(new ModelWithObjectCode { Code = "1.23" }, "Code", "NotNumericInt");
         }
     }
 }

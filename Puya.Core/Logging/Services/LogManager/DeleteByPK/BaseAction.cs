@@ -1,15 +1,9 @@
 using Puya.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.LogManager
 {
 	public abstract partial class PuyaLogManagerDeleteByPKBaseAction:
-        ServiceAction<PuyaLogManagerBase, PuyaLogManagerBaseConfig, PuyaLogManagerDeleteByPKRequest, PuyaLogManagerDeleteByPKResponse>
+        ServiceAction<PuyaLogManagerBase, PuyaLogManagerDeleteByPKRequest, PuyaLogManagerDeleteByPKResponse>
     {
         public PuyaLogManagerDeleteByPKBaseAction(PuyaLogManagerBase owner) : base(owner)
         {

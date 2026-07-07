@@ -7,7 +7,11 @@ namespace Puya.Base
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class IPv4Attribute : RegExpAttribute   // requires a prop to be a string containing an email address
     {
-        public IPv4Attribute() : base("")
-        { }
+        public IPv4Attribute(bool mask = false) : base("")
+        {
+            Mask = mask;
+        }
+
+        public bool Mask { get; }
     }
 }

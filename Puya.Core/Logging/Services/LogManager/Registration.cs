@@ -1,5 +1,4 @@
 using Puya.Service;
-using Puya.Data;
 
 namespace Puya.Logging.Services.LogManager
 {
@@ -7,8 +6,6 @@ namespace Puya.Logging.Services.LogManager
     {
         public PuyaLogManagerRegistration()
         {
-			Add(typeof(PuyaLogManagerSqlConfig), typeof(PuyaLogManagerSqlConfig));
-			Add(typeof(PuyaLogManagerBaseConfig), typeof(PuyaLogManagerBaseConfig));
 			Add(typeof(PuyaLogManagerBase), typeof(PuyaLogManagerSql));
 			Add(typeof(IPuyaLogManager), typeof(PuyaLogManagerSql));
 			Add(typeof(PuyaLogManagerSql), typeof(PuyaLogManagerSql));

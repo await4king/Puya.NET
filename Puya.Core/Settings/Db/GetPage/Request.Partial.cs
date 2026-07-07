@@ -1,8 +1,4 @@
 using Puya.Service;
-using Puya.Settings.Service.Db;
-using Puya.Settings.Service.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
 
 namespace Puya.Settings.Service.Db

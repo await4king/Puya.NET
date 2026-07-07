@@ -193,15 +193,4 @@ namespace Puya.Service
             return response;
         }
     }
-    public abstract class ServiceAction<TService, TConfig, TRequest, TResponse>: ServiceAction<TService, TRequest, TResponse>
-        where TConfig : class, IServiceConfig, new()
-        where TService : class, IService<TConfig>
-        where TRequest : class, ServiceRequest
-        where TResponse : ServiceResponse, new()
-    {
-        public ServiceAction(TService owner): base(owner)
-        {
-
-        }
-    }
 }

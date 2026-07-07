@@ -11,8 +11,7 @@ using System.Threading.Tasks;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseActionBasedService<TConfig> : BaseActionBasedService<TConfig>, IBaseService
-        where TConfig : TapBaseConfig, new()
+    public abstract class TapBaseActionBasedService : BaseActionBasedService, IBaseService
     {
         #region Properties
         public IServiceInterceptor Interceptor { get; set; }
@@ -42,7 +41,7 @@ namespace Puya.ServiceModel
                             break;
                         }
 
-                        if (type.BaseType == typeof(TapBaseActionBasedService<TConfig>))
+                        if (type.BaseType == typeof(TapBaseActionBasedService))
                         {
                             name = type.Name;
                             break;
@@ -121,29 +120,22 @@ namespace Puya.ServiceModel
             set { _translator = value; }
         }
         #endregion
-        public TapBaseActionBasedService(TConfig config,
-                                        ILogger logger,
+        public TapBaseActionBasedService(ILogger logger,
                                         IDb db,
                                         ICacheManager cache,
                                         ISettingService settings,
                                         ITranslator translator,
                                         IServiceInterceptor interceptor,
                                         ILogProvider logProvider,
-                                        IDebugger debugger) : base(config)
+                                        IDebugger debugger)
         {
-            Config.Logger = Logger = logger ?? Config.Logger;
-            Config.Db = Db = db ?? Config.Db;
-            Config.Cache = Cache = cache ?? Config.Cache;
-            Config.Settings = Settings = settings ?? Config.Settings;
-            Config.Translator = Translator = translator ?? Config.Translator;
             Interceptor = interceptor;
             LogProvider = logProvider;
             Debugger = debugger;
         }
     }
-    public abstract class TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse> : ServiceAction<TBaseService, TConfig, TRequest, TResponse>
-        where TConfig : TapBaseConfig, new()
-        where TBaseService : TapBaseActionBasedService<TConfig>, IService<TConfig>
+    public abstract class TapBaseServiceAction<TBaseService, TRequest, TResponse> : ServiceAction<TBaseService, TRequest, TResponse>
+        where TBaseService : TapBaseActionBasedService, IService
         where TRequest : class, ServiceRequest
         where TResponse : ServiceResponse, new()
     {
@@ -167,7 +159,7 @@ namespace Puya.ServiceModel
                             break;
                         }
 
-                        if (type.BaseType == typeof(TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse>))
+                        if (type.BaseType == typeof(TapBaseServiceAction<TBaseService, TRequest, TResponse>))
                         {
                             name = type.Name;
                             break;

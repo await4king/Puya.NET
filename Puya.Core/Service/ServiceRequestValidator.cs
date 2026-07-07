@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using Puya.Base;
+﻿using Puya.Base;
+using Puya.Collections;
 using Puya.Extensions;
 using Puya.Reflection;
 using Puya.Validation;
@@ -78,7 +78,19 @@ namespace Puya.Service
 
             if (bag != null)
             {
-                ReflectionHelper.ForEachPublicInstanceReadableProperty(bag.GetType(), p => sr.MessageArgs.Add(p.Name, p.GetValue(bag)));
+                var dynamicBag = bag as IDictionary<string, object>;
+
+                if (dynamicBag != null)
+                {
+                    foreach (var key in dynamicBag.Keys)
+                    {
+                        sr.MessageArgs.Add(key, dynamicBag[key]);
+                    }
+                }
+                else
+                {
+                    ReflectionHelper.ForEachPublicInstanceReadableProperty(bag.GetType(), p => sr.MessageArgs.Add(p.Name, p.GetValue(bag)));
+                }
             }
 
             res.InnerResponses.Add(sr);
@@ -100,7 +112,7 @@ namespace Puya.Service
                 var errorStatus = string.Empty;
                 var errorBag = null as object;
                 var errorException = null as Exception;
-                var extraBag = new { attr = typeof(TAttribute).Name.Replace("Attribute", "") };
+                var extraBag = new { Rule = typeof(TAttribute).Name.Replace("Attribute", "") };
 
                 if (reqAttr != null)
                 {
@@ -175,7 +187,7 @@ namespace Puya.Service
 
             return isValid;
         }
-        protected bool ValiedateList<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate)
+        protected bool ValiedateList<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate, string name = "")
             where TAttribute : ListAttribute
         {
             return Validate<TAttribute>(prop, req, res, (vr) =>
@@ -188,6 +200,13 @@ namespace Puya.Service
                     return ServiceResponse.FromStatus("NoItems");
                 }
 
+                var attrName = string.IsNullOrEmpty(name) ? typeof(TAttribute).Name.Replace("Attribute", ""): name;
+
+                if (attrName.EndsWith("s"))
+                {
+                    attrName = attrName.Substring(0, attrName.Length - 1);
+                }
+
                 var items = value.Split(new string[] { attr.Separator }, StringSplitOptions.None);
                 var isValid = items.Length >= attr.MinCount && (attr.MaxCount == -1 || items.Length <= attr.MaxCount);
                 var invalidItem = "";
@@ -195,12 +214,13 @@ namespace Puya.Service
                 if (isValid)
                 {
                     var vir = new ValidationItemRequest<TAttribute> { Attribute = attr, Prop = prop };
+                    var i = 0;
 
                     foreach (var item in items)
                     {
                         vir.Value = item?.Trim();
 
-                        bool itemIsValid = !string.IsNullOrEmpty(attr.Pattern)
+                        var itemIsValid = !string.IsNullOrEmpty(attr.Pattern)
                             ? System.Text.RegularExpressions.Regex.IsMatch(item.Trim(), attr.Pattern)
                             : fnValidate(vir);
 
@@ -210,15 +230,17 @@ namespace Puya.Service
                             isValid = false;
                             break;
                         }
+
+                        i++;
                     }
 
-                    return ServiceResponse.FromStatus(isValid ? "Success" : "InvalidItem")
-                                        .SetBag(new { invalidItem }.Merge(vir.Bag));
+                    return ServiceResponse.FromStatus(isValid ? "Success" : "Invalid" + attrName)
+                                          .SetBag(new { InvalidItem = invalidItem, Index = i }.Merge(vir.Bag));
                 }
                 else
                 {
                     return ServiceResponse.FromStatus(isValid ? "Success" : "ItemCountMismatch")
-                                        .SetBag(new { minCount = attr.MinCount, maxCount = attr.MaxCount });
+                                          .SetBag(new { attr.MinCount, attr.MaxCount });
                 }
             });
         }
@@ -474,7 +496,7 @@ namespace Puya.Service
                     }
                 }
 
-                return ServiceResponse.FromStatus(isValid ? "Success" : "RangeViolation").SetBag(new { from = attr.FromDec, to = attr.ToDec });
+                return ServiceResponse.FromStatus(isValid ? "Success" : "RangeViolation").SetBag(new { From = attr.FromDec, To = attr.ToDec });
             });
         }
         protected bool CheckEmailRule(PropertyInfo prop, object req, ServiceResponse res)
@@ -487,7 +509,7 @@ namespace Puya.Service
         }
         protected bool CheckMobileRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<MobileAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value), "Mobile");
+            return ValidatePattern<MobileAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value), ":Mobile");
         }
         protected bool CheckMobilesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -495,19 +517,27 @@ namespace Puya.Service
         }
         protected bool CheckPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<PhoneAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value), "Phone");
+            return ValidatePattern<PhoneAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value), ":Phone");
         }
         protected bool CheckPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return ValiedateList<PhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value));
         }
+        protected bool CheckIrPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValidatePattern<IrPhoneAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIrPhone(vi.Value), ":Phone");
+        }
+        protected bool CheckIrPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return ValiedateList<IrPhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIrPhone(vi.Value), "Phone");
+        }
         protected bool CheckIPv4Rule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValidatePattern<IPv4Attribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value), "IPv4");
+            return ValidatePattern<IPv4Attribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value, vi.Attribute.Mask), ":IPv4");
         }
         protected bool CheckIPv4sRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value));
+            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value, vi.Attribute.Mask));
         }
         protected bool CheckRegExpRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -549,28 +579,24 @@ namespace Puya.Service
 
             if (!isValid)
             {
-                ReportError(prop, res, "InvalidNationalCode", new { reason = result.ToString() });
+                ReportError(prop, res, "InvalidNationalCode", new { Reason = result.ToString() });
             }
 
             return isValid;
         }
         protected bool CheckOneOfRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            var attr = prop.GetCustomAttribute<OneOfAttribute>();
-
-            if (attr == null) return true;
-
-            var value = prop.GetValue(req) as string;
-            var items = attr.Items.Split(new string[] { attr.Separator }, StringSplitOptions.None).Select(i => i.Trim());
-            var allowedItems = new HashSet<string>(items, attr.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
-            var isValid = string.IsNullOrEmpty(value) || allowedItems.Contains(value);
-
-            if (!isValid)
+            return Validate<OneOfAttribute>(prop, req, res, (vr) =>
             {
-                ReportError(prop, res, "InvalidValue", new { allowed = attr.Items });
-            }
+                var value = vr.Value;
+                var strValue = value as string;
+                var attr = vr.Attribute;
+                var items = attr.Items.Split(new string[] { attr.Separator }, StringSplitOptions.None).Select(i => i.Trim());
+                var allowedItems = new HashSet<string>(items, attr.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+                var isValid = string.IsNullOrEmpty(strValue) || allowedItems.Contains(strValue);
 
-            return isValid;
+                return ServiceResponse.FromStatus(isValid ? "Success" : "InvalidValue").SetBag(new { Allowed = attr.Items });
+            });
         }
         protected bool CheckManyOfRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -605,14 +631,24 @@ namespace Puya.Service
             var attr = prop.GetCustomAttribute<PreventCharsAttribute>();
             if (attr == null) return true;
 
-            var value = prop.GetValue(req) as string;
-            if (string.IsNullOrEmpty(value)) return true;
+            var value = prop.GetValue(req);
+            var strValue = prop.GetValue(req) as string;
+            var isValid = false;
 
-            var isValid = !value.Any(c => attr.ExcludedCharacters.Contains(c));
-
-            if (!isValid)
+            if (value != null && string.IsNullOrEmpty(strValue))
             {
-                ReportError(prop, res, "ContainsExcludedChars", new { excluded = attr.ExcludedCharacters });
+                ReportError(prop, res, "TypeMismatch");
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(strValue)) return true;
+
+                isValid = !strValue.Any(c => attr.ExcludedCharacters.Contains(c));
+
+                if (!isValid)
+                {
+                    ReportError(prop, res, "ContainsExcludedChars", new { Excluded = attr.ExcludedCharacters });
+                }
             }
 
             return isValid;
@@ -712,6 +748,14 @@ namespace Puya.Service
                         break;
                     }
                     if (!CheckPhonesRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckIrPhoneRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckIrPhonesRule(prop, req, res) && !fullValidation)
                     {
                         break;
                     }

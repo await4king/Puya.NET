@@ -1,17 +1,9 @@
-using Puya.Service;
 using Puya.ServiceModel;
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Puya.Settings.Service.Models;
 
 namespace Puya.Settings.Service.Db
 {
 	public abstract partial class TapDbSettingsDeleteByPKBaseAction:
-        TapBaseServiceAction<TapDbSettingsBase, TapDbSettingsBaseConfig, TapDbSettingsDeleteByPKRequest, TapDbSettingsDeleteByPKResponse>
+        TapBaseServiceAction<TapDbSettingsBase, TapDbSettingsDeleteByPKRequest, TapDbSettingsDeleteByPKResponse>
     {
         public TapDbSettingsDeleteByPKBaseAction(TapDbSettingsBase owner) : base(owner)
         {

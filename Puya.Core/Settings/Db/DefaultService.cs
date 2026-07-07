@@ -17,10 +17,6 @@ namespace Puya.Settings.Service.Db
 {
 	public partial class TapDbSettingsDefault : TapDbSettingsBase
     {
-        public TapDbSettingsDefaultConfig StrongConfig
-        {
-            get { return Config as TapDbSettingsDefaultConfig; }
-        }
         public override TapDbSettingsAddBaseAction Add { get; protected set; }
         public override TapDbSettingsUpdateByPKBaseAction UpdateByPK { get; protected set; }
         public override TapDbSettingsUpdateByKeyBaseAction UpdateByKey { get; protected set; }
@@ -31,7 +27,6 @@ namespace Puya.Settings.Service.Db
         public override TapDbSettingsGetByPKBaseAction GetByPK { get; protected set; }
 		public TapDbSettingsDefault
             (
-                TapDbSettingsDefaultConfig config,
                 ILogger logger,
                 IDb dbContext,
                 ICacheManager cache,
@@ -40,7 +35,7 @@ namespace Puya.Settings.Service.Db
                 IServiceInterceptor interceptor,
                 ILogProvider logProvider,
                 IDebugger debugger
-            ) : base(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger)
+            ) : base(logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger)
 		{
         	Add = new TapDbSettingsDefaultAddAction(this);
         	Actions.Add("Add", Add);
@@ -58,11 +53,10 @@ namespace Puya.Settings.Service.Db
         	Actions.Add("GetPage", GetPage);
         	GetByPK = new TapDbSettingsDefaultGetByPKAction(this);
         	Actions.Add("GetByPK", GetByPK);
-			Init(config, logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger);
+			Init(logger, dbContext, cache, settings, translator, interceptor, logProvider, debugger);
         }
 		partial void Init
             (
-                TapDbSettingsDefaultConfig config,
                 ILogger logger,
                 IDb dbContext,
                 ICacheManager cache,

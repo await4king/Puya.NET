@@ -9,7 +9,7 @@ namespace Puya.Base
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class MobilesAttribute : ListAttribute // requires a prop to be a string containing a comma separated list of email addresses
     {
-        public MobilesAttribute(int minCount, int maxCount = -1, string pattern = "") : base(minCount, maxCount, pattern)
+        public MobilesAttribute(int minCount = 0, int maxCount = -1, string pattern = "") : base(minCount, maxCount, pattern)
         { }
     }
 }

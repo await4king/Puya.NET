@@ -1,4 +1,5 @@
 ﻿using Puya.Base;
+using Puya.Collections;
 using Puya.Extensions;
 using System;
 using System.Collections.Concurrent;
@@ -266,13 +267,26 @@ namespace Puya.Reflection
         public static object GetProp(this object obj, string name, bool ignoreCase = true)
         {
             var result = null as object;
+
             if (obj != null)
             {
-                var prop = GetPublicInstanceReadableProperties(obj.GetType())
-                                .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
-                if (prop != null)
+                var dynamicModel = obj as IDictionary<string, object>;
+
+                if (dynamicModel != null)
                 {
-                    result = prop.GetValue(obj);
+                    if (dynamicModel.ContainsKey(name))
+                    {
+                        result = dynamicModel[name];
+                    }
+                }
+                else
+                {
+                    var prop = GetPublicInstanceReadableProperties(obj.GetType())
+                                    .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
+                    if (prop != null)
+                    {
+                        result = prop.GetValue(obj);
+                    }
                 }
             }
 
@@ -282,11 +296,27 @@ namespace Puya.Reflection
         {
             if (obj != null)
             {
-                var prop = GetPublicInstanceReadableProperties(obj.GetType())
-                                .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
-                if (prop != null)
+                var dynamicModel = obj as IDictionary<string, object>;
+
+                if (dynamicModel != null)
                 {
-                    prop.SetValue(obj, value);
+                    if (dynamicModel.ContainsKey(name))
+                    {
+                        dynamicModel[name] = value;
+                    }
+                    else
+                    {
+                        dynamicModel.Add(name, value);
+                    }
+                }
+                else
+                {
+                    var prop = GetPublicInstanceReadableProperties(obj.GetType())
+                                    .FirstOrDefault(x => (ignoreCase && x.Name.Equalz(name)) || x.Name.Equals(name));
+                    if (prop != null)
+                    {
+                        prop.SetValue(obj, value);
+                    }
                 }
             }
         }

@@ -8,11 +8,22 @@ namespace Puya.Base
         public ListAttribute(int minCount, int maxCount = -1, string pattern = "", bool ignoreCase = false, string separator = ",")
         {
             Pattern = pattern;
+
+            if (string.IsNullOrEmpty(separator))
+            {
+                separator = ",";
+            }
+
             Separator = separator;
             MinCount = minCount;
             MaxCount = maxCount;
             Type = DataType.String;
             IgnoreCase = ignoreCase;
+
+            if (MinCount > 0)
+            {
+                RequiresNullCheck = true;
+            }
         }
         public string Separator { get; set; }
         public string Pattern { get; set; }

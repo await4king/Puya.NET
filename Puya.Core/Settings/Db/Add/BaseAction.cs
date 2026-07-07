@@ -11,7 +11,7 @@ using Puya.Settings.Service.Models;
 namespace Puya.Settings.Service.Db
 {
 	public abstract partial class TapDbSettingsAddBaseAction:
-        TapBaseServiceAction<TapDbSettingsBase, TapDbSettingsBaseConfig, TapDbSettingsAddRequest, TapDbSettingsAddResponse>
+        TapBaseServiceAction<TapDbSettingsBase, TapDbSettingsAddRequest, TapDbSettingsAddResponse>
     {
         public TapDbSettingsAddBaseAction(TapDbSettingsBase owner) : base(owner)
         {

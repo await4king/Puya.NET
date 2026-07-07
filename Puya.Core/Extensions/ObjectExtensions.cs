@@ -55,7 +55,7 @@ namespace Puya.Extensions
         }
         public static object Merge(this object obj, params object[] others)
         {
-            var result = new ExpandoObject() as IDictionary<string, object>;
+            var result = new DynamicModel() as IDictionary<string, object>;
 
             Merge(result, obj, 0);
 

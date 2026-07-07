@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Puya.Service;
 using Puya.Data;
@@ -10,9 +6,8 @@ using Puya.Conversion;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseDbNonQueryServiceAction<TBaseService, TConfig, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TConfig, TRequest, TResponse>
-        where TConfig : TapBaseConfig, new()
-        where TBaseService : TapBaseActionBasedService<TConfig>, IService<TConfig>
+    public abstract class TapBaseDbNonQueryServiceAction<TBaseService, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
+        where TBaseService : TapBaseActionBasedService, IService
         where TRequest : TapBaseDbServiceRequest
         where TResponse : ServiceResponse, new()
     {

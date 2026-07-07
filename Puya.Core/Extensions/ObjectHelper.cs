@@ -15,52 +15,68 @@ namespace Puya.Extensions
         {
             if (instance != null)
             {
-                var _type = instance?.GetType() ?? type;
+                var dynamicModel = instance as IDictionary<string, object>;
 
-                if (_type != null)
+                if (dynamicModel != null)
                 {
-                    var properties = ReflectionHelper.GetPublicInstanceProperties(_type);
-                    var dotIndex = propertyName.IndexOf('.');
-
-                    if (dotIndex < 0)
+                    if (dynamicModel.ContainsKey(propertyName))
                     {
-                        var prop = properties.FirstOrDefault(p => p.CanWrite && string.Compare(p.Name, propertyName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0);
-
-                        if (prop != null)
-                        {
-                            var _value = ObjectExtensions.ConvertTo(value, prop.PropertyType);
-
-                            if (_value != null || !prop.PropertyType.IsSimpleType() || prop.PropertyType == TypeHelper.TypeOfString)
-                            {
-                                prop.SetValue(instance, _value);
-                            }
-                        }
+                        dynamicModel[propertyName] = value;
                     }
                     else
                     {
-                        var innerPropertyName = propertyName.Substring(0, dotIndex);
+                        dynamicModel.Add(propertyName, value);
+                    }
+                }
+                else
+                {
+                    var _type = instance?.GetType() ?? type;
 
-                        if (!string.IsNullOrEmpty(innerPropertyName))
+                    if (_type != null)
+                    {
+                        var properties = ReflectionHelper.GetPublicInstanceProperties(_type);
+                        var dotIndex = propertyName.IndexOf('.');
+
+                        if (dotIndex < 0)
                         {
-                            var innerProp = properties.FirstOrDefault(p => string.Compare(p.Name, innerPropertyName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0);
+                            var prop = properties.FirstOrDefault(p => p.CanWrite && string.Compare(p.Name, propertyName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0);
 
-                            if (innerProp != null)
+                            if (prop != null)
                             {
-                                var innerObject = innerProp.GetValue(instance);
+                                var _value = ObjectExtensions.ConvertTo(value, prop.PropertyType);
 
-                                if (innerObject == null)
+                                if (_value != null || !prop.PropertyType.IsSimpleType() || prop.PropertyType == TypeHelper.TypeOfString)
                                 {
-                                    try
-                                    {
-                                        innerObject = ObjectActivator.Instance.Activate(innerProp.PropertyType);
-                                        innerProp.SetValue(instance, innerObject);
-                                    }
-                                    catch { }
+                                    prop.SetValue(instance, _value);
                                 }
+                            }
+                        }
+                        else
+                        {
+                            var innerPropertyName = propertyName.Substring(0, dotIndex);
 
-                                if (innerObject != null)
+                            if (!string.IsNullOrEmpty(innerPropertyName))
+                            {
+                                var innerProp = properties.FirstOrDefault(p => string.Compare(p.Name, innerPropertyName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0);
+
+                                if (innerProp != null)
                                 {
-                                    SetProperty(ref innerObject, innerProp.PropertyType, propertyName.Substring(dotIndex + 1), value, ignoreCase);
+                                    var innerObject = innerProp.GetValue(instance);
+
+                                    if (innerObject == null)
+                                    {
+                                        try
+                                        {
+                                            innerObject = ObjectActivator.Instance.Activate(innerProp.PropertyType);
+                                            innerProp.SetValue(instance, innerObject);
+                                        }
+                                        catch { }
+                                    }
+
+                                    if (innerObject != null)
+                                    {
+                                        SetProperty(ref innerObject, innerProp.PropertyType, propertyName.Substring(dotIndex + 1), value, ignoreCase);
+                                    }
                                 }
                             }
                         }

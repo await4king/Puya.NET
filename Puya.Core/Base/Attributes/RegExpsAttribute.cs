@@ -8,7 +8,7 @@ namespace Puya.Base
     [AttributeUsage(AttributeTargets.Property)]
     public class RegExpsAttribute : ListAttribute // requires a prop to be a string containing a comma separated list of email addresses
     {
-        public RegExpsAttribute(string pattern, int minCount, int maxCount = -1) : base(minCount, maxCount, pattern)
+        public RegExpsAttribute(string pattern, int minCount = 0, int maxCount = -1) : base(minCount, maxCount, pattern)
         { }
     }
 }

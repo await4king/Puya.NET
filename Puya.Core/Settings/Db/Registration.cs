@@ -1,15 +1,4 @@
 using Puya.Service;
-using Puya.ServiceModel;
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Puya.Data;
-using Puya.Logging;
-using Puya.Caching;
-using Puya.Settings;
 
 namespace Puya.Settings.Service.Db
 {
@@ -17,8 +6,6 @@ namespace Puya.Settings.Service.Db
     {
         public TapDbSettingsRegistration()
         {
-			Add(typeof(TapDbSettingsDefaultConfig), typeof(TapDbSettingsDefaultConfig));
-			Add(typeof(TapDbSettingsBaseConfig), typeof(TapDbSettingsBaseConfig));
 			Add(typeof(TapDbSettingsBase), typeof(TapDbSettingsDefault));
 			Add(typeof(ITapDbSettings), typeof(TapDbSettingsDefault));
 			Add(typeof(TapDbSettingsDefault), typeof(TapDbSettingsDefault));
