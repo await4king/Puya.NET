@@ -5,31 +5,31 @@ using Puya.Service;
 
 namespace Puya.Core.Tests.Validation
 {
-    public class ServiceRequestValidator_OneOf_attribute_Tests: ServiceRequestValidationTests
+    public class ServiceRequestValidator_ManyOf_attribute_Tests: ServiceRequestValidationTests
     {
         public class ModelWithIntColor : ServiceRequest
         {
-            [OneOf("red,green,blue")]
+            [ManyOf("red,green,blue")]
             public int Color { get; set; }
         }
         public class ModelWithNullableIntColor : ServiceRequest
         {
-            [OneOf("red,green,blue")]
+            [ManyOf("red,green,blue")]
             public int? Color { get; set; }
         }
         public class ModelWithStringColor : ServiceRequest
         {
-            [OneOf("red,green,blue")]
+            [ManyOf("red,green,blue")]
             public string Color { get; set; }
         }
         public class ModelWithStringColor2 : ServiceRequest
         {
-            [OneOf("red,green,blue", true)]
+            [ManyOf("red,green,blue", 0, 5, true)]
             public string Color { get; set; }
         }
         public class ModelWithObjectColor : ServiceRequest
         {
-            [OneOf("red,green,blue")]
+            [ManyOf("red,green,blue")]
             public object Color { get; set; }
         }
         [Fact]
@@ -58,20 +58,32 @@ namespace Puya.Core.Tests.Validation
             ShouldPass(new ModelWithStringColor { Color = "red" });
         }
         [Fact]
+        public void valid_string_values_should_pass()
+        {
+            ShouldPass(new ModelWithStringColor { Color = "red,green" });
+            ShouldPass(new ModelWithStringColor { Color = "red,   green" });
+            ShouldPass(new ModelWithStringColor { Color = "red,   green  " });
+        }
+        [Fact]
         public void valid_string_value_should_pass2()
         {
             ShouldPass(new ModelWithStringColor2 { Color = "Red" });
         }
         [Fact]
-        public void valid_string_value_should_fail2()
+        public void invalid_string_value_should_fail2()
         {
-            ShouldFail(new ModelWithStringColor2 { Color = "Reds" }, "Color", "InvalidItem", new { Allowed = "red,green,blue" });
+            ShouldFail(new ModelWithStringColor2 { Color = "Reds" }, "Color", "InvalidItem", new { Allowed = "red,green,blue", Item = "Reds", Index = 0 });
         }
         [Fact]
-        public void non_numeric_string_value_should_fail()
+        public void invalid_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringColor { Color = "a" }, "Color", "InvalidItem", new { Allowed = "red,green,blue" });
-            ShouldFail(new ModelWithStringColor { Color = "Red" }, "Color", "InvalidItem", new { Allowed = "red,green,blue" });
+            ShouldFail(new ModelWithStringColor { Color = "a" }, "Color", "InvalidItem", new { Allowed = "red,green,blue", Item = "a", Index = 0 });
+            ShouldFail(new ModelWithStringColor { Color = "Red" }, "Color", "InvalidItem", new { Allowed = "red,green,blue", Item = "Red", Index = 0 });
+        }
+        [Fact]
+        public void mixed_valid_and_invalid_values_should_fail()
+        {
+            ShouldFail(new ModelWithStringColor { Color = "red,green,black" }, "Color", "InvalidItem", new { Allowed = "red,green,blue", Item = "black", Index = 2 });
         }
         [Fact]
         public void value_with_object_not_valid_type_should_fail()
@@ -101,7 +113,7 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void value_with_object_string_not_valid_should_not_pass()
         {
-            ShouldFail(new ModelWithObjectColor { Color = "a1" }, "Color", "InvalidItem", new { Allowed = "red,green,blue" });
+            ShouldFail(new ModelWithObjectColor { Color = "a1" }, "Color", "InvalidItem", new { Allowed = "red,green,blue", Item = "a1", Index = 0 });
         }
     }
 }

@@ -58,7 +58,7 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void single_non_ipv4_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringIPv4 { IPv4 = "a" }, "IPv4", "InvalidIPv4", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithStringIPv4 { IPv4 = "a" }, "IPv4", "InvalidIPv4", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_ipv4_string_value_should_pass()
@@ -68,17 +68,17 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void multiple_ipv4_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringIPv4 { IPv4 = "192.168.10.1,192.168.*.*" }, "IPv4", "InvalidIPv4", null, new { InvalidItem = "192.168.*.*", Index = 1 });
+            ShouldFail(new ModelWithStringIPv4 { IPv4 = "192.168.10.1,192.168.*.*" }, "IPv4", "InvalidIPv4", null, new { Item = "192.168.*.*", Index = 1 });
         }
         [Fact]
         public void multiple_non_ipv4_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringIPv4 { IPv4 = "a,b" }, "IPv4", "InvalidIPv4", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithStringIPv4 { IPv4 = "a,b" }, "IPv4", "InvalidIPv4", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_mixed_valid_invalid_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringIPv4 { IPv4 = "192.168.10.1,b" }, "IPv4", "InvalidIPv4", null, new { InvalidItem = "b", Index = 1 });
+            ShouldFail(new ModelWithStringIPv4 { IPv4 = "192.168.10.1,b" }, "IPv4", "InvalidIPv4", null, new { Item = "b", Index = 1 });
         }
         [Fact]
         public void value_with_object_not_string_should_fail()
@@ -113,12 +113,12 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void multiple_non_ipv4_with_object_value_should_fail()
         {
-            ShouldFail(new ModelWithObjectIPv4 { IPv4 = "a,b" }, "IPv4", "InvalidIPv4", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithObjectIPv4 { IPv4 = "a,b" }, "IPv4", "InvalidIPv4", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_mixed_valid_invalid_with_object_value_should_fail()
         {
-            ShouldFail(new ModelWithObjectIPv4 { IPv4 = "192.168.10.1,b" }, "IPv4", "InvalidIPv4", null, new { InvalidItem = "b", Index = 1 });
+            ShouldFail(new ModelWithObjectIPv4 { IPv4 = "192.168.10.1,b" }, "IPv4", "InvalidIPv4", null, new { Item = "b", Index = 1 });
         }
     }
 }

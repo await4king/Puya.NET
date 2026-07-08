@@ -41,11 +41,6 @@ namespace Puya.Core.Tests.Validation
             ShouldFail(new ModelWithIntCode(), "NationalCode", "TypeMismatch", new { Expected = "String" });
         }
         [Fact]
-        public void value_with_float_should_pass()
-        {
-            ShouldPass(new ModelWithFloatCode());
-        }
-        [Fact]
         public void value_with_nullable_int_should_pass()
         {
             ShouldPass(new ModelWithNullableIntCode());
@@ -61,49 +56,30 @@ namespace Puya.Core.Tests.Validation
             ShouldPass(new ModelWithStringCode { NationalCode = "" });
         }
         [Fact]
-        public void numeric_string_value_should_pass()
+        public void repeating_string_value_should_fail()
         {
-            ShouldPass(new ModelWithStringCode { NationalCode = "123" });
+            ShouldFail(new ModelWithStringCode { NationalCode = "1111111111" }, "NationalCode", "InvalidNationalCode", new { Reason = "RepeatingDigit" });
         }
         [Fact]
-        public void non_numeric_string_value_should_fail()
+        public void incorrect_length_value_should_fail()
         {
-            ShouldFail(new ModelWithStringCode { NationalCode = "a" }, "NationalCode", "NotNationalCode");
+            ShouldFail(new ModelWithStringCode { NationalCode = "123" }, "NationalCode", "InvalidNationalCode", new { Reason = "IncorrectLength" });
+            ShouldFail(new ModelWithStringCode { NationalCode = "abc" }, "NationalCode", "InvalidNationalCode", new { Reason = "IncorrectLength" });
         }
         [Fact]
-        public void value_with_bool_should_fail()
+        public void not_numeric_should_fail()
         {
-            ShouldFail(new ModelWithBoolCode { NationalCode = true }, "NationalCode", "TypeMismatch");
+            ShouldFail(new ModelWithStringCode { NationalCode = "abcdefghij" }, "NationalCode", "InvalidNationalCode", new { Reason = "NotNumeric" });
         }
         [Fact]
-        public void value_with_object_not_numeric_should_fail()
+        public void test_value_should_fail()
         {
-            ShouldFail(new ModelWithObjectCode { NationalCode = DateTime.Now }, "NationalCode", "TypeMismatch");
+            ShouldFail(new ModelWithStringCode { NationalCode = "0123456789" }, "NationalCode", "InvalidNationalCode", new { Reason = "Invalid" });
         }
         [Fact]
         public void value_with_object_string_should_pass()
         {
             ShouldPass(new ModelWithObjectCode { NationalCode = "" });
-        }
-        [Fact]
-        public void value_with_object_int_should_pass()
-        {
-            ShouldPass(new ModelWithObjectCode { NationalCode = 0 });
-        }
-        [Fact]
-        public void value_with_object_string_numeric_should_pass()
-        {
-            ShouldPass(new ModelWithObjectCode { NationalCode = "1" });
-        }
-        [Fact]
-        public void value_with_object_string_float_should_pass()
-        {
-            ShouldPass(new ModelWithObjectCode { NationalCode = "1.23" });
-        }
-        [Fact]
-        public void value_with_object_string_non_numeric_should_not_pass()
-        {
-            ShouldFail(new ModelWithObjectCode { NationalCode = "a1" }, "NationalCode", "NotNationalCode");
         }
     }
 }

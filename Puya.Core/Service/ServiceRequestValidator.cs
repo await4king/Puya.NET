@@ -187,7 +187,7 @@ namespace Puya.Service
 
             return isValid;
         }
-        protected bool ValiedateList<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate, string name = "")
+        protected bool ValidateList<TAttribute>(PropertyInfo prop, object req, ServiceResponse res, Func<ValidationItemRequest<TAttribute>, bool> fnValidate, string name = "")
             where TAttribute : ListAttribute
         {
             return Validate<TAttribute>(prop, req, res, (vr) =>
@@ -235,7 +235,7 @@ namespace Puya.Service
                     }
 
                     return ServiceResponse.FromStatus(isValid ? "Success" : "Invalid" + attrName)
-                                          .SetBag(new { InvalidItem = invalidItem, Index = i }.Merge(vir.Bag));
+                                          .SetBag(new { Item = invalidItem, Index = i }.Merge(vir.Bag));
                 }
                 else
                 {
@@ -560,7 +560,7 @@ namespace Puya.Service
         }
         protected bool CheckEmailsRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<EmailsAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsEmail(vi.Value));
+            return ValidateList<EmailsAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsEmail(vi.Value));
         }
         protected bool CheckMobileRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -568,7 +568,7 @@ namespace Puya.Service
         }
         protected bool CheckMobilesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<MobilesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value));
+            return ValidateList<MobilesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsMobile(vi.Value));
         }
         protected bool CheckPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -576,7 +576,7 @@ namespace Puya.Service
         }
         protected bool CheckPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<PhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value));
+            return ValidateList<PhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsPhone(vi.Value));
         }
         protected bool CheckIrPhoneRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -584,7 +584,7 @@ namespace Puya.Service
         }
         protected bool CheckIrPhonesRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<IrPhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIrPhone(vi.Value), "Phone");
+            return ValidateList<IrPhonesAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIrPhone(vi.Value), "Phone");
         }
         protected bool CheckIPv4Rule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -592,7 +592,7 @@ namespace Puya.Service
         }
         protected bool CheckIPv4sRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<IPv4sAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value, vi.Attribute.Mask));
+            return ValidateList<IPv4sAttribute>(prop, req, res, vi => string.IsNullOrEmpty(vi.Value?.ToString()) || Validation.Validation.IsIPv4(vi.Value, vi.Attribute.Mask));
         }
         protected bool CheckRegExpRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -610,7 +610,7 @@ namespace Puya.Service
         }
         protected bool CheckRegExpsRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<RegExpsAttribute>(prop, req, res, vi =>
+            return ValidateList<RegExpsAttribute>(prop, req, res, vi =>
             {
                 var isValid = System.Text.RegularExpressions.Regex.IsMatch(vi.Value, vi.Attribute.Pattern);
 
@@ -650,14 +650,14 @@ namespace Puya.Service
                 var allowedItems = new HashSet<string>(items, attr.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
                 var isValid = string.IsNullOrEmpty(strValue) || allowedItems.Contains(strValue);
 
-                return ServiceResponse.FromStatus(isValid ? "Success" : "InvalidValue").SetBag(new { Allowed = attr.Items });
+                return ServiceResponse.FromStatus(isValid ? "Success" : "InvalidItem").SetBag(new { Allowed = attr.Items });
             });
         }
         protected bool CheckManyOfRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             HashSet<string> allowedItems = null;
 
-            return ValiedateList<ManyOfAttribute>(prop, req, res, vi =>
+            return ValidateList<ManyOfAttribute>(prop, req, res, vi =>
             {
                 if (allowedItems == null && !string.IsNullOrEmpty(vi.Value?.ToString()))
                 {
@@ -666,20 +666,27 @@ namespace Puya.Service
                                         vi.Attribute.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
                 }
 
-                return string.IsNullOrEmpty(vi.Value?.ToString()) || allowedItems.Contains(vi.Value);
-            });
+                var result = string.IsNullOrEmpty(vi.Value?.ToString()) || allowedItems.Contains(vi.Value);
+
+                if (!result)
+                {
+                    vi.Bag = new { Allowed = allowedItems.Join(",") };
+                }
+
+                return result;
+            }, "Item");
         }
         protected bool CheckListRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<ListAttribute>(prop, req, res, vi => true);
+            return ValidateList<ListAttribute>(prop, req, res, vi => true);
         }
         protected bool CheckMinCountRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<MinCountAttribute>(prop, req, res, vi => true);
+            return ValidateList<MinCountAttribute>(prop, req, res, vi => true);
         }
         protected bool CheckMaxCountRule(PropertyInfo prop, object req, ServiceResponse res)
         {
-            return ValiedateList<MaxCountAttribute>(prop, req, res, vi => true);
+            return ValidateList<MaxCountAttribute>(prop, req, res, vi => true);
         }
         protected bool CheckPreventCharsRule(PropertyInfo prop, object req, ServiceResponse res)
         {
@@ -727,10 +734,12 @@ namespace Puya.Service
                 foreach (var prop in props.OrderBy(p =>
                 {
                     var order = 0;
+
                     if (TryGetCustomAttribute(p, out ValidationOrderAttribute attr))
                     {
                         order = attr.Order;
                     }
+
                     return order;
                 }).ThenBy(p => p.Name))
                 {

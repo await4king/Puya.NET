@@ -53,7 +53,7 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void single_non_mobile_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringMobile { Mobile = "a" }, "Mobile", "InvalidMobile", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithStringMobile { Mobile = "a" }, "Mobile", "InvalidMobile", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_mobile_string_value_should_pass()
@@ -63,12 +63,12 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void multiple_non_mobile_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringMobile { Mobile = "a,b" }, "Mobile", "InvalidMobile", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithStringMobile { Mobile = "a,b" }, "Mobile", "InvalidMobile", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_mixed_valid_invalid_string_value_should_fail()
         {
-            ShouldFail(new ModelWithStringMobile { Mobile = "09123456789,b" }, "Mobile", "InvalidMobile", null, new { InvalidItem = "b", Index = 1 });
+            ShouldFail(new ModelWithStringMobile { Mobile = "09123456789,b" }, "Mobile", "InvalidMobile", null, new { Item = "b", Index = 1 });
         }
         [Fact]
         public void value_with_object_not_string_should_fail()
@@ -103,12 +103,12 @@ namespace Puya.Core.Tests.Validation
         [Fact]
         public void multiple_non_mobile_with_object_value_should_fail()
         {
-            ShouldFail(new ModelWithObjectMobile { Mobile = "a,b" }, "Mobile", "InvalidMobile", new { InvalidItem = "a", Index = 0 });
+            ShouldFail(new ModelWithObjectMobile { Mobile = "a,b" }, "Mobile", "InvalidMobile", new { Item = "a", Index = 0 });
         }
         [Fact]
         public void multiple_mixed_valid_invalid_with_object_value_should_fail()
         {
-            ShouldFail(new ModelWithObjectMobile { Mobile = "09123456789,b" }, "Mobile", "InvalidMobile", null, new { InvalidItem = "b", Index = 1 });
+            ShouldFail(new ModelWithObjectMobile { Mobile = "09123456789,b" }, "Mobile", "InvalidMobile", null, new { Item = "b", Index = 1 });
         }
     }
 }

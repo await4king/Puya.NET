@@ -10,7 +10,7 @@ namespace Puya.Base
     public class ManyOfAttribute : ListAttribute
     {
         public string Items { get; set; }
-        public ManyOfAttribute(string items, int minCount, int maxCount = -1, bool ignoreCase = false, string separator = ",") : base(minCount, maxCount, "", ignoreCase, separator)
+        public ManyOfAttribute(string items, int minCount = 0, int maxCount = -1, bool ignoreCase = false, string separator = ",") : base(minCount, maxCount, "", ignoreCase, separator)
         {
             Items = items;
         }
