@@ -373,6 +373,10 @@ namespace Puya.Extensions
         {
             return type.Implements(typeof(IDictionary<,>));
         }
+        public static bool IsDictionary<TKey, TValue>(this Type type)
+        {
+            return type.Implements(typeof(IDictionary<TKey,TValue>));
+        }
         public static Type[] GetGenericTypeArguments(this Type type, int parentOrder = -1)
         {
             var genericCount = 0;

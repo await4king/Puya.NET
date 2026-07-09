@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -28,12 +29,25 @@ namespace Puya.Mapping
         public object Map(Type type, object source)
         {
             var result = null as object;
-            var targetProps = ReflectionHelper.GetPublicInstanceReadableProperties(type);
 
-            if (source != null)
+            if (type != null && source != null)
             {
-                result = Activator.CreateInstance(type);
+                var targetProps = ReflectionHelper.GetPublicInstanceReadableProperties(type);
 
+                if (type.IsConstructable())
+                {
+                    try
+                    {
+                        result = ObjectActivator.Instance.Activate(type);
+                    }
+                    catch
+                    { }
+                }
+                else
+                {
+                    result = new DynamicModel();
+                }
+                
                 ReflectionHelper.ForEachProperty(source.GetType(), prop =>
                 {
                     if (prop.CanRead)
@@ -78,7 +92,7 @@ namespace Puya.Mapping
 
         public void Map(IDataReader reader, ref object target)
         {
-            if (reader.IsClosed)
+            if (reader == null || reader.IsClosed)
             {
                 return;
             }
@@ -100,7 +114,31 @@ namespace Puya.Mapping
                 return;
             }
 
-            if (target.GetType().IsDictionary())
+            var type = target.GetType();
+
+            if (type.IsDictionary<string, object>())
+            {
+                var _target = target as IDictionary<string, object>;
+
+                for (var index = 0; index < reader.FieldCount; index++)
+                {
+                    var name = reader.GetName(index);
+                    var value = reader.GetValue(index);
+
+                    if (_target.ContainsKey(name))
+                    {
+                        _target[name] = value;
+                    }
+                    else
+                    {
+                        _target.Add(name, value);
+                    }
+                }
+
+                return;
+            }
+
+            if (type.IsDictionary())
             {
                 for (var index = 0; index < reader.FieldCount; index++)
                 {
@@ -113,8 +151,6 @@ namespace Puya.Mapping
                 return;
             }
 
-            var type = target.GetType();
-
             if (type.IsNullableOrBasicType())
             {
                 var value = reader[0];
@@ -123,7 +159,7 @@ namespace Puya.Mapping
                 {
                     if (type == TypeHelper.TypeOfString)
                     {
-                        target = Activator.CreateInstance(TypeHelper.TypeOfString, SafeClrConvert.ToString(value).ToCharArray());
+                        target = SafeClrConvert.ToString(value);
                     }
                     else
                     {
@@ -147,28 +183,6 @@ namespace Puya.Mapping
                     }
                 }
 
-                return;
-            }
-
-            if (target == null)
-            {
-                if (type.IsConstructable())
-                {
-                    try
-                    {
-                        target = ObjectActivator.Instance.Activate(type);
-                    }
-                    catch
-                    { }
-                }
-                else
-                {
-                    target = new DynamicModel();
-                }
-            }
-
-            if (target == null)
-            {
                 return;
             }
 

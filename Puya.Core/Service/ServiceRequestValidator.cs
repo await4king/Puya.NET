@@ -281,6 +281,7 @@ namespace Puya.Service
             });
         }
         #endregion
+        #region Rules
         protected bool CheckRequiredRule(PropertyInfo prop, object req, ServiceResponse res)
         {
             return Validate<RequiredAttribute>(prop, req, res, (vr) => ServiceResponse.FromSucceeded());
@@ -332,6 +333,26 @@ namespace Puya.Service
                 else
                 {
                     response.SetStatus("NotNumeric");
+                }
+
+                return response;
+            });
+        }
+        protected bool CheckLenRule(PropertyInfo prop, object req, ServiceResponse res)
+        {
+            return Validate<LenAttribute>(prop, req, res, (vr) =>
+            {
+                var response = new ServiceResponse();
+                var value = vr.Value as string;
+
+                if (value?.Length == vr.Attribute.Value)
+                {
+                    response.Succeeded();
+                }
+                else
+                {
+                    response.SetStatus("IncorrectLength");
+                    response.Bag = new { ExpectedLength = vr.Attribute.Value, CurrentLength = value?.Length ?? 0 };
                 }
 
                 return response;
@@ -715,8 +736,9 @@ namespace Puya.Service
 
             return isValid;
         }
+        #endregion
         public Task<bool> Validate<TRequest, TResponse>(TRequest req, TResponse res)
-            where TRequest : class, ServiceRequest
+            where TRequest : ServiceRequest
             where TResponse : ServiceResponse, new()
         {
             var result = false;
@@ -728,20 +750,24 @@ namespace Puya.Service
             else
             {
                 var props = ReflectionHelper.GetPublicInstanceReadableProperties(req.GetType());
-                var prevInnerResponseCount = res.InnerResponses.Count;
-                var fullValidation = req.GetType().GetCustomAttribute<FullValidation>() != null;
-
-                foreach (var prop in props.OrderBy(p =>
+                var sortedProps = props.OrderBy(p =>
                 {
                     var order = 0;
 
-                    if (TryGetCustomAttribute(p, out ValidationOrderAttribute attr))
+                    if (TryGetCustomAttribute(p, out OrderAttribute attr))
                     {
-                        order = attr.Order;
+                        if (string.IsNullOrEmpty(attr.Subject) || attr.Subject.Equalz("Validation"))
+                        {
+                            order = attr.Order;
+                        }
                     }
 
                     return order;
-                }).ThenBy(p => p.Name))
+                });
+                var prevInnerResponseCount = res.InnerResponses.Count;
+                var fullValidation = req.GetType().GetCustomAttribute<FullValidation>() != null;
+
+                foreach (var prop in sortedProps)
                 {
                     if (!CheckRequiredRule(prop, req, res) && !fullValidation)
                     {
@@ -752,6 +778,10 @@ namespace Puya.Service
                         break;
                     }
                     if (!CheckMaxValueRule(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
+                    if (!CheckLenRule(prop, req, res) && !fullValidation)
                     {
                         break;
                     }

@@ -3,13 +3,15 @@
 namespace Puya.Base
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class ValidationOrderAttribute : ValidationAttribute
+    public class OrderAttribute : ValidationAttribute
     {
         public int Order { get; }
+        public string Subject { get; }
 
-        public ValidationOrderAttribute(int order)
+        public OrderAttribute(int order, string subject = "")
         {
             Order = order;
+            Subject = subject;
         }
     }
 }
