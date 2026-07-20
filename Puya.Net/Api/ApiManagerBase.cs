@@ -9,6 +9,7 @@ using Puya.Data;
 using Puya.Debugging;
 using Puya.Logging;
 using Puya.Service;
+using Puya.Extensions;
 using Puya.ServiceModel;
 using Puya.Settings;
 

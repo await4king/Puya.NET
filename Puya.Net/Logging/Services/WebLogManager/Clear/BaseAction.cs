@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Puya.Logging.Services.WebLogManager.Clear
 {
 	public abstract partial class PuyaWebLogManagerClearBaseAction:
-        ServiceAction<PuyaWebLogManagerBase, PuyaWebLogManagerBaseConfig, PuyaWebLogManagerClearRequest, PuyaWebLogManagerClearResponse>
+        ServiceAction<PuyaWebLogManagerBase, PuyaWebLogManagerClearRequest, PuyaWebLogManagerClearResponse>
     {
         public PuyaWebLogManagerClearBaseAction(PuyaWebLogManagerBase owner) : base(owner)
         {

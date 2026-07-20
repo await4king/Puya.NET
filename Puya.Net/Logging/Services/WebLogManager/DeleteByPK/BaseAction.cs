@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Puya.Logging.Services.WebLogManager.DeleteByPK
 {
 	public abstract partial class PuyaWebLogManagerDeleteByPKBaseAction:
-        ServiceAction<PuyaWebLogManagerBase, PuyaWebLogManagerBaseConfig, PuyaWebLogManagerDeleteByPKRequest, PuyaWebLogManagerDeleteByPKResponse>
+        ServiceAction<PuyaWebLogManagerBase, PuyaWebLogManagerDeleteByPKRequest, PuyaWebLogManagerDeleteByPKResponse>
     {
         public PuyaWebLogManagerDeleteByPKBaseAction(PuyaWebLogManagerBase owner) : base(owner)
         {

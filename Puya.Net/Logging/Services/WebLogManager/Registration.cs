@@ -12,8 +12,6 @@ namespace Puya.Logging.Services.WebLogManager
     {
         public PuyaWebLogManagerRegistration()
         {
-			Add(typeof(PuyaWebLogManagerSqlConfig), typeof(PuyaWebLogManagerSqlConfig));
-			Add(typeof(PuyaWebLogManagerBaseConfig), typeof(PuyaWebLogManagerBaseConfig));
 			Add(typeof(PuyaWebLogManagerBase), typeof(PuyaWebLogManagerSql));
 			Add(typeof(IPuyaWebLogManager), typeof(PuyaWebLogManagerSql));
 			Add(typeof(PuyaWebLogManagerSql), typeof(PuyaWebLogManagerSql));

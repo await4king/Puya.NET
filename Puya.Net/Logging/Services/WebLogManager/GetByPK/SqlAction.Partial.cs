@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Puya.Data;
 using Puya.Logging;
 using Puya.Logging.Services.WebLogManager.GetByPK;
+using Puya.Extensions;
 
 namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
 {

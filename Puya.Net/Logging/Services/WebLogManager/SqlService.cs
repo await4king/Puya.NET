@@ -16,15 +16,11 @@ namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
 {
 	public partial class PuyaWebLogManagerSql : PuyaWebLogManagerBase
     {
-	public PuyaWebLogManagerSqlConfig StrongConfig
-        {
-            get { return Config as PuyaWebLogManagerSqlConfig; }
-        }
         public override PuyaWebLogManagerClearBaseAction Clear { get; protected set; }
         public override PuyaWebLogManagerGetByPKBaseAction GetByPK { get; protected set; }
         public override PuyaWebLogManagerGetPageBaseAction GetPage { get; protected set; }
         public override PuyaWebLogManagerDeleteByPKBaseAction DeleteByPK { get; protected set; }
-		public PuyaWebLogManagerSql(PuyaWebLogManagerSqlConfig config, IDb db) : base(config)
+		public PuyaWebLogManagerSql(IDb db)
 		{
         	Clear = new PuyaWebLogManagerSqlClearAction(this);
         	Actions.Add("Clear", Clear);
@@ -34,9 +30,9 @@ namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
         	Actions.Add("GetPage", GetPage);
         	DeleteByPK = new PuyaWebLogManagerSqlDeleteByPKAction(this);
         	Actions.Add("DeleteByPK", DeleteByPK);
-			Init(config, db);
+			Init(db);
         }
-		partial void Init(PuyaWebLogManagerSqlConfig config, IDb db);
+		partial void Init(IDb db);
     }
 }
 

@@ -9,6 +9,7 @@ using Puya.Data;
 using Puya.Conversion;
 using Puya.Logging;
 using Puya.Logging.Services.WebLogManager.GetPage;
+using Puya.Extensions;
 
 namespace Puya.Logging.Web.Abstractions.Services.WebLogManager
 {

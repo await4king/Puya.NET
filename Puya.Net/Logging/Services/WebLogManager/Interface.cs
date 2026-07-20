@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Puya.Logging.Services.WebLogManager
 {
-	public partial interface IPuyaWebLogManager :IService<PuyaWebLogManagerBaseConfig>
+	public partial interface IPuyaWebLogManager :IService
     {
         PuyaWebLogManagerClearBaseAction Clear { get; }
         PuyaWebLogManagerGetByPKBaseAction GetByPK { get; }

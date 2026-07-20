@@ -411,14 +411,22 @@ namespace Puya.Extensions
 
             return result;
         }
-        public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> to, IDictionary<TKey, TValue> from)
+        public static void MergeWith<TKey, TValue>(this IDictionary<TKey, TValue> target, IDictionary<TKey, TValue> settings)
         {
-            foreach (var item in from)
+            if (settings?.Count > 0)
             {
-                to.Add(item);
+                foreach (var item in settings)
+                {
+                    if (target.ContainsKey(item.Key))
+                    {
+                        target[item.Key] = item.Value;
+                    }
+                    else
+                    {
+                        target.Add(item.Key, item.Value);
+                    }
+                }
             }
-
-            return to;
         }
         public static IList<T> Merge<T>(this IList<T> to, IEnumerable<T> from)
         {

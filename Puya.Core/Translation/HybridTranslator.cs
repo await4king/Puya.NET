@@ -112,7 +112,7 @@ namespace Puya.Translation
             {
                 var r = translator.GetAll(storename);
 
-                result.Merge(r);
+                result.MergeWith(r);
             }
 
             return result;
