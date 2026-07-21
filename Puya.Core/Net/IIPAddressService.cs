@@ -3,5 +3,6 @@
     public interface IIPAddressService
     {
         string GetClientIPAddress();
+        string GetClientIPAddressWithIPv4();
     }
 }
