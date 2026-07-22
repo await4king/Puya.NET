@@ -737,7 +737,13 @@ namespace Puya.Service
             return isValid;
         }
         #endregion
-        public Task<bool> Validate<TRequest, TResponse>(TRequest req, TResponse res)
+        protected virtual Task<bool> OnCustomValidate<TRequest, TResponse>(PropertyInfo prop, TRequest req, TResponse res)
+            where TRequest : ServiceRequest
+            where TResponse : ServiceResponse, new()
+        {
+            return Task.FromResult(true);
+        }
+        public virtual async Task<bool> Validate<TRequest, TResponse>(TRequest req, TResponse res)
             where TRequest : ServiceRequest
             where TResponse : ServiceResponse, new()
         {
@@ -893,6 +899,10 @@ namespace Puya.Service
                     {
                         break;
                     }
+                    if (!await OnCustomValidate(prop, req, res) && !fullValidation)
+                    {
+                        break;
+                    }
                 }
 
                 if (res.InnerResponses.Count > prevInnerResponseCount)
@@ -905,7 +915,7 @@ namespace Puya.Service
                 }
             }
 
-            return Task.FromResult(result);
+            return result;
         }
     }
 }

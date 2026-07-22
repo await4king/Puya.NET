@@ -567,7 +567,7 @@ namespace Puya.Api
                 // the generic type of the request is the second generic argument
 
                 var genericTypeArgs = context.Action.GetType().GetGenericTypeArguments();
-                var requestType = genericTypeArgs.FirstOrDefault(t => t.DescendsFrom<ServiceRequest>());
+                var requestType = genericTypeArgs.FirstOrDefault(t => t.Implements<ServiceRequest>());
 
                 if (requestType == null)
                 {

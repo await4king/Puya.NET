@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Puya.Collections;
 using Puya.Extensions;
 using Puya.Serialization;
 using System;
@@ -22,14 +23,14 @@ namespace Puya.Service
         public string Status { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Info { get; set; }
-        private IDictionary<string, object> messageArgs;
-        public IDictionary<string, object> MessageArgs
+        private DynamicModel messageArgs;
+        public DynamicModel MessageArgs
         {
             get
             {
                 if (messageArgs == null)
                 {
-                    messageArgs = new Dictionary<string, object>();
+                    messageArgs = new DynamicModel();
                 }
 
                 return messageArgs;

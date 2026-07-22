@@ -15,9 +15,11 @@ namespace Puya.Net.Tests
         {
             var constrProvider = new DefaultConnectionStringProvider();
 
-            constrProvider.SetConnectionString("Server=.\\I2k17;Database=MyDb;Trusted_Connection=True;");
+            constrProvider.SetConnectionString("Server=.\\I2k17;Database=MyDb;User Id=sa;Password=sql2k17pass123;TrustServerCertificate=true;MultipleActiveResultSets=true");
 
             var db = new SqlServerDb(constrProvider);
+
+            db.GetConnection();
 
             return db;
         }

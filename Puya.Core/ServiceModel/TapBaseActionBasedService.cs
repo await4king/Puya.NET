@@ -132,6 +132,11 @@ namespace Puya.ServiceModel
             Interceptor = interceptor;
             LogProvider = logProvider;
             Debugger = debugger;
+            Logger = logger;
+            Cache = cache;
+            Settings = settings;
+            Translator = translator;
+            Db = db;
         }
     }
     public abstract class TapBaseServiceAction<TBaseService, TRequest, TResponse> : ServiceAction<TBaseService, TRequest, TResponse>
@@ -183,7 +188,9 @@ namespace Puya.ServiceModel
             get
             {
                 if (_logger == null)
-                    _logger = new NullLogger();
+                {
+                    _logger = Owner?.Logger ?? new NullLogger();
+                }
 
                 return _logger;
             }
@@ -195,7 +202,9 @@ namespace Puya.ServiceModel
             get
             {
                 if (_db == null)
-                    _db = new NullDb();
+                {
+                    _db = Owner?.Db ?? new NullDb();
+                }
 
                 return _db;
             }
@@ -207,7 +216,9 @@ namespace Puya.ServiceModel
             get
             {
                 if (_cache == null)
-                    _cache = new NullCacheManager();
+                {
+                    _cache = Owner?.Cache ?? new NullCacheManager();
+                }
 
                 return _cache;
             }
@@ -219,7 +230,9 @@ namespace Puya.ServiceModel
             get
             {
                 if (_settings == null)
-                    _settings = new InMemorySettingService();
+                {
+                    _settings = Owner?.Settings ?? new InMemorySettingService();
+                }
 
                 return _settings;
             }
@@ -231,11 +244,27 @@ namespace Puya.ServiceModel
             get
             {
                 if (_translator == null)
-                    _translator = new NullTranslator();
+                {
+                    _translator = Owner?.Translator ?? new NullTranslator();
+                }
 
                 return _translator;
             }
             set { _translator = value; }
+        }
+        IServiceInterceptor _interceptor;
+        public IServiceInterceptor Interceptor
+        {
+            get
+            {
+                if (_interceptor == null)
+                {
+                    _interceptor = Owner?.Interceptor ?? new NoInterceptor();
+                }
+
+                return _interceptor;
+            }
+            set { _interceptor = value; }
         }
         #endregion
         public TapBaseServiceAction(TBaseService owner) : base(owner)

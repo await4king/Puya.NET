@@ -470,7 +470,13 @@ namespace Puya.Extensions
         }
         public static ServiceResponse SetArgs(this ServiceResponse response, IDictionary<string, object> args)
         {
-            response.MessageArgs = args;
+            if (args != null)
+            {
+                foreach (var item in args)
+                {
+                    response.MessageArgs.Add(item.Key, item.Value);
+                }
+            }
 
             return response;
         }
