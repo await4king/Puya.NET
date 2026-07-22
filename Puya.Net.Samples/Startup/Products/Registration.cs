@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -13,22 +12,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Puya.Security;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial class ProductServiceRegistration : ServiceRegistery
+	public partial class TapProductsServiceRegistration : ServiceRegistery
     {
         public void Build()
         {
-			Add(typeof(ProductServiceSqlServerConfig), typeof(ProductServiceSqlServerConfig));
-			Add(typeof(ProductServiceBaseConfig), typeof(ProductServiceBaseConfig));
-			Add(typeof(ProductServiceBase), typeof(ProductServiceSqlServer));
-			Add(typeof(IProductService), typeof(ProductServiceSqlServer));
-			Add(typeof(ProductServiceSqlServer), typeof(ProductServiceSqlServer));
+			Add(typeof(TapProductsServiceBase), typeof(TapProductsServiceSqlServer));
+			Add(typeof(ITapProductsService), typeof(TapProductsServiceSqlServer));
+			Add(typeof(TapProductsServiceSqlServer), typeof(TapProductsServiceSqlServer));
 
-			Add(typeof(ProductServiceSaveBaseAction), typeof(ProductServiceSqlServerSaveDefaultAction));
-			Add(typeof(ProductServiceGetAllBaseAction), typeof(ProductServiceSqlServerGetAllDefaultAction));
+			Add(typeof(TapProductsServiceGetAllBaseAction), typeof(TapProductsServiceSqlServerGetAllDefaultAction));
+			Add(typeof(TapProductsServiceSaveBaseAction), typeof(TapProductsServiceSqlServerSaveDefaultAction));
 		}
 	}
 }
