@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -14,12 +13,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public abstract partial class ProductServiceSaveBaseAction:
-        TapBaseServiceAction<ProductServiceBase, ProductServiceBaseConfig, ProductServiceSaveRequest, ProductServiceSaveResponse>
+	public abstract partial class TapProductsServiceSaveBaseAction:
+        TapBaseServiceAction<TapProductsServiceBase, TapProductsServiceSaveRequest, TapProductsServiceSaveResponse>
     {
-        public ProductServiceSaveBaseAction(ProductServiceBase owner) : base(owner)
+        public TapProductsServiceSaveBaseAction(TapProductsServiceBase owner) : base(owner)
         {
         }
     }

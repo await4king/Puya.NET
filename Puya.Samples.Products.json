@@ -1,0 +1,98 @@
+{
+  "Namespace": "Puya.Samples.Services",
+  "FrameworkUsings": [
+    "Puya.Logging",
+    "Puya.Data",
+    "Puya.Caching",
+    "Puya.Service",
+    "Puya.ServiceModel",
+    "Puya.Settings",
+    "Puya.Translation",
+    "Puya.Debugging"
+  ],
+  "RegistrationDir": "Puya.Net.Samples/Startup",
+  "AbstractionDir": "Puya.Samples/Services/Abstractions",
+  "ImplementationDir": "Puya.Samples/Services/Implementations",
+  "Services": [
+    {
+      "Folder": "Products",
+      "Namespace": ".Products",
+      "Usings": [],
+      "Service": "TapProductsService",
+      "ParentConstructors": [
+        [
+          "ILogger",
+          "IDb",
+          "ICacheManager",
+          "ISettingService",
+          "ITranslator",
+          "IServiceInterceptor",
+          "ILogProvider",
+          "IDebugger"
+        ]
+      ],
+      "Constructors": [
+        {
+          "logger": "ILogger",
+          "db": "IDb",
+          "cache": "ICacheManager",
+          "settings": "ISettingService",
+          "translator": "ITranslator",
+          "interceptor": "IServiceInterceptor",
+          "logProvider": "ILogProvider",
+          "debugger": "IDebugger"
+        }
+      ],
+      "Concretes": [
+        {
+          "Suffix": "SqlServer",
+          "ActionSuffix": "Default",
+          "Partial": true,
+          "Default": true,
+          "Constructors": [
+            {
+              "logger": "ILogger",
+              "db": "IDb",
+              "cache": "ICacheManager",
+              "settings": "ISettingService",
+              "translator": "ITranslator",
+              "interceptor": "IServiceInterceptor",
+              "logProvider": "ILogProvider",
+              "debugger": "IDebugger"
+            }
+          ]
+        }
+      ],
+      "ParentService": "TapBaseActionBasedService",
+      "ParentAction": "TapBaseServiceAction",
+      "PartialRegistration": true,
+      "PartialServiceBase": true,
+      "PartialInterface": true,
+      "Actions": [
+        {
+          "Name": "GetAll",
+          "Usings": [],
+          "Concretes": [
+            "Default"
+          ],
+          "PartialBase": true,
+          "ResponseData": "IList<Puya.Collections.DynamicModel>"
+        },
+        {
+          "Name": "Save",
+          "Concretes": [
+            "Default"
+          ],
+          "RequestProps": {
+            "Id": "int",
+            "Name": "string",
+            "Code": "string",
+            "Price": "decimal?"
+          },
+          "PartialRequest": false,
+          "ResponseData": "int"
+        }
+      ]
+    }
+  ]
+}

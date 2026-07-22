@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -13,11 +12,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Puya.Security;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial class ProductServiceBaseConfig: TapBaseConfig
+	public partial class TapProductsServiceSaveRequest : ServiceRequest
     {
-    }
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public string Code { get; set; }
+		public decimal? Price { get; set; }
+	}
 }

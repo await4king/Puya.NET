@@ -1,25 +1,26 @@
-using Puya.Collections;
-using Puya.Logging;
-using Puya.Data;
 using Puya.Caching;
+using Puya.Conversion;
+using Puya.Data;
+using Puya.Debugging;
+using Puya.Extensions;
+using Puya.Logging;
 using Puya.Service;
 using Puya.ServiceModel;
 using Puya.Settings;
 using Puya.Translation;
-using Puya.Debugging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Puya.Conversion;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-    public partial class ProductServiceSqlServerSaveDefaultAction : ProductServiceSaveBaseAction
+	public partial class TapProductsServiceSqlServerSaveDefaultAction : TapProductsServiceSaveBaseAction
     {
-        private async Task DoRun(ProductServiceSaveRequest request, ProductServiceSaveResponse response, bool async, CancellationToken cancellation)
-        {
+		private async Task DoRun(TapProductsServiceSaveRequest request, TapProductsServiceSaveResponse response, bool async, CancellationToken cancellation)
+		{
             try
             {
                 do
@@ -96,13 +97,13 @@ namespace Puya.Samples.Products.Products
                 Owner.Error(e);
             }
         }
-        protected override void RunInternal(ProductServiceSaveRequest request, ProductServiceSaveResponse response)
+		protected override void RunInternal(TapProductsServiceSaveRequest request, TapProductsServiceSaveResponse response)
+		{
+			DoRun(request, response, false, CancellationToken.None).Wait();
+		}
+        protected override async Task RunInternalAsync(TapProductsServiceSaveRequest request, TapProductsServiceSaveResponse response, CancellationToken cancellation)
         {
-            DoRun(request, response, false, CancellationToken.None).Wait();
-        }
-        protected override async Task RunInternalAsync(ProductServiceSaveRequest request, ProductServiceSaveResponse response, CancellationToken cancellation)
-        {
-            await DoRun(request, response, true, cancellation);
-        }
-    }
+			await DoRun(request, response, true, cancellation);
+		}
+	}
 }

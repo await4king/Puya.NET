@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -14,10 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public abstract partial class ProductServiceGetAllBaseAction:
-        TapBaseServiceAction<ProductServiceBase, ProductServiceBaseConfig, ProductServiceGetAllRequest, ProductServiceGetAllResponse>
+    public partial class TapProductsServiceGetAllResponse : ServiceResponse<IList<Puya.Collections.DynamicModel>>
     {
-    }
+	}
 }

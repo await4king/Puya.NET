@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -14,9 +13,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial class ProductServiceGetAllRequest : ServiceRequest
+	public partial class TapProductsServiceGetAllRequest : ServiceRequest
     {
 	}
 }

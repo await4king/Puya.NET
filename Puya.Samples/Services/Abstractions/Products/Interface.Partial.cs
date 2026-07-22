@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -13,13 +12,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Puya.Security;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial interface IProductService :IService<ProductServiceBaseConfig>
-	{
-        ProductServiceSaveBaseAction Save { get; }
-        ProductServiceGetAllBaseAction GetAll { get; }
+	public partial interface ITapProductsService :IService
+    {
     }
 }

@@ -1,4 +1,3 @@
-using Puya.Collections;
 using Puya.Logging;
 using Puya.Data;
 using Puya.Caching;
@@ -13,11 +12,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Puya.Security;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial class ProductServiceSqlServerConfig: ProductServiceBaseConfig
+    [ActionName("GetAll")]
+	public abstract partial class TapProductsServiceGetAllBaseAction:
+        TapBaseServiceAction<TapProductsServiceBase, TapProductsServiceGetAllRequest, TapProductsServiceGetAllResponse>
     {
     }
 }
