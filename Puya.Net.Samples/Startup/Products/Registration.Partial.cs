@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Puya.Security;
 
-namespace Puya.Samples.Products.Products
+namespace Puya.Samples.Services.Products
 {
-	public partial class ProductServiceRegistration : ServiceRegistery
+	public partial class TapProductsServiceRegistration : ServiceRegistery
     {
-		public ProductServiceRegistration()
+		public TapProductsServiceRegistration()
 		{
 			Build();
 		}

@@ -6,7 +6,6 @@ using Puya.Conversion;
 using Puya.Core.ServiceModel;
 using Puya.Data;
 using Puya.Localization;
-using Puya.Net.ServiceModel;
 using Puya.Service;
 using Puya.ServiceModel;
 using Puya.Settings;

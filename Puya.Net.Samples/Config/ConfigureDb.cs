@@ -9,7 +9,7 @@ namespace Puya.Net.Samples.Config
         public static void ConfigureDb(this IServiceCollection services)
         {
             services.Configure<DataStoreConfig>(Configuration.GetSection("DataStore"));
-            services.AddScoped< IConnectionStringProvider>(sp =>
+            services.AddSingleton<IConnectionStringProvider>(sp =>
             {
                 var dss = Configuration.GetSection<DataStoreConfig>("DataStore");
                 var cstr = dss.GetConnectionString("DefaultConnection");
