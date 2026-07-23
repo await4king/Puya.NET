@@ -1,18 +1,18 @@
-﻿using Puya.Collections;
-using Puya.Data;
-using Puya.Extensions;
-using Puya.Service;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Puya.Service;
+using Puya.Data;
+using Puya.Extensions;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseDbSingleServiceAction<TBaseService, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
+    public abstract class TapBaseDbSchemaListReaderServiceAction<TBaseService, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
         where TBaseService : TapBaseActionBasedService, IService
         where TRequest : class, ServiceRequest
-        where TResponse : ServiceResponse<DynamicModel>, new()
+        where TResponse : ServiceResponse<ReportData<List<object>>>, new()
     {
-        public TapBaseDbSingleServiceAction(TBaseService owner): base(owner)
+        public TapBaseDbSchemaListReaderServiceAction(TBaseService owner): base(owner)
         { }
         private async Task DoRun(TRequest request, TResponse response, bool async, CancellationToken cancellation)
         {
@@ -22,7 +22,7 @@ namespace Puya.ServiceModel
             }.Merge(request);
             var sproc = GetSprocName();
 
-            response.Data = await Db.ExecuteSingleCommandDynamicAsync(sproc, request, async, cancellation);
+            response.Data = await Db.GetSchemaBasedList(sproc, true, args, async, cancellation); ;
 
             response.Finalize(args);
         }

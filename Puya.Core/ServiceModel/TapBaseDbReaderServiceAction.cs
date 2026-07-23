@@ -1,37 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Puya.Service;
 using Puya.Data;
-using Puya.Conversion;
+using Puya.Collections;
+using Puya.Extensions;
 
 namespace Puya.ServiceModel
 {
-    public abstract class TapBaseDbReaderServiceAction<TBaseService, TRequest, TResponse, TData> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
+    public abstract class TapBaseDbReaderServiceAction<TBaseService, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
         where TBaseService : TapBaseActionBasedService, IService
-        where TRequest : TapBaseDbServiceRequest
-        where TResponse : ServiceResponse<IList<TData>>, new()
+        where TRequest : class, ServiceRequest
+        where TResponse : ServiceResponse<IList<DynamicModel>>, new()
     {
         public TapBaseDbReaderServiceAction(TBaseService owner): base(owner)
         { }
         private async Task DoRun(TRequest request, TResponse response, bool async, CancellationToken cancellation)
         {
-            if (async)
+            var args = new
             {
-                response.Data = await Db.ExecuteReaderCommandAsync<TData>($"usp1_{Owner.Name}_{Name}", request, cancellation);
-            }
-            else
-            {
-                response.Data = Db.ExecuteReaderCommand<TData>($"usp1_{Owner.Name}_{Name}", request);
-            }
+                Result = CommandHelper.Result()
+            }.Merge(request);
+            var sproc = GetSprocName();
 
-            var result = SafeClrConvert.ToString(request.Result.Value);
+            response.Data = await Db.ExecuteReaderCommandDynamicAsync(sproc, request, async, cancellation);
 
-            response.SetStatus(result);
-            response.Message = SafeClrConvert.ToString(request.Message.Value);
+            response.Finalize(args);
         }
         protected override void RunInternal(TRequest request, TResponse response)
         {

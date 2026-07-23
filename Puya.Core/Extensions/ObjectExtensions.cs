@@ -19,39 +19,50 @@ namespace Puya.Extensions
         {
             return arrExcludes.Length != 0 && Array.Exists(arrExcludes, ex => string.Compare(ex, key, ignoreCase) == 0);
         }
-        static void Merge(IDictionary<string, object> result, object source, int index)
+        static int Merge(IDictionary<string, object> to, object from, int index)
         {
-            if (source == null) return;
+            var result = 0;
 
-            var sourceType = source.GetType();
-
-            if (sourceType.IsDictionary())
+            if (from != null)
             {
-                source.IterateDictionary(kv =>
+                var sourceType = from.GetType();
+
+                if (sourceType.IsDictionary())
                 {
-                    result[kv.Key?.ToString()] = kv.Value;
-                });
-            }
-            else if (sourceType.IsEnumerable())
-            {
-                var e = source as IEnumerable;
-                var arr = new ArrayList();
-
-                e.ForEach(item => arr.Add(item));
-
-                result[index.ToString()] = arr;
-            }
-            else
-            {
-                var properties = ReflectionHelper.GetPublicInstanceReadableProperties(sourceType);
-
-                foreach (var prop in properties)
+                    from.IterateDictionary(kv =>
+                    {
+                        to[kv.Key?.ToString()] = kv.Value;
+                        result++;
+                    });
+                }
+                else if (sourceType.IsEnumerable())
                 {
-                    var value = prop.GetValue(source);
+                    var e = from as IEnumerable;
+                    var arr = new ArrayList();
 
-                    result[prop.Name] = value;
+                    e.ForEach(item =>
+                    {
+                        arr.Add(item);
+                        result++;
+                    });
+
+                    to[index.ToString()] = arr;
+                }
+                else
+                {
+                    var properties = ReflectionHelper.GetPublicInstanceReadableProperties(sourceType);
+
+                    foreach (var prop in properties)
+                    {
+                        var value = prop.GetValue(from);
+
+                        to[prop.Name] = value;
+                        result++;
+                    }
                 }
             }
+
+            return result;
         }
         public static object Merge(this object obj, params object[] others)
         {
@@ -59,11 +70,14 @@ namespace Puya.Extensions
 
             Merge(result, obj, 0);
 
-            var index = 1;
-
-            foreach (var other in others)
+            if (others != null & others.Length > 0)
             {
-                Merge(result, other, index++);
+                var index = 1;
+
+                foreach (var other in others)
+                {
+                    Merge(result, other, index++);
+                }
             }
 
             return result;

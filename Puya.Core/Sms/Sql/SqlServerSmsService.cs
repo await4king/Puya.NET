@@ -1,9 +1,8 @@
 ﻿using System;
-using Puya.Service;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
 using Puya.Extensions;
+using Microsoft.Data.SqlClient;
 
 namespace Puya.Sms
 {

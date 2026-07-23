@@ -104,52 +104,102 @@ namespace Puya.Extensions
         {
             if (response != null && args != null)
             {
-                var props = ReflectionHelper.GetPublicInstanceReadableProperties(args.GetType());
-                var resultProp = props.FirstOrDefault(p => p.Name.Equalz("Result"));
-                var fieldProp = props.FirstOrDefault(p => p.Name.Equalz("Field"));
-                var messageProp = props.FirstOrDefault(p => p.Name.Equalz("Message"));
-
-                if (resultProp != null)
+                if (args.GetType().IsDictionary<string, object>())
                 {
-                    var resultParam = resultProp.GetValue(args) as CommandParameter;
+                    var dic = args as IDictionary<string, object>;
+                    var resultValue = dic.ContainsKey("Result") ? dic["Result"] : null;
+                    var statusValue = dic.ContainsKey("Status") ? dic["Status"] : null;
+                    var fieldValue = dic.ContainsKey("Field") ? dic["Field"] : null;
+                    var messageValue = dic.ContainsKey("Message") ? dic["Message"] : null;
 
-                    if (resultParam != null)
+                    if (resultValue != null)
                     {
-                        response.Finalize(resultParam);
+                        var resultParam = resultValue as CommandParameter;
+
+                        if (resultParam != null)
+                        {
+                            response.Finalize(resultParam);
+                        }
                     }
-                }
-                else
-                {
-                    var statusProp = props.FirstOrDefault(p => p.Name.Equalz("Status"));
-
-                    if (statusProp != null)
+                    else
                     {
-                        var statusParam = statusProp.GetValue(args) as CommandParameter;
+                        var statusParam = resultValue as CommandParameter;
 
                         if (statusParam != null)
                         {
                             response.Finalize(statusParam);
                         }
                     }
-                }
 
-                if (fieldProp != null)
-                {
-                    var fieldParam = fieldProp.GetValue(args) as CommandParameter;
-
-                    if (fieldParam != null)
+                    if (fieldValue != null && string.IsNullOrEmpty(response.Info))
                     {
-                        response.Info = SafeClrConvert.ToString(fieldParam.Value);
+                        var fieldParam = fieldValue as CommandParameter;
+
+                        if (fieldParam != null)
+                        {
+                            response.Info = SafeClrConvert.ToString(fieldParam.Value);
+                        }
+                    }
+
+                    if (messageValue != null && string.IsNullOrEmpty(response.Message))
+                    {
+                        var messageParam = messageValue as CommandParameter;
+
+                        if (messageParam != null)
+                        {
+                            response.Message = SafeClrConvert.ToString(messageParam.Value);
+                        }
                     }
                 }
-
-                if (messageProp != null)
+                else
                 {
-                    var messageParam = messageProp.GetValue(args) as CommandParameter;
+                    var props = ReflectionHelper.GetPublicInstanceReadableProperties(args.GetType());
+                    var resultProp = props.FirstOrDefault(p => p.Name.Equalz("Result"));
+                    var fieldProp = props.FirstOrDefault(p => p.Name.Equalz("Field"));
+                    var messageProp = props.FirstOrDefault(p => p.Name.Equalz("Message"));
 
-                    if (messageParam != null)
+                    if (resultProp != null)
                     {
-                        response.Message = SafeClrConvert.ToString(messageParam.Value);
+                        var resultParam = resultProp.GetValue(args) as CommandParameter;
+
+                        if (resultParam != null)
+                        {
+                            response.Finalize(resultParam);
+                        }
+                    }
+                    else
+                    {
+                        var statusProp = props.FirstOrDefault(p => p.Name.Equalz("Status"));
+
+                        if (statusProp != null)
+                        {
+                            var statusParam = statusProp.GetValue(args) as CommandParameter;
+
+                            if (statusParam != null)
+                            {
+                                response.Finalize(statusParam);
+                            }
+                        }
+                    }
+
+                    if (fieldProp != null && string.IsNullOrEmpty(response.Info))
+                    {
+                        var fieldParam = fieldProp.GetValue(args) as CommandParameter;
+
+                        if (fieldParam != null)
+                        {
+                            response.Info = SafeClrConvert.ToString(fieldParam.Value);
+                        }
+                    }
+
+                    if (messageProp != null && string.IsNullOrEmpty(response.Message))
+                    {
+                        var messageParam = messageProp.GetValue(args) as CommandParameter;
+
+                        if (messageParam != null)
+                        {
+                            response.Message = SafeClrConvert.ToString(messageParam.Value);
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Puya.Conversion;
 using Puya.Data;
@@ -335,70 +336,84 @@ select case when exists
             Assert.True(logs.Count == 1);
         }
         [Fact]
-        public void Test_DbLogger_log0()
+        public void Test_Mock_HttpContext()
         {
+            // 1. Create the form data
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
-{
-    { "username", "testuser" },
-    { "password", "secure123" }
-};
-
-            // Create a FormCollection with your mock data
+    {
+        { "username", "testuser" },
+        { "password", "secure123" }
+    };
             var formCollection = new FormCollection(formData);
 
-            // Create a FormFeature and set it in a FeatureCollection
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
+            // 2. Create a service provider with basic services
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            services.AddLogging();
+            var serviceProvider = services.BuildServiceProvider();
 
-            features.Set<IFormFeature>(formFeature);
+            // 3. Create the HttpContext
+            var httpContext = new DefaultHttpContext
+            {
+                RequestServices = serviceProvider
+            };
 
-            var context = new DefaultHttpContext(features);
+            // 4. Set up the request
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/x-www-form-urlencoded";
 
-            //context.Request.Method = "POST";
+            // 5. CRITICAL: Set the form feature on the request's feature collection
+            httpContext.Request.Form = formCollection;  // ← This is the key!
 
+            // 6. Set user if needed
             var claimsPrincipal = GetPrincipal("testuser", new Claim[] { });
-
             if (claimsPrincipal != null)
             {
-                context.User = claimsPrincipal;
+                httpContext.User = claimsPrincipal;
             }
 
-            // Now you can access form data like this:
-            var username = context.Request.Form["username"];
+            // 7. Now this will work
+            var username = httpContext.Request.Form["username"];
 
             Assert.True(username == "testuser");
         }
         [Fact]
         public void Test_DbLogger_log1()
         {
+            // Create form data
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
-{
-    { "username", "testuser" },
-    { "password", "secure123" }
-};
-
-            // Create a FormCollection with your mock data
+    {
+        { "username", "testuser" },
+        { "password", "secure123" }
+    };
             var formCollection = new FormCollection(formData);
 
-            // Create a FormFeature and set it in a FeatureCollection
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
-            var url = new Uri("https://ali.com/api/test?foo=bar");
-            features.Set<IFormFeature>(formFeature);
-            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            // Setup service provider
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Create HttpContext
+            var httpContext = new DefaultHttpContext
             {
-                Scheme = url.Scheme,
-                Path = url.LocalPath,
-                QueryString = url.Query,
-                Headers = new HeaderDictionary { ["Host"] = url.Host }
-            });
+                RequestServices = serviceProvider
+            };
+
+            // Setup request
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/x-www-form-urlencoded";
+            httpContext.Request.Form = formCollection;
+            httpContext.Request.Scheme = url.Scheme;
+            httpContext.Request.Path = url.LocalPath;
+            httpContext.Request.QueryString = new QueryString(url.Query);
+            httpContext.Request.Headers["Host"] = url.Host;
 
             var db = GetDb();
-            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", httpContext.Features);
             var logger = new SqlServerWebLogger(config, db);
 
             logger.Clear();
-
             logger.Info("test");
 
             var logs = logger.FetchLogs();
@@ -406,45 +421,49 @@ select case when exists
             Assert.True(logs.Count == 1);
 
             var log0 = logs[0] as Log;
-
             Assert.NotNull(log0);
-
             Assert.True(string.Equals(log0.Method, "POST", StringComparison.OrdinalIgnoreCase));
             Assert.True(string.IsNullOrEmpty(log0.Form));
         }
+
         [Fact]
         public void Test_DbLogger_log11()
         {
+            // Create form data
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
-{
-    { "username", "testuser" },
-    { "password", "secure123" }
-};
-
-            // Create a FormCollection with your mock data
+    {
+        { "username", "testuser" },
+        { "password", "secure123" }
+    };
             var formCollection = new FormCollection(formData);
 
-            // Create a FormFeature and set it in a FeatureCollection
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
-            var url = new Uri("https://ali.com/api/test?foo=bar");
-            features.Set<IFormFeature>(formFeature);
-            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            // Setup service provider
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Create HttpContext
+            var httpContext = new DefaultHttpContext
             {
-                Scheme = url.Scheme,
-                Path = url.LocalPath,
-                QueryString = url.Query,
-                Headers = new HeaderDictionary { ["Host"] = url.Host }
-            });
+                RequestServices = serviceProvider
+            };
+
+            // Setup request
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/x-www-form-urlencoded";
+            httpContext.Request.Form = formCollection;
+            httpContext.Request.Scheme = url.Scheme;
+            httpContext.Request.Path = url.LocalPath;
+            httpContext.Request.QueryString = new QueryString(url.Query);
+            httpContext.Request.Headers["Host"] = url.Host;
 
             var db = GetDb();
-            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", httpContext.Features);
             var logger = new SqlServerWebLogger(config, db);
-            
+
             logger.UseForm();
-
             logger.Clear();
-
             logger.Info("test");
 
             var logs = logger.FetchLogs();
@@ -452,47 +471,51 @@ select case when exists
             Assert.True(logs.Count == 1);
 
             var log0 = logs[0] as Log;
-
             Assert.NotNull(log0);
-
             Assert.False(string.IsNullOrEmpty(log0.Form));
             Assert.True(log0.Method == "POST");
             Assert.True(log0.Form.Contains("username", StringComparison.OrdinalIgnoreCase));
             Assert.True(log0.Form.Contains("password", StringComparison.OrdinalIgnoreCase));
         }
+
         [Fact]
         public void Test_DbLogger_log12()
         {
+            // Create form data
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
-{
-    { "username", "testuser" },
-    { "password", "secure123" }
-};
-
-            // Create a FormCollection with your mock data
+    {
+        { "username", "testuser" },
+        { "password", "secure123" }
+    };
             var formCollection = new FormCollection(formData);
 
-            // Create a FormFeature and set it in a FeatureCollection
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
-            var url = new Uri("https://ali.com/api/test?foo=bar");
-            features.Set<IFormFeature>(formFeature);
-            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            // Setup service provider
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Create HttpContext
+            var httpContext = new DefaultHttpContext
             {
-                Scheme = url.Scheme,
-                Path = url.LocalPath,
-                QueryString = url.Query,
-                Headers = new HeaderDictionary { ["Host"] = url.Host }
-            });
+                RequestServices = serviceProvider
+            };
+
+            // Setup request
+            var url = new Uri("https://ali.com/api/test?foo=bar");
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/x-www-form-urlencoded";
+            httpContext.Request.Form = formCollection;
+            httpContext.Request.Scheme = url.Scheme;
+            httpContext.Request.Path = url.LocalPath;
+            httpContext.Request.QueryString = new QueryString(url.Query);
+            httpContext.Request.Headers["Host"] = url.Host;
 
             var db = GetDb();
-            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features);
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", httpContext.Features);
             var logger = new SqlServerWebLogger(config, db);
 
             logger.UseForm("username");
-
             logger.Clear();
-
             logger.Info("test");
 
             var logs = logger.FetchLogs();
@@ -500,40 +523,52 @@ select case when exists
             Assert.True(logs.Count == 1);
 
             var log0 = logs[0] as Log;
-
             Assert.NotNull(log0);
-
             Assert.False(string.IsNullOrEmpty(log0.Form));
             Assert.True(log0.Method == "POST");
             Assert.True(log0.Form.Contains("username", StringComparison.OrdinalIgnoreCase));
             Assert.False(log0.Form.Contains("password", StringComparison.OrdinalIgnoreCase));
         }
+
         [Fact]
         public void Test_DbLogger_log13()
         {
+            // Create form data (empty for body test)
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
             var formCollection = new FormCollection(formData);
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
-            var url = new Uri("https://ali.com/api/test?foo=bar");
 
-            features.Set<IFormFeature>(formFeature);
-            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            // Setup service provider
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Create HttpContext
+            var httpContext = new DefaultHttpContext
             {
-                Scheme = url.Scheme,
-                Path = url.LocalPath,
-                QueryString = url.Query,
-                Headers = new HeaderDictionary { ["Host"] = url.Host }
-            });
+                RequestServices = serviceProvider
+            };
+
+            // Setup request
+            var url = new Uri("https://ali.com/api/test?foo=bar");
             var body = "{\"username\":\"testuser\",\"password\":\"secure123\"}";
+            var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
+            var stream = new MemoryStream(bodyBytes);
+
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/json";
+            httpContext.Request.Form = formCollection;
+            httpContext.Request.Scheme = url.Scheme;
+            httpContext.Request.Path = url.LocalPath;
+            httpContext.Request.QueryString = new QueryString(url.Query);
+            httpContext.Request.Headers["Host"] = url.Host;
+            httpContext.Request.Body = stream;
+
             var db = GetDb();
-            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", features, body, "application/json");
+            var config = GetDbLoggerConfig(null, "POST", "ali", null, null, "ali", httpContext.Features, body, "application/json");
             var logger = new SqlServerWebLogger(config, db);
 
             logger.UseBody();
-
             logger.Clear();
-
             logger.Info("test");
 
             var logs = logger.FetchLogs();
@@ -541,38 +576,50 @@ select case when exists
             Assert.True(logs.Count == 1);
 
             var log0 = logs[0] as Log;
-
             Assert.NotNull(log0);
-
             Assert.False(string.IsNullOrEmpty(log0.Body));
             Assert.True(log0.Method == "POST");
             Assert.True(string.Equals(body, log0.Body));
         }
+
         [Fact]
         public void Test_DebugLogger_Log_1()
         {
+            // Create form data (empty for body test)
             var formData = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
             var formCollection = new FormCollection(formData);
-            var formFeature = new FormFeature(formCollection);
-            var features = new FeatureCollection();
-            var url = new Uri("https://ali.com/api/test?foo=bar");
 
-            features.Set<IFormFeature>(formFeature);
-            features.Set<IHttpRequestFeature>(new HttpRequestFeature
+            // Setup service provider
+            var services = new ServiceCollection();
+            services.AddHttpContextAccessor();
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Create HttpContext
+            var httpContext = new DefaultHttpContext
             {
-                Scheme = url.Scheme,
-                Path = url.LocalPath,
-                QueryString = url.Query,
-                Headers = new HeaderDictionary { ["Host"] = url.Host }
-            });
+                RequestServices = serviceProvider
+            };
+
+            // Setup request
+            var url = new Uri("https://ali.com/api/test?foo=bar");
             var body = "{\"username\":\"testuser\",\"password\":\"secure123\"}";
-            var config = GetDebugLoggerConfig(null, "POST", "ali", null, null, "ali", features, body, "application/json");
+            var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
+            var stream = new MemoryStream(bodyBytes);
+
+            httpContext.Request.Method = "POST";
+            httpContext.Request.ContentType = "application/json";
+            httpContext.Request.Form = formCollection;
+            httpContext.Request.Scheme = url.Scheme;
+            httpContext.Request.Path = url.LocalPath;
+            httpContext.Request.QueryString = new QueryString(url.Query);
+            httpContext.Request.Headers["Host"] = url.Host;
+            httpContext.Request.Body = stream;
+
+            var config = GetDebugLoggerConfig(null, "POST", "ali", null, null, "ali", httpContext.Features, body, "application/json");
             var logger = new DebugLogger(config);
 
             logger.UseBody();
-
             logger.Clear();
-
             logger.Info("hello");
             logger.Debug("BeginJob", "this is a message", () => new { a = 10, b = true, c = "test" });
 

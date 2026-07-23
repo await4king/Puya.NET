@@ -283,6 +283,15 @@ namespace Puya.ServiceModel
 
             Owner.Logger.Danger(e, ActionName, new { State = "OnEror" });
         }
+        protected string GetSprocName()
+        {
+            var sprocAttr = this.GetType().GetCustomAttribute<SprocNameAttribute>();
+            var sprocPrefixAttr = this.GetType().GetCustomAttribute<SprocPrefixAttribute>();
+            var sprocPrefix = !string.IsNullOrEmpty(sprocPrefixAttr?.Prefix) ? sprocPrefixAttr.Prefix : $"usp1";
+            var sproc = !string.IsNullOrEmpty(sprocAttr?.Name) ? sprocAttr?.Name : $"{sprocPrefix}_{Owner.Name}_{Name}";
+
+            return sproc;
+        }
         public virtual string GetMessageKey(TResponse response)
         {
             return string.Empty;

@@ -44,7 +44,7 @@ namespace Puya.Core.Tests
             var contextInfoProvider = new DefaultDbContextInfoProvider();
             var mapper = new DefaultMapper();
 
-            constrProvider.SetConnectionString("Server=.\\I2k17;Database=PuyaData1;User Id=sa;Password=sql2k17pass123");
+            constrProvider.SetConnectionString("Server=.\\I2k17;Database=Karmania-14031012;User Id=sa;Password=sql2k17pass123;TrustServerCertificate=true;MultipleActiveResultSets=true");
 
             var db = new SqlServerDb(constrProvider, contextInfoProvider, mapper);
 

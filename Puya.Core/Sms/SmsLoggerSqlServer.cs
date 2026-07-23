@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using Puya.Extensions;
+using Microsoft.Data.SqlClient;
 
 namespace Puya.Sms
 {

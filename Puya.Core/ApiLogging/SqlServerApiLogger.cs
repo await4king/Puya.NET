@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
+﻿using Microsoft.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 

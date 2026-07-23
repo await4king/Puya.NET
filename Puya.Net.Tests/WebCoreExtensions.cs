@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Moq;
 using Puya.Extensions;
 using System.Security.Claims;
@@ -19,8 +19,6 @@ namespace Puya.Net.Tests
         public override ConnectionInfo Connection { get; }
 
         public override WebSocketManager WebSockets { get; }
-
-        public override AuthenticationManager Authentication { get; }
 
         public override ClaimsPrincipal User { get; set; }
         public override IDictionary<object, object> Items { get; set; }

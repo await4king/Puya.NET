@@ -2,32 +2,36 @@
 using System.Threading.Tasks;
 using Puya.Service;
 using Puya.Data;
-using Puya.Conversion;
+using Puya.Extensions;
 
 namespace Puya.ServiceModel
 {
     public abstract class TapBaseDbNonQueryServiceAction<TBaseService, TRequest, TResponse> : TapBaseServiceAction<TBaseService, TRequest, TResponse>
         where TBaseService : TapBaseActionBasedService, IService
-        where TRequest : TapBaseDbServiceRequest
+        where TRequest : class, ServiceRequest
         where TResponse : ServiceResponse, new()
     {
         public TapBaseDbNonQueryServiceAction(TBaseService owner): base(owner)
         { }
         private async Task DoRun(TRequest request, TResponse response, bool async, CancellationToken cancellation)
         {
+            var args = new
+            {
+                Result = CommandHelper.Result()
+            }.Merge(request);
+
+            var sproc = GetSprocName();
+
             if (async)
             {
-                await Db.ExecuteNonQueryCommandAsync($"usp1_{Owner.Name}_{Name}", request, cancellation);
+                await Db.ExecuteNonQueryCommandAsync(sproc, args, cancellation);
             }
             else
             {
-                Db.ExecuteNonQueryCommand($"usp1_{Owner.Name}_{Name}", request);
+                Db.ExecuteNonQueryCommand(sproc, args);
             }
 
-            var result = SafeClrConvert.ToString(request.Result.Value);
-
-            response.SetStatus(result);
-            response.Message = SafeClrConvert.ToString(request.Message.Value);
+            response.Finalize(args);
         }
         protected override void RunInternal(TRequest request, TResponse response)
         {

@@ -8,19 +8,27 @@
       "Usings": [ "Puya.Data", "Puya.Logging", "Tap.Caching", "Tap.Settings" ],
       "Service": "TapDbSettings",
       "ParentConstructors": [
-        [ "TapDbSettingsBaseConfig" ],
-        [ "TapDbSettingsBaseConfig", "ILogger" ],
-        [ "TapDbSettingsBaseConfig", "ILogger", "IDb" ],
-        [ "TapDbSettingsBaseConfig", "ILogger", "IDb", "ICacheManager" ],
-        [ "TapDbSettingsBaseConfig", "ILogger", "IDb", "ICacheManager", "ISettingService" ]
+        [
+          "ILogger",
+          "IDb",
+          "ICacheManager",
+          "ISettingService",
+          "ITranslator",
+          "IServiceInterceptor",
+          "ILogProvider",
+          "IDebugger"
+        ]
       ],
       "Constructors": [
         {
-          "config": ":TapDbSettingsBaseConfig",
           "logger": "ILogger",
-          "dbContext": "IDb",
+          "db": "IDb",
           "cache": "ICacheManager",
-          "settings": "ISettingService"
+          "settings": "ISettingService",
+          "translator": "ITranslator",
+          "interceptor": "IServiceInterceptor",
+          "logProvider": "ILogProvider",
+          "debugger": "IDebugger"
         }
       ],
       "Concretes": [
@@ -28,14 +36,24 @@
           "Suffix": "Default",
           "ActionSuffix": "Default",
           "Partial": true,
-          "Default": true
+          "Default": true,
+          "Constructors": [
+            {
+              "logger": "ILogger",
+              "db": "IDb",
+              "cache": "ICacheManager",
+              "settings": "ISettingService",
+              "translator": "ITranslator",
+              "interceptor": "IServiceInterceptor",
+              "logProvider": "ILogProvider",
+              "debugger": "IDebugger"
+            }
+          ]
         }
       ],
-      "ParentService": "TapBaseActionBasedService<TapDbSettingsBaseConfig>",
+      "ParentService": "TapBaseActionBasedService",
       "ParentAction": "TapBaseServiceAction",
-      "ParentConfig": "TapBaseConfig",
       "PartialRegistration": true,
-      "PartialConfig": true,
       "PartialServiceBase": true,
       "PartialInterface": true,
       "Actions": [
