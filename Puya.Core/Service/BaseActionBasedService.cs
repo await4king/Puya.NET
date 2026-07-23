@@ -15,6 +15,7 @@ namespace Puya.Service
                 
                 return name;
             }
+            set { name = value; }
         }
         public virtual IServiceAction GetAction(string name)
         {

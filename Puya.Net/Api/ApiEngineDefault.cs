@@ -19,6 +19,7 @@ using Puya.Logging;
 using Puya.Service;
 using Puya.Net.Api;
 using Puya.Debugging;
+using Puya.ServiceModel;
 
 namespace Puya.Api
 {
@@ -747,6 +748,8 @@ namespace Puya.Api
                     RevealExceptions = debugger.IsDebugging,
                     ShowDetailedEnginePipeline = debugger.IsDebugging
                 };
+
+                apis.LogProvider = apiCallContext.Scope.ServiceProvider.GetService<ILogProvider>();
 
                 httpContext.Items.Add("Tap-ApiCallContext", apiCallContext);
 

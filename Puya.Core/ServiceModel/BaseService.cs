@@ -68,6 +68,7 @@ namespace Puya.ServiceModel
 
                 return name;
             }
+            set { name = value; }
         }
         #endregion 
         public BaseService(IDb db, ILogger logger, ICacheManager cache, ISettingService settings, ILogProvider logProvider, IDebugger debugger)

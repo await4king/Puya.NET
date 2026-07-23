@@ -58,6 +58,10 @@ namespace Puya.ServiceModel
 
                 return name;
             }
+            set
+            {
+                name = value;
+            }
         }
         private ILogger _logger;
         public ILogger Logger

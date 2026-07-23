@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Puya.Collections;
 using Puya.Service;
+using Puya.ServiceModel;
 
 namespace Puya.Api
 {
@@ -37,7 +38,7 @@ namespace Puya.Api
     }
     public class ApiManagerCreateStoreResponse : ServiceResponse { }
 
-    public interface IApiManager
+    public interface IApiManager: IBaseService
     {
         ApiManagerFindAppByIdResponse FindAppById(ApiManagerFindAppByIdRequest request);
         Task<ApiManagerFindAppByIdResponse> FindAppByIdAsync(ApiManagerFindAppByIdRequest request, CancellationToken cancellation);

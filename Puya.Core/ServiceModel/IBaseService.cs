@@ -9,12 +9,12 @@ namespace Puya.ServiceModel
 {
     public interface IBaseService
     {
-        IDb Db { get; }
-        ILogger Logger { get; }
-        ICacheManager Cache { get; }
-        ISettingService Settings { get; }
-        ILogProvider LogProvider { get; }
-        IDebugger Debugger { get; }
-        string Name { get; }
+        IDb Db { get; set; }
+        ILogger Logger { get; set; }
+        ICacheManager Cache { get; set; }
+        ISettingService Settings { get; set; }
+        ILogProvider LogProvider { get; set; }
+        IDebugger Debugger { get; set; }
+        string Name { get; set; }
     }
 }
