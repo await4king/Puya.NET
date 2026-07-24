@@ -19,13 +19,21 @@ namespace Puya.Collections
     }
     public class DynamicModel : DynamicModel<object>
     {
-        public DynamicModel(IEqualityComparer<string> comparer = null, bool ignoreNotExistingKeys = true): base(comparer, ignoreNotExistingKeys)
+        public DynamicModel(): this(null, true)
+        { }
+        public DynamicModel(IEqualityComparer<string> comparer) : this(comparer, true)
+        { }
+        public DynamicModel(IEqualityComparer<string> comparer, bool ignoreNotExistingKeys): base(comparer, ignoreNotExistingKeys)
         { }
     }
     public class DynamicModel<T> : DynamicObject, IDictionary<string, T>
     {
         Dictionary<string, T> props;
         public bool IgnoreNotExistingKeys { get; set; }
+        public DynamicModel(): this(null, true)
+        { }
+        public DynamicModel(IEqualityComparer<string> comparer) : this(comparer, true)
+        { }
         public DynamicModel(IEqualityComparer<string> comparer = null, bool ignoreNotExistingKeys = true)
         {
             if (comparer == null)
