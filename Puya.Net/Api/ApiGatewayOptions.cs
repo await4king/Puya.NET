@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Puya.Net.Api
 {
-    public class ApiEngineOptions
+    public class ApiGatewayOptions
     {
         public bool ForceApiAppAssignment { get; set; }
     }

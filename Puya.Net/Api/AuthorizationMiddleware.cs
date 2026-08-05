@@ -7,13 +7,13 @@ using Puya.Extensions;
 
 namespace Puya.Api
 {
-    public class AuthorizationMiddleware : IApiEngineMiddleware
+    public class AuthorizationMiddleware : IApiGatewayMiddleware
     {
-        public ApiEngineEvents[] Events => new ApiEngineEvents[] { ApiEngineEvents.Locating };
+        public ApiGatewayEvents[] Events => new ApiGatewayEvents[] { ApiGatewayEvents.Locating };
 
-        public Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation)
+        public Task<ApiGatewayMiddlewareResponse> RunAsync(ApiCallContext context, ApiGatewayEvents @event, CancellationToken cancellation)
         {
-            var result = new ApiEngineMiddlewareResponse();
+            var result = new ApiGatewayMiddlewareResponse();
 
             if (SafeClrConvert.ToBoolean(context.GetApiSetting("RequiresAuthentication")))
             {

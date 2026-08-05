@@ -1,10 +1,10 @@
 ﻿namespace Puya.Api
 {
-    public enum ApiEngineEvents
+    public enum ApiGatewayEvents
     {
         None,
         /// <summary>
-        /// Triggers as soon as engine intends to serve the request, before doing any operation like processing the request, finding application and api in the registry, etc.
+        /// Triggers as soon as gateway intends to serve the request, before doing any operation like processing the request, finding application and api in the registry, etc.
         /// </summary>
         Starting,
         /// <summary>

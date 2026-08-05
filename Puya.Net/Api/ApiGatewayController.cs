@@ -15,23 +15,23 @@ using Puya.Debugging;
 
 namespace Puya.Api
 {
-    public class ApiEngineController : Controller
+    public class ApiGatewayController : Controller
     {
-        private readonly IApiEngine engine;
+        private readonly IApiGateway gateway;
         private readonly IDebugger debugger;
 
-        public ApiEngineController(IApiEngine engine, IDebugger debugger)
+        public ApiGatewayController(IApiGateway gateway, IDebugger debugger)
         {
-            this.engine = engine;
+            this.gateway = gateway;
             this.debugger = debugger;
         }
         public virtual async Task<IActionResult> Root(CancellationToken cancellation)
         {
-            var content = await engine.Serve(ControllerContext.HttpContext, cancellation);
+            var content = await gateway.ProcessAsync(ControllerContext.HttpContext, cancellation);
 
             System.Diagnostics.Debug.WriteLine("IsDebugging: " + debugger.IsDebugging);
 
-            if (ControllerContext.HttpContext.Response.Headers.ContainsKey(ApiEngineConstants.EncryptedResponseHeaderName))
+            if (ControllerContext.HttpContext.Response.Headers.ContainsKey(ApiGatewayConstants.EncryptedResponseHeaderName))
             {
                 return Content(content, "text/plain");
             }

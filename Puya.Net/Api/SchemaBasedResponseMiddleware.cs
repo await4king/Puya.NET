@@ -7,11 +7,11 @@ using Puya.Service;
 
 namespace Puya.Api
 {
-    public class SchemaBasedResponseMiddleware : IApiEngineMiddleware
+    public class SchemaBasedResponseMiddleware : IApiGatewayMiddleware
     {
-        public ApiEngineEvents[] Events => new ApiEngineEvents[] { ApiEngineEvents.Serializing };
+        public ApiGatewayEvents[] Events => new ApiGatewayEvents[] { ApiGatewayEvents.Serializing };
 
-        public Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation)
+        public Task<ApiGatewayMiddlewareResponse> RunAsync(ApiCallContext context, ApiGatewayEvents @event, CancellationToken cancellation)
         {
             if (SafeClrConvert.ToBoolean(context.GetApiSetting("SchemaBasedResponse")))
             {
@@ -38,11 +38,11 @@ namespace Puya.Api
                 }
             }
 
-            var result = new ApiEngineMiddlewareResponse();
+            var result = new ApiGatewayMiddlewareResponse();
 
             result.Succeeded();
 
-            context.SetHeader(ApiEngineConstants.SchemaListResponseHeader, "true");
+            context.SetHeader(ApiGatewayConstants.SchemaListResponseHeader, "true");
 
             return Task.FromResult(result);
         }

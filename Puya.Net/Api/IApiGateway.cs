@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Puya.Api
 {
-    public interface IApiEngine
+    public interface IApiGateway
     {
         string DefaultApp { get; set; }
-        Task<string> Serve(HttpContext context, CancellationToken cancellation);
+        Task<string> ProcessAsync(HttpContext context, CancellationToken cancellation);
     }
 }

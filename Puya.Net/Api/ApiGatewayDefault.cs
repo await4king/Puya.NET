@@ -23,7 +23,7 @@ using Puya.ServiceModel;
 
 namespace Puya.Api
 {
-    public class ApiEngineDefault : IApiEngine
+    public class ApiGatewayDefault : IApiGateway
     {
         protected readonly IServiceProvider serviceProvider;
         protected readonly IApiManager apis;
@@ -32,8 +32,8 @@ namespace Puya.Api
         protected readonly IApiResponseSerializer serializer;
         private readonly IDebugger debugger;
         protected readonly IMiddlewaresStore middlewaresStore;
-        public ApiEngineOptions Options { get; set; }
-        public ApiEngineDefault(IServiceProvider serviceProvider,
+        public ApiGatewayOptions Options { get; set; }
+        public ApiGatewayDefault(IServiceProvider serviceProvider,
                                 IApiManager apis,
                                 IApiCryptor cryptor,
                                 IApiResponseSerializer serializer,
@@ -249,21 +249,21 @@ namespace Puya.Api
         }
         void AppendResponse(ApiCallContext context, ServiceResponse innerResponse, string subject)
         {
-            if (context.ShowDetailedEnginePipeline && !innerResponse.Success)
+            if (context.ShowDetailedPipeline && !innerResponse.Success)
             {
                 innerResponse.Subject = subject;
 
                 context.Response.InnerResponses.Add(innerResponse);
             }
         }
-        protected virtual async Task<bool> RunMiddlewares(ApiEngineEvents engineEvent, ApiCallContext context, CancellationToken cancellation)
+        protected virtual async Task<bool> RunMiddlewares(ApiGatewayEvents gatewayEvent, ApiCallContext context, CancellationToken cancellation)
         {
             var shouldEndPipeline = false;
-            var middlewares = middlewaresStore?.GetMiddlewares(engineEvent);
+            var middlewares = middlewaresStore?.GetMiddlewares(gatewayEvent);
 
             if (middlewares != null)
             {
-                context._state = (ApiState)Enum.Parse(typeof(ApiState), engineEvent.ToString());
+                context._state = (ApiState)Enum.Parse(typeof(ApiState), gatewayEvent.ToString());
 
                 var count = 0;
 
@@ -273,7 +273,7 @@ namespace Puya.Api
                     {
                         try
                         {
-                            var sr = await middleware.RunAsync(context, engineEvent, cancellation);
+                            var sr = await middleware.RunAsync(context, gatewayEvent, cancellation);
 
                             if (sr != null)
                             {
@@ -298,12 +298,12 @@ namespace Puya.Api
 
                             context.Response.Info = middleware.GetType().Name;
 
-                            Danger(context, e, "MiddlewareFailed", new { Event = engineEvent, Middleware = middleware.GetType().Name });
+                            Danger(context, e, "MiddlewareFailed", new { Event = gatewayEvent, Middleware = middleware.GetType().Name });
                         }
                     }
                     else
                     {
-                        logger.Warn("ApiEngine", $"Middleware {count} is null");
+                        logger.Warn("ApiGateway", $"Middleware {count} is null");
                     }
 
                     count++;
@@ -314,7 +314,7 @@ namespace Puya.Api
         }
         protected virtual bool IsEncryptedRequest(ApiCallContext context)
         {
-            var value = context.GetHeader(ApiEngineConstants.EncryptedRequestHeaderName);
+            var value = context.GetHeader(ApiGatewayConstants.EncryptedRequestHeaderName);
 
             return value.Equalz("true", "yes", "1");
         }
@@ -344,7 +344,7 @@ namespace Puya.Api
                     using (var reader = new StreamReader(context.HttpContext.Request.Body,
                                                     encoding: Encoding.UTF8,
                                                     detectEncodingFromByteOrderMarks: false,
-                                                    bufferSize: ApiEngineConstants.BodyStreamBufferSize,
+                                                    bufferSize: ApiGatewayConstants.BodyStreamBufferSize,
                                                     leaveOpen: true))
                     {
                         body = await reader.ReadToEndAsync();
@@ -472,7 +472,7 @@ namespace Puya.Api
                     break;
                 }
 
-                if (SafeClrConvert.ToBoolean(context.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedRequestName]) && !context.ApiRequestDecrypted)
+                if (SafeClrConvert.ToBoolean(context.Api.Settings[ApiGatewayConstants.ApiSettingsEncryptedRequestName]) && !context.ApiRequestDecrypted)
                 {
                     context.Response.SetStatus("RequiresEncryptedRequest");
                     break;
@@ -664,7 +664,7 @@ namespace Puya.Api
         }
         protected virtual async Task<string> Serialize(HttpContext httpContext, ApiCallContext context, CancellationToken cancellation)
         {
-            await RunMiddlewares(ApiEngineEvents.Serializing, context, cancellation);
+            await RunMiddlewares(ApiGatewayEvents.Serializing, context, cancellation);
 
             if (!context.RevealExceptions)
             {
@@ -679,7 +679,7 @@ namespace Puya.Api
             {
                 content = serializer.Serialize(context.Response);
 
-                if (context.Api != null && SafeClrConvert.ToBoolean(context.Api.Settings[ApiEngineConstants.ApiSettingsEncryptedResponseName]))
+                if (context.Api != null && SafeClrConvert.ToBoolean(context.Api.Settings[ApiGatewayConstants.ApiSettingsEncryptedResponseName]))
                 {
                     try
                     {
@@ -687,7 +687,7 @@ namespace Puya.Api
 
                         content = cryptor.Encrypt(context, content);
 
-                        context.SetHeader(ApiEngineConstants.EncryptedResponseHeaderName, "true");
+                        context.SetHeader(ApiGatewayConstants.EncryptedResponseHeaderName, "true");
                     }
                     catch (Exception e)
                     {
@@ -736,7 +736,7 @@ namespace Puya.Api
 
             return content;
         }
-        public virtual async Task<string> Serve(HttpContext httpContext, CancellationToken cancellation)
+        public virtual async Task<string> ProcessAsync(HttpContext httpContext, CancellationToken cancellation)
         {
             using (var scope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope())
             {
@@ -746,7 +746,7 @@ namespace Puya.Api
                     Response = new ServiceResponse(),
                     Scope = scope,
                     RevealExceptions = debugger.IsDebugging,
-                    ShowDetailedEnginePipeline = debugger.IsDebugging
+                    ShowDetailedPipeline = debugger.IsDebugging
                 };
 
                 apis.LogProvider = apiCallContext.Scope.ServiceProvider.GetService<ILogProvider>();
@@ -757,7 +757,7 @@ namespace Puya.Api
                 {
                     do
                     {
-                        if (await RunMiddlewares(ApiEngineEvents.Starting, apiCallContext, cancellation))
+                        if (await RunMiddlewares(ApiGatewayEvents.Starting, apiCallContext, cancellation))
                         {
                             break;
                         }
@@ -767,7 +767,7 @@ namespace Puya.Api
                             break;
                         }
 
-                        if (await RunMiddlewares(ApiEngineEvents.Loading, apiCallContext, cancellation))
+                        if (await RunMiddlewares(ApiGatewayEvents.Loading, apiCallContext, cancellation))
                         {
                             break;
                         }
@@ -777,7 +777,7 @@ namespace Puya.Api
                             break;
                         }
 
-                        if (await RunMiddlewares(ApiEngineEvents.Locating, apiCallContext, cancellation))
+                        if (await RunMiddlewares(ApiGatewayEvents.Locating, apiCallContext, cancellation))
                         {
                             break;
                         }
@@ -787,7 +787,7 @@ namespace Puya.Api
                             break;
                         }
 
-                        if (await RunMiddlewares(ApiEngineEvents.Executing, apiCallContext, cancellation))
+                        if (await RunMiddlewares(ApiGatewayEvents.Executing, apiCallContext, cancellation))
                         {
                             break;
                         }

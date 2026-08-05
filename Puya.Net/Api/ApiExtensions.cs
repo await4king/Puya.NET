@@ -21,6 +21,7 @@ namespace Puya.Api
                 var cols = new List<string>();
                 var data = new List<List<object>>();
                 var isDictionary = false;
+
                 PropertyInfo keysProp = null;
                 PropertyInfo valuesProp = null;
 

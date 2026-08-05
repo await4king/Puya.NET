@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace Puya.Api
 {
-    public abstract class ApiEngineMiddleware: IApiEngineMiddleware
+    public abstract class ApiGatewayMiddleware: IApiGatewayMiddleware
     {
-        public virtual ApiEngineEvents[] Events { get; protected set; }
-        public abstract Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation);
+        public virtual ApiGatewayEvents[] Events { get; protected set; }
+        public abstract Task<ApiGatewayMiddlewareResponse> RunAsync(ApiCallContext context, ApiGatewayEvents @event, CancellationToken cancellation);
         public object GetService(ApiCallContext context, Type type)
         {
             return context.Scope.ServiceProvider.GetService(type);

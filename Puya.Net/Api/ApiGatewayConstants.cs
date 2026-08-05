@@ -1,6 +1,6 @@
 ﻿namespace Puya.Api
 {
-    public static class ApiEngineConstants
+    public static class ApiGatewayConstants
     {
         private static int bodyStreamBufferSize;
         public static int BodyStreamBufferSize
@@ -44,7 +44,7 @@
             }
             set { encryptedResponseHeaderName = value; }
         }
-        public static bool ShowDetailedEnginePipeline { get; set; }
+        public static bool ShowDetailedPipeline { get; set; }
         public static bool RevealExceptions { get; set; }
         private static string schemaListResponseHeader;
         public static string SchemaListResponseHeader

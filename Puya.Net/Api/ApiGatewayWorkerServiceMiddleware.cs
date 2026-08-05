@@ -4,12 +4,12 @@ using Puya.Api;
 using Puya.Data;
 using System.Threading.Tasks;
 
-public class ApiEngineWorkerServiceMiddleware
+public class ApiGatewayWorkerServiceMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public ApiEngineWorkerServiceMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
+    public ApiGatewayWorkerServiceMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
     {
         _next = next;
         _serviceScopeFactory = serviceScopeFactory;
@@ -21,18 +21,21 @@ public class ApiEngineWorkerServiceMiddleware
         {
             var cancellationToken = context.RequestAborted;
 
-           var apiEngine = scope.ServiceProvider.GetRequiredService<IApiEngine>();
+           var apiGateway = scope.ServiceProvider.GetRequiredService<IApiGateway>();
 
-            if (apiEngine == null)
+            if (apiGateway == null)
             {
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Internal Server Error: IApiEngine is missing.");
+
+                await context.Response.WriteAsync("Internal Server Error: IApiGateway is missing.");
+
                 return;
             }
 
-            var response = await apiEngine.Serve(context, cancellationToken);
+            var response = await apiGateway.ProcessAsync(context, cancellationToken);
 
             context.Response.ContentType = "application/json";
+
             await context.Response.WriteAsync(response);
        }
     }

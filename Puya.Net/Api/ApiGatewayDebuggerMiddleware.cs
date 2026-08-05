@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace Puya.Api
 {
-    public class TapApiEngineDebuggerMiddleware : ApiEngineMiddleware
+    public class ApiGatewayDebuggerMiddleware : ApiGatewayMiddleware
     {
-        public override ApiEngineEvents[] Events => new ApiEngineEvents[] { ApiEngineEvents.Serializing };
-        public TapApiEngineDebuggerMiddleware()
+        public override ApiGatewayEvents[] Events => new ApiGatewayEvents[] { ApiGatewayEvents.Serializing };
+        public ApiGatewayDebuggerMiddleware()
         {
         }
-        public override Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation)
+        public override Task<ApiGatewayMiddlewareResponse> RunAsync(ApiCallContext context, ApiGatewayEvents @event, CancellationToken cancellation)
         {
             var logProvider = GetService<ILogProvider>(context);
             var debugger = GetService<Puya.Debugging.IDebugger>(context);
@@ -37,7 +37,7 @@ namespace Puya.Api
                 context.Response.Logs = logProvider.Logs;
             }
 
-            return Task.FromResult<ApiEngineMiddlewareResponse>(null);
+            return Task.FromResult<ApiGatewayMiddlewareResponse>(null);
         }
     }
 }

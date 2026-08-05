@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace Puya.Api
 {
-    public class SimpleCorsMiddleware : IApiEngineMiddleware
+    public class SimpleCorsMiddleware : IApiGatewayMiddleware
     {
-        public ApiEngineEvents[] Events => new ApiEngineEvents[] { ApiEngineEvents.Locating };
+        public ApiGatewayEvents[] Events => new ApiGatewayEvents[] { ApiGatewayEvents.Locating };
 
-        public Task<ApiEngineMiddlewareResponse> RunAsync(ApiCallContext context, ApiEngineEvents @event, CancellationToken cancellation)
+        public Task<ApiGatewayMiddlewareResponse> RunAsync(ApiCallContext context, ApiGatewayEvents @event, CancellationToken cancellation)
         {
-            var result = new ApiEngineMiddlewareResponse();
+            var result = new ApiGatewayMiddlewareResponse();
             var origin = "";
 
             if (context != null && context.App != null && context.App.Allows(context.GetHeader("origin"), out origin))

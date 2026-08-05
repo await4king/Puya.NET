@@ -8,34 +8,34 @@ namespace Puya.Api
 {
     public interface IMiddlewaresStore
     {
-        List<IApiEngineMiddleware> GetMiddlewares(ApiEngineEvents engineEvent);
+        List<IApiGatewayMiddleware> GetMiddlewares(ApiGatewayEvents gatewayEvent);
     }
     public class MiddlewaresStore: IMiddlewaresStore
     {
         public MiddlewaresStore()
         {
-            Middlewares = new List<IApiEngineMiddleware>
+            Middlewares = new List<IApiGatewayMiddleware>
             {
                 new AuthorizationMiddleware(),
                 new SchemaBasedResponseMiddleware(),
                 new SimpleCorsMiddleware(),
-                new TapApiEngineDebuggerMiddleware(),
+                new ApiGatewayDebuggerMiddleware(),
             };
 
-            middlewaresCache = new ConcurrentDictionary<ApiEngineEvents, List<IApiEngineMiddleware>>();
+            middlewaresCache = new ConcurrentDictionary<ApiGatewayEvents, List<IApiGatewayMiddleware>>();
         }
-        private readonly ConcurrentDictionary<ApiEngineEvents, List<IApiEngineMiddleware>> middlewaresCache;
-        public List<IApiEngineMiddleware> Middlewares { get; private set; }
-        public void Use(IApiEngineMiddleware middleware)
+        private readonly ConcurrentDictionary<ApiGatewayEvents, List<IApiGatewayMiddleware>> middlewaresCache;
+        public List<IApiGatewayMiddleware> Middlewares { get; private set; }
+        public void Use(IApiGatewayMiddleware middleware)
         {
             lock (AppDomain.CurrentDomain)
             {
                 Middlewares.Add(middleware);
             }
         }
-        public List<IApiEngineMiddleware> GetMiddlewares(ApiEngineEvents engineEvent)
+        public List<IApiGatewayMiddleware> GetMiddlewares(ApiGatewayEvents gatewayEvent)
         {
-            return middlewaresCache.GetOrAdd(engineEvent, e => Middlewares?.Where(m => (m?.Events ?? new ApiEngineEvents[0] { }).Contains(e))?.ToList() ?? new List<IApiEngineMiddleware>());
+            return middlewaresCache.GetOrAdd(gatewayEvent, e => Middlewares?.Where(m => (m?.Events ?? new ApiGatewayEvents[0] { }).Contains(e))?.ToList() ?? new List<IApiGatewayMiddleware>());
         }
     }
 }

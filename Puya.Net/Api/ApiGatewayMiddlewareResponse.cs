@@ -2,7 +2,7 @@
 
 namespace Puya.Api
 {
-    public class ApiEngineMiddlewareResponse: ServiceResponse
+    public class ApiGatewayMiddlewareResponse: ServiceResponse
     {
         public bool ShouldEndPipeline { get; set; }
     }

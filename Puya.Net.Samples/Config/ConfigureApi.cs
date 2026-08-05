@@ -36,7 +36,7 @@ namespace Puya.Net.Samples.Config
                 return result;
             });
             services.AddSingleton<IMiddlewaresStore, MiddlewaresStore>();
-            services.AddScoped<IApiEngine>(sp =>
+            services.AddScoped<IApiGateway>(sp =>
             {
                 var apiManager = sp.GetService<IApiManager>();
                 var apiCryptor = sp.GetService<IApiCryptor>();
@@ -46,7 +46,7 @@ namespace Puya.Net.Samples.Config
                 var defaultApp = Configuration["DefaultApp"];
                 var middlewareStore = sp.GetService<IMiddlewaresStore>();
 
-                var result = new ApiEngineDefault(sp, apiManager, apiCryptor, apiSerializer, debugger, logger, middlewareStore);
+                var result = new ApiGatewayDefault(sp, apiManager, apiCryptor, apiSerializer, debugger, logger, middlewareStore);
 
                 result.DefaultApp = string.IsNullOrEmpty(defaultApp) ? "/" : defaultApp;
 

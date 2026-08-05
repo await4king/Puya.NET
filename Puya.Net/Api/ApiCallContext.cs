@@ -25,7 +25,7 @@ namespace Puya.Api
         public ServiceResponse Response { get; set; }
         public Dictionary<string, object> Data { get; set; }
         public bool RevealExceptions { get; set; }
-        public bool ShowDetailedEnginePipeline { get; set; }
+        public bool ShowDetailedPipeline { get; set; }
         public IServiceScope Scope { get; set; }
         public ApiCallContext()
         {
