@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Puya.Api;
 using Puya.Net.Samples.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,7 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapPuyaGateway("/api");
     endpoints.MapApiAndControllers();
 });
 //app.MapControllers();
